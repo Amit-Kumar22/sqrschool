@@ -30,11 +30,11 @@
 
   /* Static premium design tokens — not backend-controlled. */
   --shadow-color: 222 47% 11%;
-  --shadow-premium-sm: 0 1px 2px hsl(var(--shadow-color) / 0.06), 0 2px 6px -2px hsl(var(--shadow-color) / 0.06);
-  --shadow-premium: 0 1px 2px hsl(var(--shadow-color) / 0.05), 0 10px 28px -8px hsl(var(--shadow-color) / 0.14),
-    0 3px 8px -3px hsl(var(--shadow-color) / 0.08);
-  --shadow-premium-lg: 0 2px 4px hsl(var(--shadow-color) / 0.04), 0 24px 48px -12px hsl(var(--shadow-color) / 0.22),
-    0 8px 16px -4px hsl(var(--shadow-color) / 0.1);
+  --shadow-premium-sm: 0 2px 6px -1px hsl(var(--shadow-color) / 0.14), 0 4px 14px -4px hsl(var(--shadow-color) / 0.12);
+  --shadow-premium: 0 4px 10px -2px hsl(var(--shadow-color) / 0.16), 0 14px 34px -10px hsl(var(--shadow-color) / 0.24),
+    0 3px 8px -3px hsl(var(--shadow-color) / 0.12);
+  --shadow-premium-lg: 0 10px 20px -4px hsl(var(--shadow-color) / 0.2), 0 28px 56px -14px hsl(var(--shadow-color) / 0.32),
+    0 8px 16px -4px hsl(var(--shadow-color) / 0.16);
 }
 
 @theme inline {
@@ -154,6 +154,32 @@ a {
   }
 
   /*
+   * Colorful "glow" shadows — tinted to the element's own brand color
+   * (indigo primary / amber button) instead of a neutral gray, for the
+   * premium marketing cards and solid-fill CTAs on the public site.
+   */
+  .shadow-glow-primary {
+    box-shadow: 0 2px 4px hsl(var(--shadow-color) / 0.05),
+      0 16px 32px -10px color-mix(in srgb, var(--color-primary) 50%, transparent),
+      0 6px 14px -6px color-mix(in srgb, var(--color-primary) 35%, transparent);
+  }
+  .shadow-glow-primary-lg {
+    box-shadow: 0 4px 8px hsl(var(--shadow-color) / 0.06),
+      0 28px 52px -12px color-mix(in srgb, var(--color-primary) 60%, transparent),
+      0 10px 22px -8px color-mix(in srgb, var(--color-primary) 45%, transparent);
+  }
+  .shadow-glow-button {
+    box-shadow: 0 2px 4px hsl(var(--shadow-color) / 0.05),
+      0 16px 32px -10px color-mix(in srgb, var(--color-button-bg) 55%, transparent),
+      0 6px 14px -6px color-mix(in srgb, var(--color-button-bg) 40%, transparent);
+  }
+  .shadow-glow-button-lg {
+    box-shadow: 0 4px 8px hsl(var(--shadow-color) / 0.06),
+      0 28px 52px -12px color-mix(in srgb, var(--color-button-bg) 65%, transparent),
+      0 10px 22px -8px color-mix(in srgb, var(--color-button-bg) 50%, transparent);
+  }
+
+  /*
    * Fixed white card used across the post-login admin panel. Deliberately
    * NOT built from --color-surface/--color-ink (those are backend-theme
    * controlled) — the admin chrome keeps one constant premium look no
@@ -176,5 +202,29 @@ a {
     );
     background-size: 300% 100%;
     animation: var(--animate-shimmer);
+  }
+
+  /* Flip-flop cards — used for the premium landing-page feature/program grids */
+  .flip-card {
+    perspective: 1600px;
+  }
+  .flip-card-inner {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-style: preserve-3d;
+  }
+  .flip-card-inner.is-flipped {
+    transform: rotateY(180deg);
+  }
+  .flip-card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .flip-card-face-back {
+    transform: rotateY(180deg);
   }
 }

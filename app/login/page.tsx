@@ -81,7 +81,7 @@ export default function LoginPage() {
         <div className="animate-float pointer-events-none absolute bottom-10 left-10 h-48 w-48 rounded-full bg-button-bg/20 blur-3xl" />
 
         <Link href="/" className="relative flex items-center gap-2 font-semibold">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-gradient-to-br from-button-bg to-button-bg/70 text-button-text shadow-premium">
+          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-gradient-to-br from-button-bg to-button-bg/70 text-button-text shadow-glow-button">
             <GraduationCap size={20} />
           </span>
           <span>{theme.companyName || 'SQR School'}</span>
@@ -106,7 +106,7 @@ export default function LoginPage() {
                 style={{ animationDelay: `${150 + idx * 90}ms` }}
                 className="animate-fade-in-up flex items-start gap-2.5 text-sm text-white/90"
               >
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-button-bg/90 text-button-text">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-button-bg/90 text-button-text shadow-glow-button">
                   <ShieldCheck size={12} />
                 </span>
                 {item}
@@ -122,11 +122,11 @@ export default function LoginPage() {
 
       {/* ── Login form ── */}
       <div className="flex w-full flex-1 items-center justify-center px-4 py-12 lg:w-1/2">
-        <div className="animate-scale-in relative w-full max-w-sm overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-8 shadow-premium-lg">
+        <div className="animate-scale-in relative w-full max-w-sm overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-8 shadow-glow-primary-lg">
           <span className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-primary via-button-bg to-primary" />
 
           <div className="mb-8 flex flex-col items-center lg:items-start">
-            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary text-white shadow-premium lg:hidden">
+            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary text-white shadow-glow-primary lg:hidden">
               <GraduationCap size={22} />
             </span>
             <h2 className="text-2xl font-bold text-heading">Welcome back</h2>
@@ -148,7 +148,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@sqrschool.edu"
-                  className="h-11 w-full rounded-lg border border-black/10 bg-white pr-3 pl-10 text-sm text-ink placeholder:text-ink/40 focus:border-primary focus:ring-2 focus:ring-primary/25 focus:outline-none"
+                  className="h-11 w-full rounded-lg border border-black/10 bg-white pr-3 pl-10 text-sm text-ink shadow-premium-sm placeholder:text-ink/40 focus:border-primary focus:ring-2 focus:ring-primary/25 focus:outline-none"
                 />
               </div>
             </div>
@@ -167,7 +167,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="h-11 w-full rounded-lg border border-black/10 bg-white pr-10 pl-10 text-sm text-ink placeholder:text-ink/40 focus:border-primary focus:ring-2 focus:ring-primary/25 focus:outline-none"
+                  className="h-11 w-full rounded-lg border border-black/10 bg-white pr-10 pl-10 text-sm text-ink shadow-premium-sm placeholder:text-ink/40 focus:border-primary focus:ring-2 focus:ring-primary/25 focus:outline-none"
                 />
                 <button
                   type="button"
@@ -189,7 +189,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-sm font-semibold text-white shadow-premium transition-all hover:-translate-y-0.5 hover:shadow-premium-lg disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-sm font-semibold text-white shadow-glow-primary transition-all hover:-translate-y-0.5 hover:shadow-glow-primary-lg disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
             >
               {loading && <Loader2 size={16} className="animate-spin" />}
               {loading ? 'Signing in…' : 'Sign In'}

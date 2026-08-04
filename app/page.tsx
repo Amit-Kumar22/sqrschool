@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import Navbar from '@/components/site/Navbar';
 import Footer from '@/components/site/Footer';
+import Gallery from '@/components/site/Gallery';
+import FlipCard from '@/components/ui/FlipCard';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const STATS = [
@@ -33,6 +35,7 @@ const PROGRAMS = [
     description: 'A joyful foundation years program built around curiosity, phonics and numeracy.',
     image: '/images/primary.jpg',
     imagePosition: 'object-top',
+    accent: 'primary' as const,
   },
   {
     icon: Microscope,
@@ -41,6 +44,7 @@ const PROGRAMS = [
     description: 'Concept-driven science, math and language learning with hands-on labs.',
     image: '/images/middle.jpg',
     imagePosition: 'object-center',
+    accent: 'button' as const,
   },
   {
     icon: Trophy,
@@ -49,6 +53,7 @@ const PROGRAMS = [
     description: 'Board-focused academics paired with career counselling and mentorship.',
     image: '/images/building.jpg',
     imagePosition: 'object-center',
+    accent: 'primary' as const,
   },
 ];
 
@@ -58,26 +63,35 @@ const FEATURES = [
     title: 'Experienced Faculty',
     description: 'Qualified, caring teachers dedicated to every student’s growth.',
     image: '/images/faculty.jpg',
+    accent: 'primary' as const,
   },
   {
     icon: ShieldCheck,
     title: 'Safe Campus',
     description: 'CCTV-monitored premises with verified staff and secure transport.',
     image: '/images/campus-gate.jpg',
+    accent: 'button' as const,
   },
   {
     icon: Palette,
     title: 'Arts & Creativity',
     description: 'Dedicated studios for music, art and drama for well-rounded learning.',
     image: '/images/creativity.jpg',
+    accent: 'primary' as const,
   },
   {
     icon: Volleyball,
     title: 'Sports & Fitness',
     description: 'Full-size courts and grounds for football, basketball and athletics.',
     image: '/images/sports.jpg',
+    accent: 'button' as const,
   },
 ];
+
+const ACCENT_SHADOW = {
+  primary: { shadow: 'shadow-glow-primary', shadowLg: 'shadow-glow-primary-lg', text: 'text-primary' },
+  button: { shadow: 'shadow-glow-button', shadowLg: 'shadow-glow-button-lg', text: 'text-button-bg' },
+};
 
 const TESTIMONIALS = [
   {
@@ -132,13 +146,13 @@ export default function Home() {
               <div className="mt-6 flex flex-wrap gap-3">
                 <a
                   href="#admissions"
-                  className="inline-flex items-center gap-1.5 rounded-md bg-button-bg px-5 py-2.5 text-sm font-semibold text-button-text shadow-premium transition-all hover:-translate-y-0.5 hover:shadow-premium-lg"
+                  className="inline-flex items-center gap-1.5 rounded-md bg-button-bg px-5 py-2.5 text-sm font-semibold text-button-text shadow-glow-button transition-all hover:-translate-y-0.5 hover:shadow-glow-button-lg"
                 >
                   Apply for Admission <ArrowRight size={16} />
                 </a>
                 <Link
                   href="/login"
-                  className="inline-flex items-center gap-1.5 rounded-md border border-white/30 px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-white/10"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-white/30 bg-white/5 px-5 py-2.5 text-sm font-semibold shadow-premium-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:bg-white/10 hover:shadow-premium"
                 >
                   Portal Login
                 </Link>
@@ -201,30 +215,40 @@ export default function Home() {
               </ul>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {FEATURES.map((feature, idx) => (
-                <div
-                  key={feature.title}
-                  style={{ animationDelay: `${idx * 70}ms` }}
-                  className="animate-fade-in-up group overflow-hidden rounded-xl border border-black/5 bg-white shadow-premium-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-premium-lg"
-                >
-                  <div className="relative h-24 w-full overflow-hidden">
-                    <Image
-                      src={feature.image}
-                      alt={feature.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-primary/20" />
-                    <span className="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white text-primary shadow-premium-sm">
-                      <feature.icon size={16} />
-                    </span>
-                  </div>
-                  <div className="p-4">
-                    <p className="text-sm font-semibold text-heading">{feature.title}</p>
-                    <p className="mt-1 text-xs text-ink/60">{feature.description}</p>
-                  </div>
-                </div>
-              ))}
+              {FEATURES.map((feature, idx) => {
+                const accent = ACCENT_SHADOW[feature.accent];
+                return (
+                  <FlipCard
+                    key={feature.title}
+                    className="h-40 animate-fade-in-up"
+                    style={{ animationDelay: `${idx * 70}ms` }}
+                    front={
+                      <div className={`h-full w-full overflow-hidden rounded-xl border border-black/5 bg-white ${accent.shadow}`}>
+                        <div className="relative h-24 w-full overflow-hidden">
+                          <Image src={feature.image} alt={feature.title} fill className="object-cover" />
+                          <div className="absolute inset-0 bg-primary/20" />
+                          <span
+                            className={`absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white ${accent.text} ${accent.shadow}`}
+                          >
+                            <feature.icon size={16} />
+                          </span>
+                        </div>
+                        <div className="p-3">
+                          <p className="text-sm font-semibold text-heading">{feature.title}</p>
+                          <p className="mt-0.5 text-[11px] text-ink/40">Tap to know more</p>
+                        </div>
+                      </div>
+                    }
+                    back={
+                      <div className={`flex h-full w-full flex-col justify-center rounded-xl bg-gradient-to-br from-primary to-secondary p-4 text-white ${accent.shadowLg}`}>
+                        <feature.icon size={20} className="mb-2 text-button-bg" />
+                        <p className="text-sm font-semibold">{feature.title}</p>
+                        <p className="mt-1.5 text-xs text-white/80">{feature.description}</p>
+                      </div>
+                    }
+                  />
+                );
+              })}
             </div>
           </div>
         </section>
@@ -238,33 +262,64 @@ export default function Home() {
             </div>
 
             <div className="mt-10 grid gap-6 md:grid-cols-3">
-              {PROGRAMS.map((program, idx) => (
-                <div
-                  key={program.title}
-                  style={{ animationDelay: `${idx * 80}ms` }}
-                  className="animate-fade-in-up group overflow-hidden rounded-xl border border-black/5 bg-white shadow-premium-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-premium-lg"
-                >
-                  <div className="relative h-40 w-full overflow-hidden">
-                    <Image
-                      src={program.image}
-                      alt={program.title}
-                      fill
-                      className={`object-cover transition-transform duration-500 group-hover:scale-105 ${program.imagePosition}`}
-                    />
-                  </div>
-                  <div className="p-6">
-                    <div className="-mt-12 mb-3 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 text-white shadow-premium">
-                      <program.icon size={22} />
-                    </div>
-                    <h3 className="text-base font-semibold text-heading">{program.title}</h3>
-                    <p className="text-xs font-medium text-primary">{program.grades}</p>
-                    <p className="mt-2 text-sm text-ink/65">{program.description}</p>
-                  </div>
-                </div>
-              ))}
+              {PROGRAMS.map((program, idx) => {
+                const accent = ACCENT_SHADOW[program.accent];
+                const badgeGradient =
+                  program.accent === 'button'
+                    ? 'bg-gradient-to-br from-button-bg to-button-bg/70 text-button-text'
+                    : 'bg-gradient-to-br from-primary to-primary/70 text-white';
+                return (
+                  <FlipCard
+                    key={program.title}
+                    className="h-72 animate-fade-in-up"
+                    style={{ animationDelay: `${idx * 80}ms` }}
+                    front={
+                      <div className={`flex h-full w-full flex-col overflow-hidden rounded-xl border border-black/5 bg-white ${accent.shadow}`}>
+                        <div className="relative h-36 w-full overflow-hidden">
+                          <Image
+                            src={program.image}
+                            alt={program.title}
+                            fill
+                            className={`object-cover ${program.imagePosition}`}
+                          />
+                        </div>
+                        <div className="flex flex-1 flex-col p-5">
+                          <div
+                            className={`relative z-10 -mt-11 mb-2 inline-flex h-11 w-11 shrink-0 items-center justify-center self-start rounded-lg ${badgeGradient} ${accent.shadow}`}
+                          >
+                            <program.icon size={20} />
+                          </div>
+                          <h3 className="text-base font-semibold text-heading">{program.title}</h3>
+                          <p className="text-xs font-medium text-primary">{program.grades}</p>
+                          <p className="mt-auto pt-2 text-[11px] text-ink/40">Tap to explore →</p>
+                        </div>
+                      </div>
+                    }
+                    back={
+                      <div className={`flex h-full w-full flex-col justify-between rounded-xl bg-gradient-to-br from-primary to-secondary p-5 text-white ${accent.shadowLg}`}>
+                        <div>
+                          <program.icon size={22} className="mb-2 text-button-bg" />
+                          <h3 className="text-base font-semibold">{program.title}</h3>
+                          <p className="text-xs font-medium text-white/70">{program.grades}</p>
+                          <p className="mt-2 text-sm text-white/85">{program.description}</p>
+                        </div>
+                        <a
+                          href="#admissions"
+                          className="mt-3 inline-flex items-center gap-1 self-start text-xs font-semibold text-button-bg hover:underline"
+                        >
+                          Enquire now <ArrowRight size={12} />
+                        </a>
+                      </div>
+                    }
+                  />
+                );
+              })}
             </div>
           </div>
         </section>
+
+        {/* ── Gallery ── */}
+        <Gallery />
 
         {/* ── Testimonials ── */}
         <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -278,7 +333,7 @@ export default function Home() {
               <figure
                 key={t.name}
                 style={{ animationDelay: `${idx * 80}ms` }}
-                className="animate-fade-in-up rounded-xl border border-black/5 bg-white p-6 shadow-premium-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-premium-lg"
+                className="animate-fade-in-up rounded-xl border border-black/5 bg-white p-6 shadow-glow-primary transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-primary-lg"
               >
                 <Quote size={20} className="text-primary/40" />
                 <blockquote className="mt-3 text-sm text-ink/75">&ldquo;{t.quote}&rdquo;</blockquote>
@@ -293,7 +348,7 @@ export default function Home() {
 
         {/* ── Admissions CTA ── */}
         <section id="admissions" className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
-          <div className="relative flex flex-col items-center justify-between gap-4 overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-secondary px-6 py-10 text-center text-white shadow-premium-lg sm:flex-row sm:text-left">
+          <div className="relative flex flex-col items-center justify-between gap-4 overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-secondary px-6 py-10 text-center text-white shadow-glow-primary-lg sm:flex-row sm:text-left">
             <div className="pointer-events-none absolute -top-16 -right-16 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
             <div className="relative">
               <h2 className="text-xl font-bold sm:text-2xl">Admissions for 2026-27 are now open</h2>
@@ -301,7 +356,7 @@ export default function Home() {
             </div>
             <a
               href="mailto:info@sqrschool.edu"
-              className="relative inline-flex shrink-0 items-center gap-1.5 rounded-md bg-button-bg px-5 py-2.5 text-sm font-semibold text-button-text shadow-premium transition-all hover:-translate-y-0.5 hover:shadow-premium-lg"
+              className="relative inline-flex shrink-0 items-center gap-1.5 rounded-md bg-button-bg px-5 py-2.5 text-sm font-semibold text-button-text shadow-glow-button transition-all hover:-translate-y-0.5 hover:shadow-glow-button-lg"
             >
               Enquire Now <ArrowRight size={16} />
             </a>

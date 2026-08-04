@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+/*
+ * Theme colors are exposed as CSS custom properties (--theme-*) so ThemeContext
+ * can override them at runtime with whatever the backend returns from
+ * /v1/themes/active. Tailwind utilities (bg-primary, text-heading, etc.) read
+ * from these via the @theme inline block below, so every component that uses
+ * those utilities repaints automatically whenever the active theme changes —
+ * no per-component wiring needed.
+ *
+ * Defaults below are "Prestige Indigo" — our recommended premium theme,
+ * shown before the API responds and if the request fails. It also lives as
+ * a selectable preset in the Super Admin theme gallery (lib/themePresets.ts).
+ */
+:root {
+  --theme-primary: #4f46e5;
+  --theme-secondary: #1e1b4b;
+  --theme-background: #f8fafc;
+  --theme-text: #334155;
+  --theme-heading: #14123b;
+  --theme-link: #4f46e5;
+  --theme-button-bg: #f59e0b;
+  --theme-button-text: #1e1b4b;
+  --theme-navbar-bg: #14123b;
+  --theme-navbar-text: #f8fafc;
+  --theme-footer-bg: #0b0a24;
+  --theme-footer-text: #e2e8f0;
+  --theme-bottom-nav-bg: #14123b;
+  --theme-bottom-nav-text: #f8fafc;
+
+  /* Static premium design tokens — not backend-controlled. */
+  --shadow-color: 222 47% 11%;
+  --shadow-premium-sm: 0 1px 2px hsl(var(--shadow-color) / 0.06), 0 2px 6px -2px hsl(var(--shadow-color) / 0.06);
+  --shadow-premium: 0 1px 2px hsl(var(--shadow-color) / 0.05), 0 10px 28px -8px hsl(var(--shadow-color) / 0.14),
+    0 3px 8px -3px hsl(var(--shadow-color) / 0.08);
+  --shadow-premium-lg: 0 2px 4px hsl(var(--shadow-color) / 0.04), 0 24px 48px -12px hsl(var(--shadow-color) / 0.22),
+    0 8px 16px -4px hsl(var(--shadow-color) / 0.1);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-primary: var(--theme-primary);
+  --color-secondary: var(--theme-secondary);
+  --color-surface: var(--theme-background);
+  --color-ink: var(--theme-text);
+  --color-heading: var(--theme-heading);
+  --color-link: var(--theme-link);
+  --color-button-bg: var(--theme-button-bg);
+  --color-button-text: var(--theme-button-text);
+  --color-navbar-bg: var(--theme-navbar-bg);
+  --color-navbar-text: var(--theme-navbar-text);
+  --color-footer-bg: var(--theme-footer-bg);
+  --color-footer-text: var(--theme-footer-text);
+  --color-bottom-nav-bg: var(--theme-bottom-nav-bg);
+  --color-bottom-nav-text: var(--theme-bottom-nav-text);
+
+  --animate-fade-in-up: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-scale-in: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-shimmer: shimmer 1.6s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -300% 0;
+    }
+    100% {
+      background-position: 300% 0;
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+/* Smooth repaint when the active theme swaps colors */
+body,
+header,
+footer,
+nav,
+button,
+a {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-primary) 30%, transparent);
+  color: var(--color-heading);
+}
+
+/* Thin, premium scrollbars for tables, sidebars and modals */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-ink) 25%, transparent) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-ink) 20%, transparent);
+  border-radius: 999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-ink) 35%, transparent);
+}
+
+@layer utilities {
+  .shadow-premium-sm {
+    box-shadow: var(--shadow-premium-sm);
+  }
+  .shadow-premium {
+    box-shadow: var(--shadow-premium);
+  }
+  .shadow-premium-lg {
+    box-shadow: var(--shadow-premium-lg);
+  }
+
+  /*
+   * Fixed white card used across the post-login admin panel. Deliberately
+   * NOT built from --color-surface/--color-ink (those are backend-theme
+   * controlled) — the admin chrome keeps one constant premium look no
+   * matter what theme is active on the public site. See also: the
+   * app-* utility classes below.
+   */
+  .card-premium {
+    border-radius: 1rem;
+    border: 1px solid rgb(15 23 42 / 0.06);
+    background: #ffffff;
+    box-shadow: var(--shadow-premium);
+  }
+
+  .skeleton {
+    background-image: linear-gradient(
+      100deg,
+      color-mix(in srgb, var(--color-ink) 8%, transparent) 30%,
+      color-mix(in srgb, var(--color-ink) 14%, transparent) 45%,
+      color-mix(in srgb, var(--color-ink) 8%, transparent) 60%
+    );
+    background-size: 300% 100%;
+    animation: var(--animate-shimmer);
+  }
+}

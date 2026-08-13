@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { API_ENDPOINTS, BACKEND_API_BASE_URL } from './config';
-import { getAuthToken } from './auth';
+import { getAuthToken, normalizeRole, type Role } from './auth';
 
 // ─── Axios instance ───────────────────────────────────────────────────────────
 
@@ -83,14 +83,15 @@ export interface Profile {
   fullName: string;
   email: string;
   phone: string;
-  role: 'SUPERADMIN' | 'PRINCIPAL' | 'TEACHER' | 'STAFF' | 'STUDENT';
+  role: Role;
   status: string;
   createdAt: string;
 }
 
 export const getProfile = async (): Promise<Profile> => {
   const response = await api.get<ApiEnvelope<Profile>>(API_ENDPOINTS.PROFILE.GET);
-  return response.data.result;
+  const profile = response.data.result;
+  return { ...profile, role: normalizeRole(profile.role) };
 };
 
 export interface ProfileAddress {

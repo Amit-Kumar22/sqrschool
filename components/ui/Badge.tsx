@@ -17,3 +17,12 @@ export function StatusBadge({ active, activeLabel = 'Active', inactiveLabel = 'I
     </span>
   );
 }
+
+/** Small neutral pill for labeling a record's role (staff, student, etc). */
+export function RoleBadge({ role }: { role: string }) {
+  return (
+    <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700 ring-1 ring-inset ring-indigo-600/20">
+      {role}
+    </span>
+  );
+}

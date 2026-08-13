@@ -6,6 +6,19 @@
 
 export type Role = 'SUPERADMIN' | 'PRINCIPAL' | 'TEACHER' | 'STAFF' | 'STUDENT';
 
+// Backend quirk: principal accounts carry role "ADMIN" over the wire (both
+// /auth/login and /profile), not "PRINCIPAL". Routing, nav and ProtectedRoute
+// are all built around the canonical "PRINCIPAL" role, so every role coming
+// off the API is normalized through here once, at the boundary (getProfile).
+const ROLE_ALIASES: Record<string, Role> = {
+  ADMIN: 'PRINCIPAL',
+};
+
+export function normalizeRole(role: string): Role {
+  const upper = (role ?? '').toUpperCase();
+  return ROLE_ALIASES[upper] ?? (upper as Role);
+}
+
 export interface SessionUser {
   id: number;
   fullName: string;

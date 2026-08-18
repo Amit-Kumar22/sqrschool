@@ -40,7 +40,10 @@ export const API_ENDPOINTS = {
   ADMIN: {
     ADD_STAFF: '/v1/admin/add-staff',
     ALL_STAFF: '/v1/admin/all-staff',
-    ALL_STUDENT: '/v1/admin/all-student',
+  },
+  STUDENT_ADMISSION: {
+    CREATE: '/v1/student-admissions/new-addmission',
+    LIST: '/v1/student-admissions/all-student',
   },
   ACADEMIC_YEAR: {
     LIST: '/v1/academic-year',

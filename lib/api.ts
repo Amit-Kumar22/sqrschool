@@ -85,6 +85,7 @@ export interface Profile {
   phone: string;
   role: Role;
   status: string;
+  schoolCode?: string;
   createdAt: string;
 }
 

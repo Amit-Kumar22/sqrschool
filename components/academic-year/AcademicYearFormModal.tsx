@@ -11,10 +11,10 @@ import {
 import type { School } from '@/lib/schoolService';
 import { apiErrorMessage } from '@/lib/api';
 
-function toFormState(item: AcademicYear | null, defaultSchoolCode: string): AcademicYearPayload {
-  if (!item) return { schoolCode: defaultSchoolCode, startDate: '', endDate: '', description: '' };
+function toFormState(item: AcademicYear | null, schoolCode: string): AcademicYearPayload {
+  if (!item) return { schoolCode, startDate: '', endDate: '', description: '' };
   return {
-    schoolCode: defaultSchoolCode,
+    schoolCode,
     startDate: item.startDate,
     endDate: item.endDate,
     description: item.description,
@@ -23,27 +23,30 @@ function toFormState(item: AcademicYear | null, defaultSchoolCode: string): Acad
 
 export default function AcademicYearFormModal({
   item,
+  schoolCode,
   schools,
-  defaultSchoolCode,
   onClose,
   onSaved,
 }: {
   item: AcademicYear | null;
-  schools: School[];
-  defaultSchoolCode: string;
+  /** The account's own school — auto-fills and hides the school field when set. */
+  schoolCode: string;
+  /** Only needed (and only shown) when schoolCode is empty — lets the admin pick which school this academic year belongs to. */
+  schools?: School[];
   onClose: () => void;
   onSaved: (item: AcademicYear) => void;
 }) {
-  const [form, setForm] = useState<AcademicYearPayload>(() => toFormState(item, defaultSchoolCode));
+  const [form, setForm] = useState<AcademicYearPayload>(() => toFormState(item, schoolCode));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   const isEditing = !!item;
+  const needsSchoolPicker = !schoolCode;
   const setField = (key: keyof AcademicYearPayload, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.schoolCode) {
+    if (needsSchoolPicker && !form.schoolCode) {
       setError('Please select a school.');
       return;
     }
@@ -86,24 +89,26 @@ export default function AcademicYearFormModal({
 
         <form onSubmit={handleSubmit} className="px-4 py-3">
           <div className="grid gap-2.5">
-            <label className="block text-sm">
-              <span className="mb-1 block text-xs font-medium text-slate-900">School *</span>
-              <select
-                value={form.schoolCode}
-                required
-                onChange={(e) => setField('schoolCode', e.target.value)}
-                className="h-9 w-full rounded-md border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
-              >
-                <option value="" disabled>
-                  Select a school
-                </option>
-                {schools.map((school) => (
-                  <option key={school.id} value={school.schoolCode}>
-                    {school.schoolName} ({school.schoolCode})
+            {needsSchoolPicker && (
+              <label className="block text-sm">
+                <span className="mb-1 block text-xs font-medium text-slate-900">School *</span>
+                <select
+                  value={form.schoolCode}
+                  required
+                  onChange={(e) => setField('schoolCode', e.target.value)}
+                  className="h-9 w-full rounded-md border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
+                >
+                  <option value="" disabled>
+                    Select a school
                   </option>
-                ))}
-              </select>
-            </label>
+                  {(schools ?? []).map((school) => (
+                    <option key={school.id} value={school.schoolCode}>
+                      {school.schoolName} ({school.schoolCode})
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
 
             <div className="grid grid-cols-2 gap-2.5">
               <label className="block text-sm">

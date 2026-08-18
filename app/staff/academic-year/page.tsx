@@ -8,7 +8,8 @@ import {
   getAcademicYears,
   type AcademicYear,
 } from '@/lib/academicYearService';
-import { getSchools, type School } from '@/lib/schoolService';
+import { fetchAcrossAllSchools, getSchools, type School } from '@/lib/schoolService';
+import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
@@ -17,9 +18,7 @@ import AcademicYearFormModal from '@/components/academic-year/AcademicYearFormMo
 const formatDate = (value: string) => (value ? new Date(value).toLocaleDateString() : '—');
 
 export default function StaffAcademicYearPage() {
-  const [schools, setSchools] = useState<School[]>([]);
-  const [schoolsLoading, setSchoolsLoading] = useState(true);
-  const [selectedSchoolCode, setSelectedSchoolCode] = useState('');
+  const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
 
   const [items, setItems] = useState<AcademicYear[]>([]);
   const [loading, setLoading] = useState(false);
@@ -29,33 +28,36 @@ export default function StaffAcademicYearPage() {
   const [editingItem, setEditingItem] = useState<AcademicYear | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
+  // Only needed when the account has no schoolCode of its own — lets the
+  // "Add academic year" form ask which school it belongs to, instead of
+  // staying disabled forever for admins who manage more than one school.
+  const [schools, setSchools] = useState<School[]>([]);
+  const [schoolsListLoading, setSchoolsListLoading] = useState(false);
+
   useEffect(() => {
+    if (schoolsLoading || selectedSchoolCode) return;
     const loadSchools = async () => {
-      setSchoolsLoading(true);
-      setError('');
+      setSchoolsListLoading(true);
       try {
         const page = await getSchools();
         setSchools(page.content);
-        if (page.content.length > 0) setSelectedSchoolCode(page.content[0].schoolCode);
-      } catch (err) {
-        setError(apiErrorMessage(err, 'Could not load schools from the server.'));
+      } catch {
+        // Non-fatal — the "Add academic year" school picker just stays empty.
       } finally {
-        setSchoolsLoading(false);
+        setSchoolsListLoading(false);
       }
     };
     loadSchools();
-  }, []);
+  }, [schoolsLoading, selectedSchoolCode]);
 
   const loadItems = async (schoolCode: string) => {
-    if (!schoolCode) {
-      setItems([]);
-      return;
-    }
     setLoading(true);
     setError('');
     try {
-      const page = await getAcademicYears({ schoolCode });
-      setItems(page.content);
+      const content = schoolCode
+        ? (await getAcademicYears({ schoolCode })).content
+        : await fetchAcrossAllSchools((code) => getAcademicYears({ schoolCode: code }));
+      setItems(content);
     } catch (err) {
       setError(apiErrorMessage(err, 'Could not load academic years from the server.'));
     } finally {
@@ -64,8 +66,9 @@ export default function StaffAcademicYearPage() {
   };
 
   useEffect(() => {
+    if (schoolsLoading) return;
     loadItems(selectedSchoolCode);
-  }, [selectedSchoolCode]);
+  }, [selectedSchoolCode, schoolsLoading]);
 
   const openCreateModal = () => {
     setEditingItem(null);
@@ -178,7 +181,7 @@ export default function StaffAcademicYearPage() {
         actions={
           <button
             onClick={openCreateModal}
-            disabled={schoolsLoading || schools.length === 0}
+            disabled={schoolsLoading || (!selectedSchoolCode && (schoolsListLoading || schools.length === 0))}
             className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-premium-sm transition-colors hover:bg-indigo-700 disabled:opacity-50"
           >
             <Plus size={16} /> Add academic year
@@ -186,31 +189,10 @@ export default function StaffAcademicYearPage() {
         }
       />
 
-      {!schoolsLoading && schools.length === 0 && !error && (
-        <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
-          Add a school first — academic years are managed per school.
+      {(error || schoolError) && (
+        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error || schoolError}
         </div>
-      )}
-
-      <label className="block text-sm">
-        <span className="sr-only">School</span>
-        <select
-          value={selectedSchoolCode}
-          onChange={(e) => setSelectedSchoolCode(e.target.value)}
-          disabled={schoolsLoading || schools.length === 0}
-          className="h-9 min-w-48 rounded-md border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none disabled:opacity-50"
-        >
-          {schools.length === 0 && <option value="">No schools yet</option>}
-          {schools.map((school) => (
-            <option key={school.id} value={school.schoolCode}>
-              {school.schoolName} ({school.schoolCode})
-            </option>
-          ))}
-        </select>
-      </label>
-
-      {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
       )}
 
       <DataTable
@@ -219,16 +201,14 @@ export default function StaffAcademicYearPage() {
         rowKey={(item) => item.id}
         loading={loading || schoolsLoading}
         emptyTitle="No academic years yet"
-        emptyDescription={
-          schools.length === 0 ? 'Add a school before adding academic years.' : 'Add the first academic year to get started.'
-        }
+        emptyDescription="Add the first academic year to get started."
       />
 
       {formModalOpen && (
         <AcademicYearFormModal
           item={editingItem}
+          schoolCode={selectedSchoolCode}
           schools={schools}
-          defaultSchoolCode={selectedSchoolCode}
           onClose={() => {
             setFormModalOpen(false);
             setEditingItem(null);

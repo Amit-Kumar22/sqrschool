@@ -10,6 +10,7 @@ import {
   PlaySquare,
   School,
   UserCircle,
+  UserPlus,
   Users,
 } from 'lucide-react';
 import type { Role } from '@/lib/auth';
@@ -45,6 +46,7 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Academic Year', href: '/staff/academic-year', icon: CalendarRange });
     items.push({ label: 'Class', href: '/staff/class', icon: BookOpen });
     items.push({ label: 'Class Section', href: '/staff/class-section', icon: Layers });
+    items.push({ label: 'Student Admission', href: '/staff/student-admission', icon: UserPlus });
     items.push({ label: 'YouTube Testimonials', href: '/staff/youtube-testimonials', icon: PlaySquare });
     items.push({ label: 'Chatbot Management', href: '/staff/chatbot', icon: Bot });
   }

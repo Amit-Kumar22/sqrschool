@@ -1,29 +1,29 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BookOpen, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Eye, Plus, UserPlus } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
-import { deleteClass, getClasses, type SchoolClass } from '@/lib/classService';
+import { getStudentAdmissions, type StudentAdmission } from '@/lib/studentService';
 import { fetchAcrossAllSchools, getSchools, type School } from '@/lib/schoolService';
 import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
-import ClassFormModal from '@/components/class/ClassFormModal';
+import StudentAdmissionFormModal from '@/components/student-admission/StudentAdmissionFormModal';
+import StudentDetailModal from '@/components/student-admission/StudentDetailModal';
 
-export default function StaffClassPage() {
+export default function StaffStudentAdmissionPage() {
   const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
 
-  const [items, setItems] = useState<SchoolClass[]>([]);
+  const [students, setStudents] = useState<StudentAdmission[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const [formModalOpen, setFormModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<SchoolClass | null>(null);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [viewingStudent, setViewingStudent] = useState<StudentAdmission | null>(null);
 
   // Only needed when the account has no schoolCode of its own — lets the
-  // "Add class" form ask which school to attach the new class to, instead
+  // "Add student" form ask which school to admit the student into, instead
   // of staying disabled forever for admins who manage more than one school.
   const [schools, setSchools] = useState<School[]>([]);
   const [schoolsListLoading, setSchoolsListLoading] = useState(false);
@@ -36,7 +36,7 @@ export default function StaffClassPage() {
         const page = await getSchools();
         setSchools(page.content);
       } catch {
-        // Non-fatal — the "Add class" school picker just stays empty.
+        // Non-fatal — the "Add student" school picker just stays empty.
       } finally {
         setSchoolsListLoading(false);
       }
@@ -44,16 +44,16 @@ export default function StaffClassPage() {
     loadSchools();
   }, [schoolsLoading, selectedSchoolCode]);
 
-  const loadItems = async (schoolCode: string) => {
+  const loadStudents = async (schoolCode: string) => {
     setLoading(true);
     setError('');
     try {
       const content = schoolCode
-        ? (await getClasses({ schoolCode })).content
-        : await fetchAcrossAllSchools((code) => getClasses({ schoolCode: code }));
-      setItems(content);
+        ? (await getStudentAdmissions({ schoolCode })).content
+        : await fetchAcrossAllSchools((code) => getStudentAdmissions({ schoolCode: code }));
+      setStudents(content);
     } catch (err) {
-      setError(apiErrorMessage(err, 'Could not load classes from the server.'));
+      setError(apiErrorMessage(err, 'Could not load students from the server.'));
     } finally {
       setLoading(false);
     }
@@ -61,51 +61,54 @@ export default function StaffClassPage() {
 
   useEffect(() => {
     if (schoolsLoading) return;
-    loadItems(selectedSchoolCode);
+    loadStudents(selectedSchoolCode);
   }, [selectedSchoolCode, schoolsLoading]);
-
-  const openCreateModal = () => {
-    setEditingItem(null);
-    setFormModalOpen(true);
-  };
-
-  const openEditModal = (item: SchoolClass) => {
-    setEditingItem(item);
-    setFormModalOpen(true);
-  };
-
-  const handleDelete = async (id: number) => {
-    if (!confirm('Delete this class? This cannot be undone.')) return;
-    setDeletingId(id);
-    setError('');
-    try {
-      await deleteClass(id);
-      setItems((prev) => prev.filter((i) => i.id !== id));
-    } catch (err) {
-      setError(apiErrorMessage(err, 'Could not delete that class.'));
-    } finally {
-      setDeletingId(null);
-    }
-  };
 
   const handleSaved = async () => {
     setFormModalOpen(false);
-    setEditingItem(null);
-    await loadItems(selectedSchoolCode);
+    await loadStudents(selectedSchoolCode);
   };
 
-  const columns: DataTableColumn<SchoolClass>[] = [
+  const columns: DataTableColumn<StudentAdmission>[] = [
     {
-      key: 'className',
-      header: 'Class',
+      key: 'admissionNumber',
+      header: 'Admission No.',
       sortable: true,
-      accessor: (item) => item.className,
-      render: (item) => <p className="font-semibold text-slate-900">{item.className}</p>,
+      accessor: (item) => item.admissionNumber,
+      render: (item) => <p className="font-semibold text-slate-900">{item.admissionNumber}</p>,
     },
     {
-      key: 'description',
-      header: 'Description',
-      render: (item) => <span className="line-clamp-1 text-slate-600">{item.description || '—'}</span>,
+      key: 'name',
+      header: 'Name',
+      sortable: true,
+      accessor: (item) => item.user?.fullName,
+      render: (item) => <span className="text-slate-700">{item.user?.fullName || '—'}</span>,
+    },
+    {
+      key: 'class',
+      header: 'Class / Section',
+      render: (item) => (
+        <span className="text-slate-600">
+          {item.section ? `${item.section.schoolClass?.className} - ${item.section.sectionName}` : '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'academicYear',
+      header: 'Academic Year',
+      render: (item) => <span className="text-slate-600">{item.academicYear?.yearCode || '—'}</span>,
+    },
+    {
+      key: 'fatherName',
+      header: "Father's Name",
+      accessor: (item) => item.fatherName,
+      render: (item) => <span className="text-slate-600">{item.fatherName || '—'}</span>,
+    },
+    {
+      key: 'phone',
+      header: 'Phone',
+      accessor: (item) => item.user?.phone,
+      render: (item) => <span className="text-slate-600">{item.user?.phone || '—'}</span>,
     },
     {
       key: 'status',
@@ -118,29 +121,18 @@ export default function StaffClassPage() {
       key: 'actions',
       header: 'Actions',
       align: 'right',
-      widthClassName: 'w-20',
+      widthClassName: 'w-16',
       render: (item) => (
         <div className="flex items-center justify-end gap-1">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              openEditModal(item);
+              setViewingStudent(item);
             }}
-            title="Edit"
-            className="rounded-md p-1.5 text-indigo-600 transition-colors hover:bg-indigo-50"
+            title="View details"
+            className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100"
           >
-            <Pencil size={15} />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(item.id);
-            }}
-            disabled={deletingId === item.id}
-            title="Delete"
-            className="rounded-md p-1.5 text-red-500 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-30"
-          >
-            {deletingId === item.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
+            <Eye size={15} />
           </button>
         </div>
       ),
@@ -150,16 +142,16 @@ export default function StaffClassPage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        icon={BookOpen}
-        title="Class"
-        description="Manage classes for a school."
+        icon={UserPlus}
+        title="Student Admission"
+        description="View admitted students and add new admissions to a school."
         actions={
           <button
-            onClick={openCreateModal}
+            onClick={() => setFormModalOpen(true)}
             disabled={schoolsLoading || (!selectedSchoolCode && (schoolsListLoading || schools.length === 0))}
             className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-premium-sm transition-colors hover:bg-indigo-700 disabled:opacity-50"
           >
-            <Plus size={16} /> Add class
+            <Plus size={16} /> Add student
           </button>
         }
       />
@@ -172,25 +164,23 @@ export default function StaffClassPage() {
 
       <DataTable
         columns={columns}
-        data={items}
+        data={students}
         rowKey={(item) => item.id}
         loading={loading || schoolsLoading}
-        emptyTitle="No classes yet"
-        emptyDescription="Add the first class to get started."
+        emptyTitle="No students yet"
+        emptyDescription="Admit the first student to get started."
       />
 
       {formModalOpen && (
-        <ClassFormModal
-          item={editingItem}
+        <StudentAdmissionFormModal
           schoolCode={selectedSchoolCode}
           schools={schools}
-          onClose={() => {
-            setFormModalOpen(false);
-            setEditingItem(null);
-          }}
+          onClose={() => setFormModalOpen(false)}
           onSaved={handleSaved}
         />
       )}
+
+      {viewingStudent && <StudentDetailModal student={viewingStudent} onClose={() => setViewingStudent(null)} />}
     </div>
   );
 }

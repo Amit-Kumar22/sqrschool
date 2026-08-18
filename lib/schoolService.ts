@@ -56,6 +56,23 @@ export const getSchools = async (): Promise<SchoolPage> => {
   return response.data;
 };
 
+/**
+ * The school-scoped list endpoints (classes, academic years, staff) require
+ * a real schoolCode on GET and have no "every school" query mode (a literal
+ * schoolCode=null 0-results on the live API). For an account with no linked
+ * school, this is the only way to show cross-school data: list every school,
+ * then fetch each one's records and merge them client-side.
+ */
+export async function fetchAcrossAllSchools<T>(
+  fetchForSchool: (schoolCode: string) => Promise<{ content: T[] }>,
+): Promise<T[]> {
+  const schools = await getSchools();
+  const pages = await Promise.all(
+    schools.content.map((school) => fetchForSchool(school.schoolCode).catch(() => ({ content: [] as T[] }))),
+  );
+  return pages.flatMap((page) => page.content);
+}
+
 /** Full detail for a single school. Returns the raw entity — no envelope. */
 export const getSchoolDetail = async (schoolId: number): Promise<School> => {
   const response = await api.get<School>(API_ENDPOINTS.SCHOOL.DETAIL(schoolId));
@@ -134,7 +151,12 @@ export interface StaffPage {
 }
 
 export interface StaffListParams {
-  /** Required by the backend — staff are always scoped to one school. */
+  /**
+   * Required by the backend on GET — a literal string like "null" does NOT
+   * mean "every school" (confirmed: GET /admin/all-staff?schoolCode=null
+   * returns zero rows, a literal WHERE school_code = 'null' match). Callers
+   * must have a real schoolCode; skip the call entirely if they don't.
+   */
   schoolCode: string;
   role?: StaffRole;
   search?: string;
@@ -143,7 +165,7 @@ export interface StaffListParams {
 }
 
 // Fetched with a generous page size since DataTable sorts/paginates
-// client-side over the full result set, same as getSchools/getStudents.
+// client-side over the full result set, same as getSchools/getAcademicYears.
 /** Paginated staff list for one school. Returns the raw Page<StaffMember> shape — no envelope. */
 export const getStaffMembers = async ({
   schoolCode,
@@ -155,55 +177,5 @@ export const getStaffMembers = async ({
   const response = await api.get<StaffPage>(API_ENDPOINTS.ADMIN.ALL_STAFF, {
     params: { schoolCode, role, search, page, size },
   });
-  return response.data;
-};
-
-// ─── Students (Super Admin User APIs) ───────────────────────────────────────
-// Not wired into any panel yet — added here alongside the staff endpoints
-// per the same API group, ready for a future Student menu.
-
-export interface StudentUser {
-  id: number;
-  fullName: string;
-  email: string;
-  phone: string;
-  role: Role;
-  status: string;
-  createdAt: string;
-}
-
-export interface StudentSection {
-  id: number;
-  sectionName: string;
-  schoolClass: unknown;
-}
-
-export interface Student {
-  id: number;
-  created: string;
-  updated: string;
-  user: StudentUser;
-  admissionNumber: string;
-  section: StudentSection;
-  admissionDate: string;
-  fatherName: string;
-  motherName: string;
-  parentPhoneNumber: string;
-  password: string;
-  active: boolean;
-}
-
-export interface StudentPage {
-  content: Student[];
-  totalElements: number;
-  totalPages: number;
-  pageNumber: number;
-  pageSize: number;
-  last: boolean;
-}
-
-/** Paginated student list. Returns the raw Page<Student> shape — no envelope. */
-export const getStudents = async (): Promise<StudentPage> => {
-  const response = await api.get<StudentPage>(API_ENDPOINTS.ADMIN.ALL_STUDENT);
   return response.data;
 };

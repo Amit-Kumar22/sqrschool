@@ -5,15 +5,14 @@ import { Layers, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteSection, getSections, type Section } from '@/lib/classSectionService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
-import { getSchools, type School } from '@/lib/schoolService';
+import { fetchAcrossAllSchools } from '@/lib/schoolService';
+import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import SectionFormModal from '@/components/class-section/SectionFormModal';
 
 export default function StaffClassSectionPage() {
-  const [schools, setSchools] = useState<School[]>([]);
-  const [schoolsLoading, setSchoolsLoading] = useState(true);
-  const [selectedSchoolCode, setSelectedSchoolCode] = useState('');
+  const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
 
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [classesLoading, setClassesLoading] = useState(false);
@@ -28,35 +27,16 @@ export default function StaffClassSectionPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
-    const loadSchools = async () => {
-      setSchoolsLoading(true);
-      setError('');
-      try {
-        const page = await getSchools();
-        setSchools(page.content);
-        if (page.content.length > 0) setSelectedSchoolCode(page.content[0].schoolCode);
-      } catch (err) {
-        setError(apiErrorMessage(err, 'Could not load schools from the server.'));
-      } finally {
-        setSchoolsLoading(false);
-      }
-    };
-    loadSchools();
-  }, []);
-
-  useEffect(() => {
+    if (schoolsLoading) return;
     const loadClasses = async () => {
-      if (!selectedSchoolCode) {
-        setClasses([]);
-        setSelectedClassId('');
-        return;
-      }
       setClassesLoading(true);
       setError('');
       try {
-        const page = await getClasses({ schoolCode: selectedSchoolCode });
-        setClasses(page.content);
-        setSelectedClassId(page.content.length > 0 ? page.content[0].id : '');
+        const content = selectedSchoolCode
+          ? (await getClasses({ schoolCode: selectedSchoolCode })).content
+          : await fetchAcrossAllSchools((code) => getClasses({ schoolCode: code }));
+        setClasses(content);
+        setSelectedClassId(content.length > 0 ? content[0].id : '');
       } catch (err) {
         setError(apiErrorMessage(err, 'Could not load classes from the server.'));
       } finally {
@@ -64,7 +44,7 @@ export default function StaffClassSectionPage() {
       }
     };
     loadClasses();
-  }, [selectedSchoolCode]);
+  }, [selectedSchoolCode, schoolsLoading]);
 
   const loadSections = async (classId: number | '') => {
     if (!classId) {
@@ -158,7 +138,7 @@ export default function StaffClassSectionPage() {
     },
   ];
 
-  const noClassesForSchool = !schoolsLoading && !classesLoading && schools.length > 0 && classes.length === 0;
+  const noClassesForSchool = !schoolsLoading && !classesLoading && classes.length === 0;
 
   return (
     <div className="space-y-4">
@@ -177,11 +157,6 @@ export default function StaffClassSectionPage() {
         }
       />
 
-      {!schoolsLoading && schools.length === 0 && !error && (
-        <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
-          Add a school first — sections are managed per class.
-        </div>
-      )}
       {noClassesForSchool && !error && (
         <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
           This school has no classes yet — add a class first.
@@ -189,23 +164,6 @@ export default function StaffClassSectionPage() {
       )}
 
       <div className="flex flex-wrap items-center gap-2">
-        <label className="block text-sm">
-          <span className="sr-only">School</span>
-          <select
-            value={selectedSchoolCode}
-            onChange={(e) => setSelectedSchoolCode(e.target.value)}
-            disabled={schoolsLoading || schools.length === 0}
-            className="h-9 min-w-48 rounded-md border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none disabled:opacity-50"
-          >
-            {schools.length === 0 && <option value="">No schools yet</option>}
-            {schools.map((school) => (
-              <option key={school.id} value={school.schoolCode}>
-                {school.schoolName} ({school.schoolCode})
-              </option>
-            ))}
-          </select>
-        </label>
-
         <label className="block text-sm">
           <span className="sr-only">Class</span>
           <select
@@ -224,8 +182,10 @@ export default function StaffClassSectionPage() {
         </label>
       </div>
 
-      {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+      {(error || schoolError) && (
+        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error || schoolError}
+        </div>
       )}
 
       <DataTable

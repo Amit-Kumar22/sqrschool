@@ -5,10 +5,10 @@ import { CheckCircle2, Loader2, X } from 'lucide-react';
 import { addStaff, type AddStaffPayload, type School, type StaffRole } from '@/lib/schoolService';
 import { apiErrorMessage } from '@/lib/api';
 
-function emptyForm(defaultSchoolCode: string): AddStaffPayload {
+function emptyForm(schoolCode: string): AddStaffPayload {
   return {
     name: '',
-    schoolCode: defaultSchoolCode,
+    schoolCode,
     password: '',
     role: 'TEACHER',
     email: '',
@@ -17,21 +17,24 @@ function emptyForm(defaultSchoolCode: string): AddStaffPayload {
 }
 
 export default function StaffFormModal({
+  schoolCode,
   schools,
-  defaultSchoolCode = '',
   onClose,
   onSaved,
 }: {
-  schools: School[];
-  defaultSchoolCode?: string;
+  /** The account's own school — auto-fills and hides the school field when set. */
+  schoolCode: string;
+  /** Only needed (and only shown) when schoolCode is empty — lets the admin pick which school this staff member belongs to. */
+  schools?: School[];
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const [form, setForm] = useState<AddStaffPayload>(() => emptyForm(defaultSchoolCode));
+  const [form, setForm] = useState<AddStaffPayload>(() => emptyForm(schoolCode));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+  const needsSchoolPicker = !schoolCode;
   const setField = (key: keyof AddStaffPayload, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
   const handleSubmit = async (e: FormEvent) => {
@@ -40,7 +43,7 @@ export default function StaffFormModal({
       setError('Name is required.');
       return;
     }
-    if (!form.schoolCode) {
+    if (needsSchoolPicker && !form.schoolCode) {
       setError('Please select a school.');
       return;
     }
@@ -99,24 +102,26 @@ export default function StaffFormModal({
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Full name *" value={form.name} onChange={(v) => setField('name', v)} required />
 
-            <label className="block text-sm">
-              <span className="mb-1.5 block font-medium text-slate-900">School *</span>
-              <select
-                value={form.schoolCode}
-                required
-                onChange={(e) => setField('schoolCode', e.target.value)}
-                className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
-              >
-                <option value="" disabled>
-                  Select a school
-                </option>
-                {schools.map((school) => (
-                  <option key={school.id} value={school.schoolCode}>
-                    {school.schoolName} ({school.schoolCode})
+            {needsSchoolPicker && (
+              <label className="block text-sm">
+                <span className="mb-1.5 block font-medium text-slate-900">School *</span>
+                <select
+                  value={form.schoolCode}
+                  required
+                  onChange={(e) => setField('schoolCode', e.target.value)}
+                  className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
+                >
+                  <option value="" disabled>
+                    Select a school
                   </option>
-                ))}
-              </select>
-            </label>
+                  {(schools ?? []).map((school) => (
+                    <option key={school.id} value={school.schoolCode}>
+                      {school.schoolName} ({school.schoolCode})
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
 
             <label className="block text-sm">
               <span className="mb-1.5 block font-medium text-slate-900">Role</span>

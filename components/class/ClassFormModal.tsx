@@ -1,10 +1,13 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import { Loader2, X } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { createClass, updateClass, type ClassPayload, type SchoolClass } from '@/lib/classService';
 import type { School } from '@/lib/schoolService';
 import { apiErrorMessage } from '@/lib/api';
+import Modal from '@/components/ui/Modal';
+import Button from '@/components/ui/Button';
+import { SelectField, TextField } from '@/components/ui/FormField';
 
 function toFormState(item: SchoolClass | null, schoolCode: string): ClassPayload {
   return { schoolCode, className: item?.className ?? '' };
@@ -57,82 +60,52 @@ export default function ClassFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/60 p-4 py-8 backdrop-blur-sm">
-      <div className="animate-scale-in w-full max-w-md rounded-xl bg-white shadow-premium-lg">
-        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-          <h2 className="text-sm font-semibold text-slate-900">
-            {isEditing ? `Edit ${item!.className}` : 'Add class'}
-          </h2>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+    <Modal
+      icon={BookOpen}
+      title={isEditing ? `Edit ${item!.className}` : 'Add class'}
+      subtitle={isEditing ? 'Update this class.' : 'Create a new class for a school.'}
+      size="sm"
+      onClose={onClose}
+      footer={
+        <>
+          <Button type="button" variant="secondary" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" form="class-form" loading={saving}>
+            {isEditing ? 'Save changes' : 'Create'}
+          </Button>
+        </>
+      }
+    >
+      <form id="class-form" onSubmit={handleSubmit} className="grid gap-3.5">
+        {needsSchoolPicker && (
+          <SelectField
+            label="School"
+            required
+            value={form.schoolCode}
+            onChange={(e) => setField('schoolCode', e.target.value)}
           >
-            <X size={18} />
-          </button>
-        </div>
+            <option value="" disabled>
+              Select a school
+            </option>
+            {(schools ?? []).map((school) => (
+              <option key={school.id} value={school.schoolCode}>
+                {school.schoolName} ({school.schoolCode})
+              </option>
+            ))}
+          </SelectField>
+        )}
 
-        <form onSubmit={handleSubmit} className="px-4 py-3">
-          <div className="grid gap-2.5">
-            {needsSchoolPicker && (
-              <label className="block text-sm">
-                <span className="mb-1 block text-xs font-medium text-slate-900">School *</span>
-                <select
-                  value={form.schoolCode}
-                  required
-                  onChange={(e) => setField('schoolCode', e.target.value)}
-                  className="h-9 w-full rounded-md border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
-                >
-                  <option value="" disabled>
-                    Select a school
-                  </option>
-                  {(schools ?? []).map((school) => (
-                    <option key={school.id} value={school.schoolCode}>
-                      {school.schoolName} ({school.schoolCode})
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
+        <TextField
+          label="Class name"
+          required
+          value={form.className}
+          placeholder="e.g. Class 5"
+          onChange={(e) => setField('className', e.target.value)}
+        />
 
-            <label className="block text-sm">
-              <span className="mb-1 block text-xs font-medium text-slate-900">Class name *</span>
-              <input
-                type="text"
-                value={form.className}
-                required
-                placeholder="e.g. Class 5"
-                onChange={(e) => setField('className', e.target.value)}
-                className="h-9 w-full rounded-md border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
-              />
-            </label>
-          </div>
-
-          {error && (
-            <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs text-red-700">
-              {error}
-            </div>
-          )}
-
-          <div className="mt-4 flex justify-end gap-2 border-t border-slate-100 pt-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-md border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-premium-sm transition-all hover:bg-indigo-700 disabled:opacity-60"
-            >
-              {saving && <Loader2 size={14} className="animate-spin" />}
-              {saving ? 'Saving…' : isEditing ? 'Save changes' : 'Create'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        {error && <div className="animate-fade-in-up rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>}
+      </form>
+    </Modal>
   );
 }

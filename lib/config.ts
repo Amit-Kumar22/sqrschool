@@ -88,4 +88,14 @@ export const API_ENDPOINTS = {
     DELETE: (id: number) => `/v1/chatbot/${id}`,
     SEARCH: '/v1/chatbot/search',
   },
+  SCHOOL_LEADS: {
+    LIST: '/v1/school-leads',
+  },
+  // Public/unauthenticated endpoints consumed by the marketing home page —
+  // no session required, see lib/freeService.ts.
+  FREE: {
+    INFRASTRUCTURE: '/v1/free/infrastructure',
+    ANNOUNCEMENTS_ACTIVE: '/v1/free/announcements/active',
+    ABOUT_US: '/v1/free/about-us',
+  },
 } as const;

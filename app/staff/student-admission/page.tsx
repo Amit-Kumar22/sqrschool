@@ -9,6 +9,7 @@ import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
+import Button, { IconButton } from '@/components/ui/Button';
 import StudentAdmissionFormModal from '@/components/student-admission/StudentAdmissionFormModal';
 import StudentDetailModal from '@/components/student-admission/StudentDetailModal';
 
@@ -124,16 +125,14 @@ export default function StaffStudentAdmissionPage() {
       widthClassName: 'w-16',
       render: (item) => (
         <div className="flex items-center justify-end gap-1">
-          <button
+          <IconButton
+            icon={Eye}
+            label="View details"
             onClick={(e) => {
               e.stopPropagation();
               setViewingStudent(item);
             }}
-            title="View details"
-            className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100"
-          >
-            <Eye size={15} />
-          </button>
+          />
         </div>
       ),
     },
@@ -146,13 +145,13 @@ export default function StaffStudentAdmissionPage() {
         title="Student Admission"
         description="View admitted students and add new admissions to a school."
         actions={
-          <button
+          <Button
+            icon={Plus}
             onClick={() => setFormModalOpen(true)}
             disabled={schoolsLoading || (!selectedSchoolCode && (schoolsListLoading || schools.length === 0))}
-            className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-premium-sm transition-colors hover:bg-indigo-700 disabled:opacity-50"
           >
-            <Plus size={16} /> Add student
-          </button>
+            Add student
+          </Button>
         }
       />
 

@@ -4,6 +4,7 @@ import {
   BookOpen,
   Building2,
   CalendarRange,
+  Contact2,
   LayoutDashboard,
   Layers,
   Palette,
@@ -33,6 +34,7 @@ export function getNavItems(role: Role): NavItem[] {
   ];
 
   if (role === 'SUPERADMIN') {
+    items.push({ label: 'School Leads', href: '/superadmin/school-leads', icon: Contact2 });
     items.push({ label: 'Theme Settings', href: '/superadmin/settings/theme', icon: Palette });
   }
 

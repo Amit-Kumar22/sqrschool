@@ -1,9 +1,11 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
-import { Loader2, Mail, Phone as PhoneIcon, ShieldCheck } from 'lucide-react';
+import { KeyRound, Loader2, Mail, Phone as PhoneIcon, Save, ShieldCheck, UserCircle } from 'lucide-react';
 import { apiErrorMessage, getProfile, updateProfile, updatePassword, type Profile } from '@/lib/api';
 import { ROLE_LABELS } from '@/components/dashboard/navConfig';
+import { TextField } from '@/components/ui/FormField';
+import Button from '@/components/ui/Button';
 
 const EMPTY_ADDRESS = {
   buildingName: '',
@@ -95,143 +97,129 @@ export default function ProfileView() {
     .toUpperCase();
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
+    <div className="grid gap-4 lg:grid-cols-3">
       {/* ── Summary card ── */}
-      <div className="card-premium animate-fade-in-up p-6 lg:col-span-1">
-        <div className="flex flex-col items-center text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-indigo-700 text-lg font-semibold text-white shadow-premium">
+      <div className="card-premium animate-fade-in-up relative overflow-hidden lg:col-span-1">
+        <div className="h-12 bg-gradient-to-br from-indigo-600 via-indigo-600 to-violet-600" />
+        <div className="flex flex-col items-center px-4 pb-4 text-center">
+          <div className="-mt-7 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-sm font-semibold text-indigo-950 shadow-glow-amber ring-4 ring-white">
             {initials}
           </div>
-          <h2 className="mt-3 text-base font-semibold text-slate-900">{profile?.fullName}</h2>
+          <h2 className="mt-2 text-sm font-semibold text-slate-900">{profile?.fullName}</h2>
           {profile && (
             <span className="mt-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600">
               {ROLE_LABELS[profile.role]}
             </span>
           )}
-        </div>
 
-        <dl className="mt-6 space-y-3 text-sm">
-          <div className="flex items-center gap-2 text-slate-600">
-            <Mail size={15} className="shrink-0" /> {profile?.email}
-          </div>
-          <div className="flex items-center gap-2 text-slate-600">
-            <PhoneIcon size={15} className="shrink-0" /> {profile?.phone || 'Not set'}
-          </div>
-          <div className="flex items-center gap-2 text-slate-600">
-            <ShieldCheck size={15} className="shrink-0" /> Status: {profile?.status ?? '—'}
-          </div>
-        </dl>
+          <dl className="mt-4 w-full space-y-2 text-left text-sm">
+            <div className="flex items-center gap-2 text-slate-600">
+              <Mail size={14} className="shrink-0 text-slate-400" /> <span className="truncate">{profile?.email}</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-600">
+              <PhoneIcon size={14} className="shrink-0 text-slate-400" /> {profile?.phone || 'Not set'}
+            </div>
+            <div className="flex items-center gap-2 text-slate-600">
+              <ShieldCheck size={14} className="shrink-0 text-slate-400" /> Status: {profile?.status ?? '—'}
+            </div>
+          </dl>
+        </div>
       </div>
 
       {/* ── Forms ── */}
-      <div className="space-y-6 lg:col-span-2">
+      <div className="space-y-4 lg:col-span-2">
         <form
           onSubmit={handleProfileSubmit}
           style={{ animationDelay: '60ms' }}
-          className="card-premium animate-fade-in-up p-6"
+          className="card-premium animate-fade-in-up relative overflow-hidden p-4"
         >
-          <h3 className="text-sm font-semibold text-slate-900">Edit profile</h3>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <Field label="Full name" value={name} onChange={setName} required />
-            <Field label="Phone" value={phone} onChange={setPhone} />
-            <Field
+          <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-indigo-500" />
+          <div className="flex items-center gap-2">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+              <UserCircle size={14} />
+            </span>
+            <h3 className="text-sm font-semibold text-slate-900">Edit profile</h3>
+          </div>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <TextField label="Full name" value={name} onChange={(e) => setName(e.target.value)} required />
+            <TextField label="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <TextField
               label="Building name"
               value={address.buildingName}
-              onChange={(v) => setAddress((a) => ({ ...a, buildingName: v }))}
+              onChange={(e) => setAddress((a) => ({ ...a, buildingName: e.target.value }))}
             />
-            <Field
+            <TextField
               label="Street name"
               value={address.streetName}
-              onChange={(v) => setAddress((a) => ({ ...a, streetName: v }))}
+              onChange={(e) => setAddress((a) => ({ ...a, streetName: e.target.value }))}
             />
-            <Field
+            <TextField
               label="Landmark"
               value={address.landmark}
-              onChange={(v) => setAddress((a) => ({ ...a, landmark: v }))}
+              onChange={(e) => setAddress((a) => ({ ...a, landmark: e.target.value }))}
             />
-            <Field
+            <TextField
               label="District"
               value={address.district}
-              onChange={(v) => setAddress((a) => ({ ...a, district: v }))}
+              onChange={(e) => setAddress((a) => ({ ...a, district: e.target.value }))}
             />
-            <Field label="City" value={address.city} onChange={(v) => setAddress((a) => ({ ...a, city: v }))} />
-            <Field label="State" value={address.stateName} onChange={(v) => setAddress((a) => ({ ...a, stateName: v }))} />
-            <Field label="PIN code" value={address.pin} onChange={(v) => setAddress((a) => ({ ...a, pin: v }))} />
+            <TextField label="City" value={address.city} onChange={(e) => setAddress((a) => ({ ...a, city: e.target.value }))} />
+            <TextField
+              label="State"
+              value={address.stateName}
+              onChange={(e) => setAddress((a) => ({ ...a, stateName: e.target.value }))}
+            />
+            <TextField label="PIN code" value={address.pin} onChange={(e) => setAddress((a) => ({ ...a, pin: e.target.value }))} />
           </div>
 
-          {profileMessage && <Message {...profileMessage} className="mt-4" />}
+          {profileMessage && <Message {...profileMessage} className="mt-3" />}
 
-          <button
-            type="submit"
-            disabled={savingProfile}
-            className="mt-5 flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-premium-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-premium disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
-          >
-            {savingProfile && <Loader2 size={15} className="animate-spin" />}
+          <Button type="submit" icon={Save} loading={savingProfile} className="mt-4">
             {savingProfile ? 'Saving…' : 'Save changes'}
-          </button>
+          </Button>
         </form>
 
         <form
           onSubmit={handlePasswordSubmit}
           style={{ animationDelay: '120ms' }}
-          className="card-premium animate-fade-in-up p-6"
+          className="card-premium animate-fade-in-up relative overflow-hidden p-4"
         >
-          <h3 className="text-sm font-semibold text-slate-900">Change password</h3>
+          <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-400" />
+          <div className="flex items-center gap-2">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+              <KeyRound size={14} />
+            </span>
+            <h3 className="text-sm font-semibold text-slate-900">Change password</h3>
+          </div>
           <p className="mt-1 text-xs text-slate-500">
             Enter a new password along with the verification code sent to your registered email.
           </p>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <Field label="New password" type="password" value={password} onChange={setPassword} required />
-            <Field
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <TextField
+              label="New password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <TextField
               label="Confirm password"
               type="password"
               value={confirmPassword}
-              onChange={setConfirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
-            <Field label="Verification code" value={code} onChange={setCode} required />
+            <TextField label="Verification code" value={code} onChange={(e) => setCode(e.target.value)} required />
           </div>
 
-          {passwordMessage && <Message {...passwordMessage} className="mt-4" />}
+          {passwordMessage && <Message {...passwordMessage} className="mt-3" />}
 
-          <button
-            type="submit"
-            disabled={savingPassword}
-            className="mt-5 flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-premium-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-premium disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
-          >
-            {savingPassword && <Loader2 size={15} className="animate-spin" />}
+          <Button type="submit" icon={Save} loading={savingPassword} className="mt-4">
             {savingPassword ? 'Updating…' : 'Update password'}
-          </button>
+          </Button>
         </form>
       </div>
     </div>
-  );
-}
-
-function Field({
-  label,
-  value,
-  onChange,
-  type = 'text',
-  required = false,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  type?: string;
-  required?: boolean;
-}) {
-  return (
-    <label className="block text-sm">
-      <span className="mb-1.5 block font-medium text-slate-900">{label}</span>
-      <input
-        type={type}
-        value={value}
-        required={required}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
-      />
-    </label>
   );
 }
 

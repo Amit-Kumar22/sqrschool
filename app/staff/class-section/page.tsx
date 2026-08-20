@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Layers, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Layers, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteSection, getSections, type Section } from '@/lib/classSectionService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
@@ -9,6 +9,7 @@ import { fetchAcrossAllSchools } from '@/lib/schoolService';
 import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
+import Button, { IconButton } from '@/components/ui/Button';
 import SectionFormModal from '@/components/class-section/SectionFormModal';
 
 export default function StaffClassSectionPage() {
@@ -47,17 +48,27 @@ export default function StaffClassSectionPage() {
   }, [selectedSchoolCode, schoolsLoading]);
 
   const loadSections = async (classId: number | '') => {
-    if (!classId) {
-      setSections([]);
-      return;
-    }
+    // Clear immediately (not just on success) so switching classes never
+    // leaves the previous class's rows on screen while the new one loads
+    // or fails — see the catch block below for why that used to happen.
+    setSections([]);
+    if (!classId) return;
+
     setLoading(true);
     setError('');
     try {
       const result = await getSections({ classId });
       setSections(result.sections);
     } catch (err) {
-      setError(apiErrorMessage(err, 'Could not load sections from the server.'));
+      const message = apiErrorMessage(err, 'Could not load sections from the server.');
+      // The backend reports an empty class as an error response (e.g. "No
+      // sections are available for class: Class 2") instead of an empty
+      // list — treat that as the normal empty state (handled by DataTable's
+      // emptyTitle/emptyDescription below) rather than a real failure, so it
+      // doesn't show a red error banner for what isn't actually an error.
+      if (!/no .*available/i.test(message)) {
+        setError(message);
+      }
     } finally {
       setLoading(false);
     }
@@ -112,33 +123,32 @@ export default function StaffClassSectionPage() {
       widthClassName: 'w-20',
       render: (item) => (
         <div className="flex items-center justify-end gap-1">
-          <button
+          <IconButton
+            icon={Pencil}
+            label="Edit"
+            variant="primary"
             onClick={(e) => {
               e.stopPropagation();
               openEditModal(item);
             }}
-            title="Edit"
-            className="rounded-md p-1.5 text-indigo-600 transition-colors hover:bg-indigo-50"
-          >
-            <Pencil size={15} />
-          </button>
-          <button
+          />
+          <IconButton
+            icon={Trash2}
+            label="Delete"
+            variant="danger"
+            loading={deletingId === item.id}
             onClick={(e) => {
               e.stopPropagation();
               handleDelete(item.id);
             }}
-            disabled={deletingId === item.id}
-            title="Delete"
-            className="rounded-md p-1.5 text-red-500 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-30"
-          >
-            {deletingId === item.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
-          </button>
+          />
         </div>
       ),
     },
   ];
 
   const noClassesForSchool = !schoolsLoading && !classesLoading && classes.length === 0;
+  const selectedClassName = classes.find((cls) => cls.id === selectedClassId)?.className;
 
   return (
     <div className="space-y-4">
@@ -147,13 +157,9 @@ export default function StaffClassSectionPage() {
         title="Class Section"
         description="Manage sections within a class."
         actions={
-          <button
-            onClick={openCreateModal}
-            disabled={classesLoading || classes.length === 0}
-            className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-premium-sm transition-colors hover:bg-indigo-700 disabled:opacity-50"
-          >
-            <Plus size={16} /> Add section
-          </button>
+          <Button icon={Plus} onClick={openCreateModal} disabled={classesLoading || classes.length === 0}>
+            Add section
+          </Button>
         }
       />
 
@@ -193,8 +199,14 @@ export default function StaffClassSectionPage() {
         data={sections}
         rowKey={(item) => item.id}
         loading={loading || schoolsLoading || classesLoading}
-        emptyTitle="No sections yet"
-        emptyDescription={classes.length === 0 ? 'Add a class before adding sections.' : 'Add the first section to get started.'}
+        emptyTitle={selectedClassName ? `No sections for ${selectedClassName}` : 'No sections yet'}
+        emptyDescription={
+          classes.length === 0
+            ? 'Add a class before adding sections.'
+            : selectedClassName
+              ? `${selectedClassName} doesn't have any sections yet — add the first one.`
+              : 'Add the first section to get started.'
+        }
       />
 
       {formModalOpen && (

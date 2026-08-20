@@ -1,14 +1,23 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import type { LucideIcon } from 'lucide-react';
 import {
   BookOpen,
+  Bus,
+  Building2,
+  CalendarRange,
+  FlaskConical,
+  HeartPulse,
+  Laptop,
   Trophy,
   Users,
   ShieldCheck,
   Microscope,
   Palette,
+  Utensils,
   Volleyball,
   ArrowRight,
   Quote,
@@ -19,6 +28,13 @@ import Footer from '@/components/site/Footer';
 import Gallery from '@/components/site/Gallery';
 import FlipCard from '@/components/ui/FlipCard';
 import { useTheme } from '@/contexts/ThemeContext';
+import {
+  getActiveAnnouncements,
+  getPublicAboutUs,
+  getPublicInfrastructure,
+  type PublicAnnouncement,
+  type PublicInfrastructure,
+} from '@/lib/freeService';
 
 const STATS = [
   { label: 'Students', value: '2,400+' },
@@ -93,6 +109,53 @@ const ACCENT_SHADOW = {
   button: { shadow: 'shadow-glow-button', shadowLg: 'shadow-glow-button-lg', text: 'text-button-bg' },
 };
 
+// Original hardcoded copy — kept as a fallback so the About section still
+// reads fine if the /v1/free/about-us API is unreachable or empty.
+const FALLBACK_ABOUT_TEXT =
+  'has combined a rigorous academic curriculum with a nurturing environment where students are known by name, not just number. Our approach balances classroom learning with sports, arts and real-world skills.';
+
+// Infrastructure items come back with a free-text `icon` keyword (e.g.
+// "library", "playground") rather than an icon reference, so map common
+// keywords to a matching Lucide icon — anything unrecognized falls back to
+// a generic building icon rather than rendering nothing.
+const INFRASTRUCTURE_ICON_MAP: [string, LucideIcon][] = [
+  ['library', BookOpen],
+  ['book', BookOpen],
+  ['lab', FlaskConical],
+  ['science', FlaskConical],
+  ['sport', Volleyball],
+  ['play', Volleyball],
+  ['ground', Volleyball],
+  ['gym', Volleyball],
+  ['art', Palette],
+  ['music', Palette],
+  ['secur', ShieldCheck],
+  ['safe', ShieldCheck],
+  ['health', HeartPulse],
+  ['medical', HeartPulse],
+  ['transport', Bus],
+  ['bus', Bus],
+  ['computer', Laptop],
+  ['smart', Laptop],
+  ['tech', Laptop],
+  ['cafeteria', Utensils],
+  ['canteen', Utensils],
+  ['food', Utensils],
+];
+
+// Longest keyword first — otherwise a short entry that happens to be a
+// substring of a more specific one (e.g. "art" inside "smart-computer")
+// would win the match before the intended keyword is ever checked.
+const SORTED_INFRASTRUCTURE_ICON_MAP = [...INFRASTRUCTURE_ICON_MAP].sort((a, b) => b[0].length - a[0].length);
+
+function resolveInfrastructureIcon(keyword: string): LucideIcon {
+  const key = keyword?.toLowerCase() ?? '';
+  return SORTED_INFRASTRUCTURE_ICON_MAP.find(([k]) => key.includes(k))?.[1] ?? Building2;
+}
+
+const formatDate = (value: string) =>
+  value ? new Date(value).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+
 const TESTIMONIALS = [
   {
     quote: 'The teachers here genuinely care about every child. My daughter looks forward to school every single day.',
@@ -114,6 +177,24 @@ const TESTIMONIALS = [
 export default function Home() {
   const { theme } = useTheme();
   const schoolName = theme.companyName || 'SQR School';
+
+  const [infrastructure, setInfrastructure] = useState<PublicInfrastructure[]>([]);
+  const [announcements, setAnnouncements] = useState<PublicAnnouncement[]>([]);
+  const [aboutDescription, setAboutDescription] = useState('');
+
+  useEffect(() => {
+    // Each fetch fails independently — one API being down shouldn't blank
+    // out the other sections, so every section keeps its own fallback.
+    getPublicInfrastructure()
+      .then(setInfrastructure)
+      .catch(() => {});
+    getActiveAnnouncements()
+      .then(setAnnouncements)
+      .catch(() => {});
+    getPublicAboutUs()
+      .then((list) => setAboutDescription(list[0]?.description ?? ''))
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -193,6 +274,48 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ── Announcements ── */}
+        {announcements.length > 0 && (
+          <section id="announcements" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+            <div className="mx-auto max-w-xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary">Announcements</p>
+              <h2 className="mt-2 text-2xl font-bold text-heading sm:text-3xl">Latest updates &amp; notices</h2>
+            </div>
+
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {announcements.slice(0, 3).map((item, idx) => (
+                <div
+                  key={item.id}
+                  style={{ animationDelay: `${idx * 80}ms` }}
+                  className="animate-fade-in-up rounded-xl border border-black/5 bg-white p-6 shadow-glow-button transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-button-lg"
+                >
+                  {(item.startDate || item.endDate) && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-button-bg/10 px-2.5 py-1 text-[11px] font-semibold text-button-bg">
+                      <CalendarRange size={12} />
+                      {formatDate(item.startDate)}
+                      {item.endDate && item.endDate !== item.startDate ? ` – ${formatDate(item.endDate)}` : ''}
+                    </span>
+                  )}
+                  <h3 className="mt-3 text-base font-semibold text-heading">{item.announcementName}</h3>
+                  <p className="mt-1.5 line-clamp-3 text-sm text-ink/70">{item.description}</p>
+                  {item.noticeBoards?.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {item.noticeBoards.map((board, boardIdx) => (
+                        <span
+                          key={`${board.boardName}-${boardIdx}`}
+                          className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary"
+                        >
+                          {board.boardName}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* ── About ── */}
         <section id="about" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <div className="grid gap-10 md:grid-cols-2 md:items-center">
@@ -202,9 +325,7 @@ export default function Home() {
                 A community built on learning, character and care
               </h2>
               <p className="mt-3 text-sm text-ink/70 sm:text-base">
-                For over two decades, {schoolName} has combined a rigorous academic curriculum
-                with a nurturing environment where students are known by name, not just number.
-                Our approach balances classroom learning with sports, arts and real-world skills.
+                {schoolName} {aboutDescription || FALLBACK_ABOUT_TEXT}
               </p>
               <ul className="mt-5 space-y-2 text-sm">
                 {['CBSE-aligned curriculum', 'Smart, tech-enabled classrooms', 'Dedicated counselling & mentorship'].map((item) => (
@@ -215,40 +336,57 @@ export default function Home() {
               </ul>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {FEATURES.map((feature, idx) => {
-                const accent = ACCENT_SHADOW[feature.accent];
-                return (
-                  <FlipCard
-                    key={feature.title}
-                    className="h-40 animate-fade-in-up"
-                    style={{ animationDelay: `${idx * 70}ms` }}
-                    front={
-                      <div className={`h-full w-full overflow-hidden rounded-xl border border-black/5 bg-white ${accent.shadow}`}>
-                        <div className="relative h-24 w-full overflow-hidden">
-                          <Image src={feature.image} alt={feature.title} fill className="object-cover" />
-                          <div className="absolute inset-0 bg-primary/20" />
-                          <span
-                            className={`absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white ${accent.text} ${accent.shadow}`}
-                          >
-                            <feature.icon size={16} />
-                          </span>
-                        </div>
-                        <div className="p-3">
-                          <p className="text-sm font-semibold text-heading">{feature.title}</p>
-                          <p className="mt-0.5 text-[11px] text-ink/40">Tap to know more</p>
-                        </div>
+              {infrastructure.length > 0
+                ? infrastructure.slice(0, 4).map((item, idx) => {
+                    const Icon = resolveInfrastructureIcon(item.icon);
+                    return (
+                      <div
+                        key={item.id}
+                        style={{ animationDelay: `${idx * 70}ms` }}
+                        className="animate-fade-in-up flex h-40 flex-col rounded-xl border border-black/5 bg-white p-4 shadow-glow-primary transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-primary-lg"
+                      >
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary text-white shadow-glow-primary">
+                          <Icon size={18} />
+                        </span>
+                        <p className="mt-3 text-sm font-semibold text-heading">{item.name}</p>
+                        <p className="mt-1 line-clamp-3 text-xs text-ink/60">{item.description}</p>
                       </div>
-                    }
-                    back={
-                      <div className={`flex h-full w-full flex-col justify-center rounded-xl bg-gradient-to-br from-primary to-secondary p-4 text-white ${accent.shadowLg}`}>
-                        <feature.icon size={20} className="mb-2 text-button-bg" />
-                        <p className="text-sm font-semibold">{feature.title}</p>
-                        <p className="mt-1.5 text-xs text-white/80">{feature.description}</p>
-                      </div>
-                    }
-                  />
-                );
-              })}
+                    );
+                  })
+                : FEATURES.map((feature, idx) => {
+                    const accent = ACCENT_SHADOW[feature.accent];
+                    return (
+                      <FlipCard
+                        key={feature.title}
+                        className="h-40 animate-fade-in-up"
+                        style={{ animationDelay: `${idx * 70}ms` }}
+                        front={
+                          <div className={`h-full w-full overflow-hidden rounded-xl border border-black/5 bg-white ${accent.shadow}`}>
+                            <div className="relative h-24 w-full overflow-hidden">
+                              <Image src={feature.image} alt={feature.title} fill className="object-cover" />
+                              <div className="absolute inset-0 bg-primary/20" />
+                              <span
+                                className={`absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white ${accent.text} ${accent.shadow}`}
+                              >
+                                <feature.icon size={16} />
+                              </span>
+                            </div>
+                            <div className="p-3">
+                              <p className="text-sm font-semibold text-heading">{feature.title}</p>
+                              <p className="mt-0.5 text-[11px] text-ink/40">Tap to know more</p>
+                            </div>
+                          </div>
+                        }
+                        back={
+                          <div className={`flex h-full w-full flex-col justify-center rounded-xl bg-gradient-to-br from-primary to-secondary p-4 text-white ${accent.shadowLg}`}>
+                            <feature.icon size={20} className="mb-2 text-button-bg" />
+                            <p className="text-sm font-semibold">{feature.title}</p>
+                            <p className="mt-1.5 text-xs text-white/80">{feature.description}</p>
+                          </div>
+                        }
+                      />
+                    );
+                  })}
             </div>
           </div>
         </section>

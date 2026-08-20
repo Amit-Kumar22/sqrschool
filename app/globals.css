@@ -98,6 +98,28 @@
       transform: translateY(-6px);
     }
   }
+
+  --animate-fade-in: fade-in 0.18s ease-out both;
+  --animate-pop-in: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 }
 
 html {
@@ -107,6 +129,8 @@ html {
 body {
   background: var(--color-surface);
   color: var(--color-ink);
+  /* Geist's refined numeral/letterform variants — sharper at UI sizes than the browser default. */
+  font-feature-settings: 'cv11', 'ss01';
 }
 
 /* Smooth repaint when the active theme swaps colors */
@@ -177,6 +201,62 @@ a {
     box-shadow: 0 4px 8px hsl(var(--shadow-color) / 0.06),
       0 28px 52px -12px color-mix(in srgb, var(--color-button-bg) 65%, transparent),
       0 10px 22px -8px color-mix(in srgb, var(--color-button-bg) 50%, transparent);
+  }
+
+  /*
+   * Fixed-color glow shadows for the admin panel (StatCard, buttons, modal
+   * accents). Unlike shadow-glow-primary/-button above, these are NOT tied to
+   * --color-primary/--color-button-bg — the panel keeps one constant premium
+   * look regardless of the public-site theme (see card-premium), so each
+   * card/action gets a literal brand color instead of the active theme color.
+   */
+  .shadow-glow-indigo {
+    box-shadow: 0 2px 4px hsl(var(--shadow-color) / 0.05), 0 16px 32px -10px rgb(79 99 229 / 0.45),
+      0 6px 14px -6px rgb(79 99 229 / 0.32);
+  }
+  .shadow-glow-indigo-lg {
+    box-shadow: 0 4px 8px hsl(var(--shadow-color) / 0.06), 0 28px 52px -12px rgb(79 99 229 / 0.55),
+      0 10px 22px -8px rgb(79 99 229 / 0.4);
+  }
+  .shadow-glow-amber {
+    box-shadow: 0 2px 4px hsl(var(--shadow-color) / 0.05), 0 16px 32px -10px rgb(245 158 11 / 0.4),
+      0 6px 14px -6px rgb(245 158 11 / 0.3);
+  }
+  .shadow-glow-amber-lg {
+    box-shadow: 0 4px 8px hsl(var(--shadow-color) / 0.06), 0 28px 52px -12px rgb(245 158 11 / 0.5),
+      0 10px 22px -8px rgb(245 158 11 / 0.38);
+  }
+  .shadow-glow-emerald {
+    box-shadow: 0 2px 4px hsl(var(--shadow-color) / 0.05), 0 16px 32px -10px rgb(16 185 129 / 0.4),
+      0 6px 14px -6px rgb(16 185 129 / 0.3);
+  }
+  .shadow-glow-emerald-lg {
+    box-shadow: 0 4px 8px hsl(var(--shadow-color) / 0.06), 0 28px 52px -12px rgb(16 185 129 / 0.5),
+      0 10px 22px -8px rgb(16 185 129 / 0.38);
+  }
+  .shadow-glow-violet {
+    box-shadow: 0 2px 4px hsl(var(--shadow-color) / 0.05), 0 16px 32px -10px rgb(139 92 246 / 0.4),
+      0 6px 14px -6px rgb(139 92 246 / 0.3);
+  }
+  .shadow-glow-violet-lg {
+    box-shadow: 0 4px 8px hsl(var(--shadow-color) / 0.06), 0 28px 52px -12px rgb(139 92 246 / 0.5),
+      0 10px 22px -8px rgb(139 92 246 / 0.38);
+  }
+  .shadow-glow-sky {
+    box-shadow: 0 2px 4px hsl(var(--shadow-color) / 0.05), 0 16px 32px -10px rgb(14 165 233 / 0.4),
+      0 6px 14px -6px rgb(14 165 233 / 0.3);
+  }
+  .shadow-glow-sky-lg {
+    box-shadow: 0 4px 8px hsl(var(--shadow-color) / 0.06), 0 28px 52px -12px rgb(14 165 233 / 0.5),
+      0 10px 22px -8px rgb(14 165 233 / 0.38);
+  }
+  .shadow-glow-rose {
+    box-shadow: 0 2px 4px hsl(var(--shadow-color) / 0.05), 0 16px 32px -10px rgb(244 63 94 / 0.4),
+      0 6px 14px -6px rgb(244 63 94 / 0.3);
+  }
+  .shadow-glow-rose-lg {
+    box-shadow: 0 4px 8px hsl(var(--shadow-color) / 0.06), 0 28px 52px -12px rgb(244 63 94 / 0.5),
+      0 10px 22px -8px rgb(244 63 94 / 0.38);
   }
 
   /*

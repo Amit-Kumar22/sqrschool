@@ -8,6 +8,7 @@ import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { RoleBadge } from '@/components/ui/Badge';
+import Button, { IconButton } from '@/components/ui/Button';
 import StaffFormModal from '@/components/staff/StaffFormModal';
 import StaffDetailModal from '@/components/staff/StaffDetailModal';
 
@@ -118,16 +119,14 @@ export default function PrincipalStaffPage() {
       widthClassName: 'w-16',
       render: (member) => (
         <div className="flex items-center justify-end gap-1">
-          <button
+          <IconButton
+            icon={Eye}
+            label="View details"
             onClick={(e) => {
               e.stopPropagation();
               setViewingStaff(member);
             }}
-            title="View details"
-            className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100"
-          >
-            <Eye size={15} />
-          </button>
+          />
         </div>
       ),
     },
@@ -140,13 +139,13 @@ export default function PrincipalStaffPage() {
         title="Staff Management"
         description="View teaching and non-teaching staff, and add new members to a school."
         actions={
-          <button
+          <Button
+            icon={Plus}
             onClick={() => setFormModalOpen(true)}
             disabled={schoolsLoading || (!selectedSchoolCode && (schoolsListLoading || schools.length === 0))}
-            className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-premium-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-premium disabled:translate-y-0 disabled:opacity-50 disabled:shadow-none"
           >
-            <Plus size={16} /> Add staff
-          </button>
+            Add staff
+          </Button>
         }
       />
 

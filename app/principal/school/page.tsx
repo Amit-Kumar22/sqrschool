@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Eye, Loader2, Pencil, Plus, School as SchoolIcon, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Plus, School as SchoolIcon, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteSchool, getSchoolDetail, getSchools, type School } from '@/lib/schoolService';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
+import Button, { IconButton } from '@/components/ui/Button';
 import SchoolFormModal from '@/components/school/SchoolFormModal';
 import SchoolDetailModal from '@/components/school/SchoolDetailModal';
 
@@ -150,37 +151,34 @@ export default function PrincipalSchoolPage() {
       widthClassName: 'w-24',
       render: (school) => (
         <div className="flex items-center justify-end gap-1">
-          <button
+          <IconButton
+            icon={Eye}
+            label="View details"
+            loading={viewLoadingId === school.id}
             onClick={(e) => {
               e.stopPropagation();
               handleView(school.id);
             }}
-            title="View details"
-            className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100"
-          >
-            {viewLoadingId === school.id ? <Loader2 size={15} className="animate-spin" /> : <Eye size={15} />}
-          </button>
-          <button
+          />
+          <IconButton
+            icon={Pencil}
+            label="Edit school"
+            variant="primary"
             onClick={(e) => {
               e.stopPropagation();
               openEditModal(school);
             }}
-            title="Edit school"
-            className="rounded-md p-1.5 text-indigo-600 transition-colors hover:bg-indigo-50"
-          >
-            <Pencil size={15} />
-          </button>
-          <button
+          />
+          <IconButton
+            icon={Trash2}
+            label="Delete school"
+            variant="danger"
+            loading={deletingId === school.id}
             onClick={(e) => {
               e.stopPropagation();
               handleDelete(school.id);
             }}
-            disabled={deletingId === school.id}
-            title="Delete school"
-            className="rounded-md p-1.5 text-red-500 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-30"
-          >
-            {deletingId === school.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
-          </button>
+          />
         </div>
       ),
     },
@@ -193,12 +191,9 @@ export default function PrincipalSchoolPage() {
         title="School Management"
         description="View and manage school records — profile, contact details and address."
         actions={
-          <button
-            onClick={openCreateModal}
-            className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-premium-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-premium"
-          >
-            <Plus size={16} /> Add school
-          </button>
+          <Button icon={Plus} onClick={openCreateModal}>
+            Add school
+          </Button>
         }
       />
 

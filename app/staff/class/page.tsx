@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BookOpen, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { BookOpen, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteClass, getClasses, type SchoolClass } from '@/lib/classService';
 import { fetchAcrossAllSchools, getSchools, type School } from '@/lib/schoolService';
@@ -9,6 +9,7 @@ import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
+import Button, { IconButton } from '@/components/ui/Button';
 import ClassFormModal from '@/components/class/ClassFormModal';
 
 export default function StaffClassPage() {
@@ -121,27 +122,25 @@ export default function StaffClassPage() {
       widthClassName: 'w-20',
       render: (item) => (
         <div className="flex items-center justify-end gap-1">
-          <button
+          <IconButton
+            icon={Pencil}
+            label="Edit"
+            variant="primary"
             onClick={(e) => {
               e.stopPropagation();
               openEditModal(item);
             }}
-            title="Edit"
-            className="rounded-md p-1.5 text-indigo-600 transition-colors hover:bg-indigo-50"
-          >
-            <Pencil size={15} />
-          </button>
-          <button
+          />
+          <IconButton
+            icon={Trash2}
+            label="Delete"
+            variant="danger"
+            loading={deletingId === item.id}
             onClick={(e) => {
               e.stopPropagation();
               handleDelete(item.id);
             }}
-            disabled={deletingId === item.id}
-            title="Delete"
-            className="rounded-md p-1.5 text-red-500 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-30"
-          >
-            {deletingId === item.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
-          </button>
+          />
         </div>
       ),
     },
@@ -154,13 +153,13 @@ export default function StaffClassPage() {
         title="Class"
         description="Manage classes for a school."
         actions={
-          <button
+          <Button
+            icon={Plus}
             onClick={openCreateModal}
             disabled={schoolsLoading || (!selectedSchoolCode && (schoolsListLoading || schools.length === 0))}
-            className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-premium-sm transition-colors hover:bg-indigo-700 disabled:opacity-50"
           >
-            <Plus size={16} /> Add class
-          </button>
+            Add class
+          </Button>
         }
       />
 

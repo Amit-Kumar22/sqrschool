@@ -98,14 +98,14 @@ export default function DataTable<T>({
   return (
     <div className="card-premium overflow-hidden">
       <div className="scrollbar-thin overflow-x-auto">
-        <table className="w-full min-w-full border-collapse text-left text-sm">
+        <table className="w-full min-w-full border-collapse text-left text-sm tabular-nums">
           <thead>
             <tr className="bg-gradient-to-r from-indigo-950 via-indigo-800 to-indigo-950">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   scope="col"
-                  className={`whitespace-nowrap px-4 py-3.5 text-xs font-semibold tracking-wide text-white/90 uppercase ${col.widthClassName ?? ''} ${alignClass(col.align)}`}
+                  className={`whitespace-nowrap px-4 py-3.5 text-xs font-semibold tracking-wider text-white/90 uppercase ${col.widthClassName ?? ''} ${alignClass(col.align)}`}
                 >
                   {col.sortable ? (
                     <button
@@ -160,12 +160,14 @@ export default function DataTable<T>({
                   key={rowKey(row)}
                   onClick={() => onRowClick?.(row)}
                   style={{ animationDelay: `${Math.min(idx, 8) * 35}ms` }}
-                  className={`animate-fade-in-up transition-colors even:bg-slate-50/70 hover:bg-indigo-50/60 ${onRowClick ? 'cursor-pointer' : ''}`}
+                  className={`animate-fade-in-up group transition-colors even:bg-slate-50/70 hover:bg-indigo-50/60 ${onRowClick ? 'cursor-pointer' : ''}`}
                 >
-                  {columns.map((col) => (
+                  {columns.map((col, colIdx) => (
                     <td
                       key={col.key}
-                      className={`px-4 py-3.5 align-middle text-slate-700 ${alignClass(col.align)} ${col.className ?? ''}`}
+                      className={`px-4 py-3.5 align-middle text-slate-700 ${alignClass(col.align)} ${col.className ?? ''} ${
+                        colIdx === 0 ? 'border-l-2 border-transparent transition-colors group-hover:border-indigo-500' : ''
+                      }`}
                     >
                       {col.render ? col.render(row) : (col.accessor?.(row) ?? null)}
                     </td>

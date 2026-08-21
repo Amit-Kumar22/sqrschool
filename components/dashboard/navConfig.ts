@@ -1,9 +1,11 @@
 import type { LucideIcon } from 'lucide-react';
 import {
   Bot,
+  BookMarked,
   BookOpen,
   Building2,
   CalendarRange,
+  ClipboardList,
   Contact2,
   LayoutDashboard,
   Layers,
@@ -11,8 +13,10 @@ import {
   PlaySquare,
   School,
   UserCircle,
+  UserCog,
   UserPlus,
   Users,
+  UsersRound,
 } from 'lucide-react';
 import type { Role } from '@/lib/auth';
 
@@ -41,6 +45,8 @@ export function getNavItems(role: Role): NavItem[] {
   if (role === 'PRINCIPAL') {
     items.push({ label: 'School', href: '/principal/school', icon: School });
     items.push({ label: 'Staff', href: '/principal/staff', icon: Users });
+    items.push({ label: 'Exams', href: '/principal/exams', icon: ClipboardList });
+    items.push({ label: 'Teacher Assignments', href: '/principal/teacher-section', icon: UserCog });
   }
 
   if (role === 'STAFF') {
@@ -48,7 +54,11 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Academic Year', href: '/staff/academic-year', icon: CalendarRange });
     items.push({ label: 'Class', href: '/staff/class', icon: BookOpen });
     items.push({ label: 'Class Section', href: '/staff/class-section', icon: Layers });
+    items.push({ label: 'Subject', href: '/staff/subject', icon: BookMarked });
     items.push({ label: 'Student Admission', href: '/staff/student-admission', icon: UserPlus });
+    items.push({ label: 'Student Class Section', href: '/staff/student-class-section', icon: UsersRound });
+    items.push({ label: 'Teacher Section', href: '/staff/teacher-section', icon: UserCog });
+    items.push({ label: 'Exams', href: '/staff/exams', icon: ClipboardList });
     items.push({ label: 'YouTube Testimonials', href: '/staff/youtube-testimonials', icon: PlaySquare });
     items.push({ label: 'Chatbot Management', href: '/staff/chatbot', icon: Bot });
   }

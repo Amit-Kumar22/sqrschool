@@ -41,9 +41,27 @@ export const API_ENDPOINTS = {
     ADD_STAFF: '/v1/admin/add-staff',
     ALL_STAFF: '/v1/admin/all-staff',
   },
+  TEACHER: {
+    ALL_STUDENT: '/v1/teacher/all-student',
+  },
+  TEACHER_SUBJECT_MAPPING: {
+    LIST: '/v1/student-subject-section-mapping',
+    CREATE: '/v1/student-subject-section-mapping',
+    GET: (id: number) => `/v1/student-subject-section-mapping/${id}`,
+    UPDATE: (id: number) => `/v1/student-subject-section-mapping/${id}`,
+    DELETE: (id: number) => `/v1/student-subject-section-mapping/${id}`,
+    ADMIN_LIST: '/v1/student-subject-section-mapping/admin',
+  },
   STUDENT_ADMISSION: {
     CREATE: '/v1/student-admissions/new-addmission',
     LIST: '/v1/student-admissions/all-student',
+  },
+  STUDENT_CLASS_SECTION: {
+    CREATE: '/v1/student-class-sections',
+    ROSTER: (classId: number) => `/v1/student-class-sections/class/${classId}/students`,
+    GET: (id: number) => `/v1/student-class-sections/${id}`,
+    UPDATE: (id: number) => `/v1/student-class-sections/${id}`,
+    DELETE: (id: number) => `/v1/student-class-sections/${id}`,
   },
   ACADEMIC_YEAR: {
     LIST: '/v1/academic-year',
@@ -90,6 +108,20 @@ export const API_ENDPOINTS = {
   },
   SCHOOL_LEADS: {
     LIST: '/v1/school-leads',
+  },
+  EXAM: {
+    LIST: '/v1/exams',
+    CREATE: '/v1/exams',
+    GET: (id: number) => `/v1/exams/${id}`,
+    UPDATE: (id: number) => `/v1/exams/${id}`,
+    DELETE: (id: number) => `/v1/exams/${id}`,
+  },
+  SUBJECT: {
+    SAVE: '/v1/subject/save',
+    LIST: '/v1/subject/list',
+    GET: (id: number) => `/v1/subject/${id}`,
+    UPDATE: (id: number) => `/v1/subject/update/${id}`,
+    DELETE: (id: number) => `/v1/subject/delete/${id}`,
   },
   // Public/unauthenticated endpoints consumed by the marketing home page —
   // no session required, see lib/freeService.ts.

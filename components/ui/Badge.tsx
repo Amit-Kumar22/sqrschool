@@ -64,3 +64,34 @@ export function LeadStatusBadge({ status }: { status: string }) {
     </span>
   );
 }
+
+// Only "DRAFT" is confirmed by the exam API spec — unrecognized values fall
+// back to a neutral slate pill instead of breaking, same approach as
+// LEAD_STATUS_STYLES above.
+const EXAM_STATUS_STYLES: Record<string, string> = {
+  DRAFT: 'bg-slate-100 text-slate-600 ring-slate-200',
+  PUBLISHED: 'bg-sky-50 text-sky-700 ring-sky-600/20',
+  ONGOING: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  COMPLETED: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  CANCELLED: 'bg-red-50 text-red-700 ring-red-600/20',
+};
+
+/** Pill for an exam's lifecycle status — tinted by known stage, neutral for anything else. */
+export function ExamStatusBadge({ status }: { status: string }) {
+  const style = EXAM_STATUS_STYLES[status] ?? 'bg-slate-100 text-slate-600 ring-slate-200';
+  const label = status
+    ? status
+        .toLowerCase()
+        .split('_')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+    : 'Unknown';
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${style}`}
+    >
+      {label}
+    </span>
+  );
+}

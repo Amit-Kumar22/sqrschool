@@ -1,6 +1,7 @@
 import { api } from './api';
 import { API_ENDPOINTS } from './config';
 import type { Role } from './auth';
+import type { StudentAdmissionPage } from './studentService';
 
 // ─── School service ─────────────────────────────────────────────────────────
 // Dedicated service for the school-detail-controller endpoints, kept separate
@@ -176,6 +177,27 @@ export const getStaffMembers = async ({
 }: StaffListParams): Promise<StaffPage> => {
   const response = await api.get<StaffPage>(API_ENDPOINTS.ADMIN.ALL_STAFF, {
     params: { schoolCode, role, search, page, size },
+  });
+  return response.data;
+};
+
+// /v1/teacher/all-student reuses the exact same DTO as student admissions
+// (admissionNumber, academicYear, section, parentPhoneNumber, etc.) even
+// though it lists teachers — confirmed against the API docs. The top-level
+// `id` is the teacher record's own id (what other endpoints' teacherId
+// expects — confirmed by the backend rejecting the nested user.id with
+// "Teacher detail not found"); `user.fullName` is still fine for display.
+export interface TeacherListParams {
+  /** Required by the backend — same schoolCode requirement as every other school-scoped list here. */
+  schoolCode: string;
+  page?: number;
+  size?: number;
+}
+
+/** Paginated teacher list for one school, shaped like StudentAdmissionPage (see comment above). Returns the raw Page shape — no envelope. */
+export const getAllTeachers = async ({ schoolCode, page = 0, size = 200 }: TeacherListParams): Promise<StudentAdmissionPage> => {
+  const response = await api.get<StudentAdmissionPage>(API_ENDPOINTS.TEACHER.ALL_STUDENT, {
+    params: { schoolCode, page, size },
   });
   return response.data;
 };

@@ -103,3 +103,92 @@ export const getStudentAdmissions = async ({
 export const createStudentAdmission = async (data: NewAdmissionPayload): Promise<void> => {
   await api.post(API_ENDPOINTS.STUDENT_ADMISSION.CREATE, data);
 };
+
+// ─── Student Class Section service ──────────────────────────────────────────
+// Dedicated service for the student-class-section-controller endpoints —
+// assigns a student to a class + section for an academic year. Every
+// endpoint here returns/accepts the raw entity — no {result} envelope.
+
+export interface StudentClassSectionPayload {
+  studentId: number;
+  classId: number;
+  sectionId: number;
+  academicYear: string;
+}
+
+export interface StudentClassSection {
+  id: number;
+  student: StudentUser;
+  schoolClass: SchoolClass;
+  section: StudentSection;
+  academicYear: string;
+}
+
+export const createStudentClassSection = async (data: StudentClassSectionPayload): Promise<StudentClassSection> => {
+  const response = await api.post<StudentClassSection>(API_ENDPOINTS.STUDENT_CLASS_SECTION.CREATE, data);
+  return response.data;
+};
+
+export const getStudentClassSection = async (id: number): Promise<StudentClassSection> => {
+  const response = await api.get<StudentClassSection>(API_ENDPOINTS.STUDENT_CLASS_SECTION.GET(id));
+  return response.data;
+};
+
+export const updateStudentClassSection = async (id: number, data: StudentClassSectionPayload): Promise<StudentClassSection> => {
+  const response = await api.put<StudentClassSection>(API_ENDPOINTS.STUDENT_CLASS_SECTION.UPDATE(id), data);
+  return response.data;
+};
+
+export const deleteStudentClassSection = async (id: number): Promise<void> => {
+  await api.delete(API_ENDPOINTS.STUDENT_CLASS_SECTION.DELETE(id));
+};
+
+/** One roster member as returned by the class roster endpoint — a lighter shape than StudentUser (no status/schoolCode/createdAt). */
+export interface RosterStudent {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  role: Role;
+}
+
+/** One section's roster for a class + academic year. */
+export interface ClassSectionRoster {
+  classId: number;
+  className: string;
+  sectionName: string;
+  academicYear: string;
+  students: RosterStudent[];
+}
+
+export interface ClassSectionRosterPage {
+  content: ClassSectionRoster[];
+  totalElements: number;
+  totalPages: number;
+  pageNumber: number;
+  pageSize: number;
+  last: boolean;
+}
+
+export interface ClassSectionRosterParams {
+  /** Required by the backend — the roster is always scoped to one class. */
+  classId: number;
+  academicYear?: string;
+  page?: number;
+  size?: number;
+  sort?: string[];
+}
+
+/** Every section of a class, each with its rostered students for an academic year. Returns the raw Page shape — no envelope. */
+export const getClassSectionRoster = async ({
+  classId,
+  academicYear,
+  page = 0,
+  size = 200,
+  sort,
+}: ClassSectionRosterParams): Promise<ClassSectionRosterPage> => {
+  const response = await api.get<ClassSectionRosterPage>(API_ENDPOINTS.STUDENT_CLASS_SECTION.ROSTER(classId), {
+    params: { classId, academicYear, page, size, sort },
+  });
+  return response.data;
+};

@@ -116,12 +116,35 @@ export const API_ENDPOINTS = {
     UPDATE: (id: number) => `/v1/exams/${id}`,
     DELETE: (id: number) => `/v1/exams/${id}`,
   },
+  HOME_WORK: {
+    LIST: '/v1/home-work',
+    CREATE: '/v1/home-work',
+    ADD_DAILY: '/v1/home-work/add-daily',
+    GET: (id: number) => `/v1/home-work/${id}`,
+    DELETE: (id: number) => `/v1/home-work/${id}`,
+  },
+  QUESTION: {
+    LIST: '/v1/questions',
+    CREATE: '/v1/questions',
+    GET: (id: number) => `/v1/questions/${id}`,
+    UPDATE: (id: number) => `/v1/questions/${id}`,
+    DELETE: (id: number) => `/v1/questions/${id}`,
+    BY_SUBJECT: (subjectId: number) => `/v1/questions/subject/${subjectId}`,
+    BY_SUBJECT_AND_TYPE: (subjectId: number, type: string) => `/v1/questions/subject/${subjectId}/type/${type}`,
+  },
   SUBJECT: {
     SAVE: '/v1/subject/save',
     LIST: '/v1/subject/list',
     GET: (id: number) => `/v1/subject/${id}`,
     UPDATE: (id: number) => `/v1/subject/update/${id}`,
     DELETE: (id: number) => `/v1/subject/delete/${id}`,
+  },
+  FEE_STRUCTURE: {
+    LIST: '/v1/fee-structures',
+    CREATE: '/v1/fee-structures',
+    GET: (id: number) => `/v1/fee-structures/${id}`,
+    UPDATE: (id: number) => `/v1/fee-structures/${id}`,
+    DELETE: (id: number) => `/v1/fee-structures/${id}`,
   },
   // Public/unauthenticated endpoints consumed by the marketing home page —
   // no session required, see lib/freeService.ts.

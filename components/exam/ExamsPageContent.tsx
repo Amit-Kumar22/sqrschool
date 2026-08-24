@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ClipboardList, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
+import { ClipboardList, FileQuestion, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteExam, getExams, type Exam } from '@/lib/examService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
@@ -20,6 +21,10 @@ const formatDateTime = (value: string) => (value ? new Date(value).toLocaleStrin
 
 /** Exam management page — shared between the Principal and Staff panels (see their /exams routes). */
 export default function ExamsPageContent() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const basePath = pathname.startsWith('/principal') ? '/principal' : '/staff';
+
   const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
 
   const [classes, setClasses] = useState<SchoolClass[]>([]);
@@ -226,9 +231,18 @@ export default function ExamsPageContent() {
       key: 'actions',
       header: 'Actions',
       align: 'right',
-      widthClassName: 'w-20',
+      widthClassName: 'w-28',
       render: (item) => (
         <div className="flex items-center justify-end gap-1">
+          <IconButton
+            icon={FileQuestion}
+            label="Manage questions"
+            variant="default"
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push(`${basePath}/exams/${item.id}/questions`);
+            }}
+          />
           <IconButton
             icon={Pencil}
             label="Edit"

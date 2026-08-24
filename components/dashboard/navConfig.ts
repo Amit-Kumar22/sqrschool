@@ -7,8 +7,10 @@ import {
   CalendarRange,
   ClipboardList,
   Contact2,
+  IndianRupee,
   LayoutDashboard,
   Layers,
+  NotebookPen,
   Palette,
   PlaySquare,
   School,
@@ -27,9 +29,9 @@ export interface NavItem {
 }
 
 /**
- * Nav items per role. SUPERADMIN and PRINCIPAL have APIs beyond auth/profile
- * today (theme management, school management); the other roles get a
- * Dashboard + Profile shell, ready to grow once their own APIs are wired up.
+ * Nav items per role. SUPERADMIN, PRINCIPAL, STAFF and TEACHER have APIs
+ * beyond auth/profile today; STUDENT still gets a Dashboard + Profile shell,
+ * ready to grow once its own APIs are wired up.
  */
 export function getNavItems(role: Role): NavItem[] {
   const base = role.toLowerCase();
@@ -47,6 +49,7 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Staff', href: '/principal/staff', icon: Users });
     items.push({ label: 'Exams', href: '/principal/exams', icon: ClipboardList });
     items.push({ label: 'Teacher Assignments', href: '/principal/teacher-section', icon: UserCog });
+    items.push({ label: 'Fee Structure', href: '/principal/fee-structure', icon: IndianRupee });
   }
 
   if (role === 'STAFF') {
@@ -59,8 +62,13 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Student Class Section', href: '/staff/student-class-section', icon: UsersRound });
     items.push({ label: 'Teacher Section', href: '/staff/teacher-section', icon: UserCog });
     items.push({ label: 'Exams', href: '/staff/exams', icon: ClipboardList });
+    items.push({ label: 'Fee Structure', href: '/staff/fee-structure', icon: IndianRupee });
     items.push({ label: 'YouTube Testimonials', href: '/staff/youtube-testimonials', icon: PlaySquare });
     items.push({ label: 'Chatbot Management', href: '/staff/chatbot', icon: Bot });
+  }
+
+  if (role === 'TEACHER') {
+    items.push({ label: 'Homework', href: '/teacher/homework', icon: NotebookPen });
   }
 
   items.push({ label: 'My Profile', href: `/${base}/profile`, icon: UserCircle });

@@ -19,13 +19,11 @@ const todayIso = () => new Date().toISOString().slice(0, 10);
 const blankNote = (): NoteFormState => ({ homeworkDate: todayIso(), questionsText: '' });
 
 export default function HomeworkFormModal({
-  schoolCode,
   assignments,
   defaultTeacherClassId,
   onClose,
   onSaved,
 }: {
-  schoolCode: string;
   assignments: TeacherSubjectMapping[];
   defaultTeacherClassId: number | '';
   onClose: () => void;
@@ -63,7 +61,6 @@ export default function HomeworkFormModal({
     }
 
     const payload: HomeworkPayload = {
-      schoolCode,
       teacherClassId: Number(teacherClassId),
       notes: notes.map((n) => ({
         homeworkDate: n.homeworkDate,

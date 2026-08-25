@@ -8,10 +8,8 @@ import type { SchoolClass } from './classService';
 // endpoints — assigns a teacher to a subject for a class section. Every
 // endpoint here returns/accepts the raw entity — no {result} envelope.
 //
-// Unlike every other list endpoint in this codebase, the plain LIST endpoint
-// takes no schoolCode — confirmed against the API docs, presumably scoped
-// server-side from the caller's own school. The /admin variant (for
-// principal-level cross-school viewing) does require schoolCode explicitly.
+// The /admin variant is a broader-permission list (for principal-level
+// cross-school viewing) alongside the caller-scoped plain LIST endpoint.
 
 export interface MappingTeacher {
   id: number;
@@ -20,7 +18,6 @@ export interface MappingTeacher {
   phone: string;
   role: Role;
   status: string;
-  schoolCode: string;
   createdAt: string;
 }
 
@@ -50,7 +47,6 @@ export interface TeacherSubjectMappingPayload {
   subjectId: number;
   sectionId: number;
   teacherId: number;
-  schoolCode: string;
 }
 
 export interface TeacherSubjectMappingPage {
@@ -100,22 +96,19 @@ export const deleteTeacherSubjectMapping = async (id: number): Promise<void> => 
 };
 
 export interface TeacherSubjectMappingAdminListParams {
-  /** Required by the backend — lets a principal view mappings for a specific school. */
-  schoolCode: string;
   page?: number;
   size?: number;
   sort?: string[];
 }
 
-/** Cross-school-capable admin view of the same mapping list — for the Principal panel. Returns the raw Page shape — no envelope. */
+/** Broader admin view of the same mapping list — for the Principal panel. Returns the raw Page shape — no envelope. */
 export const getTeacherSubjectMappingsAdmin = async ({
-  schoolCode,
   page = 0,
   size = 200,
   sort,
-}: TeacherSubjectMappingAdminListParams): Promise<TeacherSubjectMappingPage> => {
+}: TeacherSubjectMappingAdminListParams = {}): Promise<TeacherSubjectMappingPage> => {
   const response = await api.get<TeacherSubjectMappingPage>(API_ENDPOINTS.TEACHER_SUBJECT_MAPPING.ADMIN_LIST, {
-    params: { schoolCode, page, size, sort },
+    params: { page, size, sort },
   });
   return response.data;
 };

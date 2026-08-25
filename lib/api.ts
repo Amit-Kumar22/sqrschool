@@ -15,8 +15,12 @@ export function apiErrorMessage(err: unknown, fallback: string): string {
   return (err as { response?: { data?: { message?: string } } })?.response?.data?.message || fallback;
 }
 
-// Attach Bearer token from cookie on every request
+// Attach Bearer token from cookie on every request except login — a stale
+// token left over from a previous session shouldn't ride along on a fresh
+// login attempt (the backend can reject the request over a bad/expired
+// token before it even reaches the login check).
 api.interceptors.request.use((config) => {
+  if (config.url === API_ENDPOINTS.AUTH.LOGIN) return config;
   const token = getAuthToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
@@ -85,7 +89,6 @@ export interface Profile {
   phone: string;
   role: Role;
   status: string;
-  schoolCode?: string;
   createdAt: string;
 }
 

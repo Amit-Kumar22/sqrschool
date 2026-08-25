@@ -2,9 +2,8 @@ import { api } from './api';
 import { API_ENDPOINTS } from './config';
 
 // ─── Exam service ────────────────────────────────────────────────────────────
-// Dedicated service for the exam-controller endpoints, scoped per school
-// (schoolCode is required on create/update and as a list filter). Every
-// endpoint here returns/accepts the raw entity — no {result} envelope.
+// Dedicated service for the exam-controller endpoints. Every endpoint here
+// returns/accepts the raw entity — no {result} envelope.
 
 // Only "DRAFT" is confirmed by the API spec — the rest are the expected
 // lifecycle stages. Unrecognized values still render fine (see
@@ -22,7 +21,6 @@ export interface Exam {
   description: string;
   schoolId: number;
   schoolName: string;
-  schoolCode: string;
   schoolClassId: number;
   schoolClassName: string;
   subjectId: number;
@@ -39,7 +37,6 @@ export interface Exam {
 export interface ExamPayload {
   name: string;
   description: string;
-  schoolCode: string;
   schoolClassId: number;
   subjectId: number;
   sectionIds: number[];
@@ -61,8 +58,6 @@ export interface ExamPage {
 }
 
 export interface ExamListParams {
-  /** Required by the backend — exams are always scoped to one school. */
-  schoolCode: string;
   classId?: number;
   subjectId?: number;
   sectionId?: number;
@@ -73,18 +68,17 @@ export interface ExamListParams {
 
 // Fetched with a generous page size since DataTable sorts/paginates
 // client-side over the full result set, same as getClasses/getAcademicYears.
-/** Paginated exam list for one school, optionally filtered by class/subject/section. Returns the raw Page<Exam> shape — no envelope. */
+/** Paginated exam list, optionally filtered by class/subject/section. Returns the raw Page<Exam> shape — no envelope. */
 export const getExams = async ({
-  schoolCode,
   classId,
   subjectId,
   sectionId,
   page = 0,
   size = 200,
   sort,
-}: ExamListParams): Promise<ExamPage> => {
+}: ExamListParams = {}): Promise<ExamPage> => {
   const response = await api.get<ExamPage>(API_ENDPOINTS.EXAM.LIST, {
-    params: { schoolCode, classId, subjectId, sectionId, page, size, sort },
+    params: { classId, subjectId, sectionId, page, size, sort },
   });
   return response.data;
 };
@@ -150,7 +144,6 @@ export interface Question {
 }
 
 export interface QuestionPayload {
-  schoolCode: string;
   examId: number;
   questionOrder: number;
   questionText: string;
@@ -172,17 +165,15 @@ export interface QuestionPage {
 }
 
 export interface QuestionListParams {
-  /** Required by the backend — questions are always scoped to one school. */
-  schoolCode: string;
   page?: number;
   size?: number;
   sort?: string[];
 }
 
 /** Every question in the school's bank. Returns the raw Page<Question> shape — no envelope. */
-export const getQuestions = async ({ schoolCode, page = 0, size = 200, sort }: QuestionListParams): Promise<QuestionPage> => {
+export const getQuestions = async ({ page = 0, size = 200, sort }: QuestionListParams = {}): Promise<QuestionPage> => {
   const response = await api.get<QuestionPage>(API_ENDPOINTS.QUESTION.LIST, {
-    params: { schoolCode, page, size, sort },
+    params: { page, size, sort },
   });
   return response.data;
 };

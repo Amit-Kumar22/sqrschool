@@ -29,12 +29,11 @@ function fromDatetimeLocal(value: string): string {
   return Number.isNaN(d.getTime()) ? '' : d.toISOString();
 }
 
-function toFormState(item: Exam | null, schoolCode: string, defaultClassId: number | ''): ExamPayload {
+function toFormState(item: Exam | null, defaultClassId: number | ''): ExamPayload {
   if (!item) {
     return {
       name: '',
       description: '',
-      schoolCode,
       schoolClassId: (defaultClassId || 0) as number,
       subjectId: 0,
       sectionIds: [],
@@ -49,7 +48,6 @@ function toFormState(item: Exam | null, schoolCode: string, defaultClassId: numb
   return {
     name: item.name,
     description: item.description,
-    schoolCode: item.schoolCode || schoolCode,
     schoolClassId: item.schoolClassId,
     subjectId: item.subjectId,
     sectionIds: item.sections.map((s) => s.id),
@@ -64,7 +62,6 @@ function toFormState(item: Exam | null, schoolCode: string, defaultClassId: numb
 
 export default function ExamFormModal({
   item,
-  schoolCode,
   classes,
   subjects,
   defaultClassId,
@@ -72,14 +69,13 @@ export default function ExamFormModal({
   onSaved,
 }: {
   item: Exam | null;
-  schoolCode: string;
   classes: SchoolClass[];
   subjects: Subject[];
   defaultClassId: number | '';
   onClose: () => void;
   onSaved: (item: Exam) => void;
 }) {
-  const [form, setForm] = useState<ExamPayload>(() => toFormState(item, schoolCode, defaultClassId));
+  const [form, setForm] = useState<ExamPayload>(() => toFormState(item, defaultClassId));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 

@@ -3,45 +3,33 @@
 import { FormEvent, useState } from 'react';
 import { BookMarked } from 'lucide-react';
 import { createSubject, updateSubject, type Subject, type SubjectPayload } from '@/lib/subjectService';
-import type { School } from '@/lib/schoolService';
 import { apiErrorMessage } from '@/lib/api';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import { SelectField, TextField } from '@/components/ui/FormField';
+import { TextField } from '@/components/ui/FormField';
 
-function toFormState(item: Subject | null, schoolCode: string): SubjectPayload {
-  return { schoolCode, subjectName: item?.subjectName ?? '', subjectCode: item?.subjectCode ?? '' };
+function toFormState(item: Subject | null): SubjectPayload {
+  return { subjectName: item?.subjectName ?? '', subjectCode: item?.subjectCode ?? '' };
 }
 
 export default function SubjectFormModal({
   item,
-  schoolCode,
-  schools,
   onClose,
   onSaved,
 }: {
   item: Subject | null;
-  /** The account's own school — auto-fills and hides the school field when set. */
-  schoolCode: string;
-  /** Only needed (and only shown) when schoolCode is empty — lets the admin pick which school this subject belongs to. */
-  schools?: School[];
   onClose: () => void;
   onSaved: (item: Subject) => void;
 }) {
-  const [form, setForm] = useState<SubjectPayload>(() => toFormState(item, schoolCode));
+  const [form, setForm] = useState<SubjectPayload>(() => toFormState(item));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   const isEditing = !!item;
-  const needsSchoolPicker = !schoolCode;
   const setField = (key: keyof SubjectPayload, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (needsSchoolPicker && !form.schoolCode) {
-      setError('Please select a school.');
-      return;
-    }
     if (!form.subjectName.trim()) {
       setError('Subject name is required.');
       return;
@@ -82,24 +70,6 @@ export default function SubjectFormModal({
       }
     >
       <form id="subject-form" onSubmit={handleSubmit} className="grid gap-3.5">
-        {needsSchoolPicker && (
-          <SelectField
-            label="School"
-            required
-            value={form.schoolCode}
-            onChange={(e) => setField('schoolCode', e.target.value)}
-          >
-            <option value="" disabled>
-              Select a school
-            </option>
-            {(schools ?? []).map((school) => (
-              <option key={school.id} value={school.schoolCode}>
-                {school.schoolName} ({school.schoolCode})
-              </option>
-            ))}
-          </SelectField>
-        )}
-
         <TextField
           label="Subject name"
           required

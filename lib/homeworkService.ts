@@ -13,7 +13,6 @@ export interface HomeworkNotePayload {
 }
 
 export interface HomeworkPayload {
-  schoolCode: string;
   /** The id of the teacher's subject-section assignment (a TeacherSubjectMapping.id) this homework is for. */
   teacherClassId: number;
   notes: HomeworkNotePayload[];
@@ -52,17 +51,15 @@ export interface HomeworkPage {
 }
 
 export interface HomeworkListParams {
-  /** Required by the backend — homework is always scoped to one school. */
-  schoolCode: string;
   page?: number;
   size?: number;
   sort?: string[];
 }
 
-/** Paginated homework list, scoped server-side to the caller's own school (and, per the response shape, apparently their own assignments). Returns the raw Page shape — no envelope. */
-export const getHomeworks = async ({ schoolCode, page = 0, size = 200, sort }: HomeworkListParams): Promise<HomeworkPage> => {
+/** Paginated homework list, scoped server-side to the caller's own assignments. Returns the raw Page shape — no envelope. */
+export const getHomeworks = async ({ page = 0, size = 200, sort }: HomeworkListParams = {}): Promise<HomeworkPage> => {
   const response = await api.get<HomeworkPage>(API_ENDPOINTS.HOME_WORK.LIST, {
-    params: { schoolCode, page, size, sort },
+    params: { page, size, sort },
   });
   return response.data;
 };

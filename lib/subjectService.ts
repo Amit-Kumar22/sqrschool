@@ -2,8 +2,7 @@ import { api } from './api';
 import { API_ENDPOINTS } from './config';
 
 // ─── Subject service ─────────────────────────────────────────────────────────
-// Dedicated service for the subject-controller endpoints, scoped per school
-// (schoolCode is required on both list and save). Every endpoint here
+// Dedicated service for the subject-controller endpoints. Every endpoint here
 // returns/accepts the raw entity — no {result} envelope.
 
 export interface Subject {
@@ -15,7 +14,6 @@ export interface Subject {
 export interface SubjectPayload {
   subjectName: string;
   subjectCode: string;
-  schoolCode: string;
 }
 
 export interface SubjectPage {
@@ -28,8 +26,6 @@ export interface SubjectPage {
 }
 
 export interface SubjectListParams {
-  /** Required by the backend — subjects are always scoped to one school. */
-  schoolCode: string;
   subjectName?: string;
   page?: number;
   size?: number;
@@ -38,16 +34,15 @@ export interface SubjectListParams {
 
 // Fetched with a generous page size since DataTable sorts/paginates
 // client-side over the full result set, same as getClasses/getAcademicYears.
-/** Paginated subject list for one school, optionally filtered by name. Returns the raw Page<Subject> shape — no envelope. */
+/** Paginated subject list, optionally filtered by name. Returns the raw Page<Subject> shape — no envelope. */
 export const getSubjects = async ({
-  schoolCode,
   subjectName,
   page = 0,
   size = 200,
   sort,
-}: SubjectListParams): Promise<SubjectPage> => {
+}: SubjectListParams = {}): Promise<SubjectPage> => {
   const response = await api.get<SubjectPage>(API_ENDPOINTS.SUBJECT.LIST, {
-    params: { schoolCode, subjectName, page, size, sort },
+    params: { subjectName, page, size, sort },
   });
   return response.data;
 };

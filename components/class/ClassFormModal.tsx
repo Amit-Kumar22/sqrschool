@@ -3,45 +3,33 @@
 import { FormEvent, useState } from 'react';
 import { BookOpen } from 'lucide-react';
 import { createClass, updateClass, type ClassPayload, type SchoolClass } from '@/lib/classService';
-import type { School } from '@/lib/schoolService';
 import { apiErrorMessage } from '@/lib/api';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import { SelectField, TextField } from '@/components/ui/FormField';
+import { TextField } from '@/components/ui/FormField';
 
-function toFormState(item: SchoolClass | null, schoolCode: string): ClassPayload {
-  return { schoolCode, className: item?.className ?? '' };
+function toFormState(item: SchoolClass | null): ClassPayload {
+  return { className: item?.className ?? '' };
 }
 
 export default function ClassFormModal({
   item,
-  schoolCode,
-  schools,
   onClose,
   onSaved,
 }: {
   item: SchoolClass | null;
-  /** The account's own school — auto-fills and hides the school field when set. */
-  schoolCode: string;
-  /** Only needed (and only shown) when schoolCode is empty — lets the admin pick which school this class belongs to. */
-  schools?: School[];
   onClose: () => void;
   onSaved: (item: SchoolClass) => void;
 }) {
-  const [form, setForm] = useState<ClassPayload>(() => toFormState(item, schoolCode));
+  const [form, setForm] = useState<ClassPayload>(() => toFormState(item));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   const isEditing = !!item;
-  const needsSchoolPicker = !schoolCode;
   const setField = (key: keyof ClassPayload, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (needsSchoolPicker && !form.schoolCode) {
-      setError('Please select a school.');
-      return;
-    }
     if (!form.className.trim()) {
       setError('Class name is required.');
       return;
@@ -78,24 +66,6 @@ export default function ClassFormModal({
       }
     >
       <form id="class-form" onSubmit={handleSubmit} className="grid gap-3.5">
-        {needsSchoolPicker && (
-          <SelectField
-            label="School"
-            required
-            value={form.schoolCode}
-            onChange={(e) => setField('schoolCode', e.target.value)}
-          >
-            <option value="" disabled>
-              Select a school
-            </option>
-            {(schools ?? []).map((school) => (
-              <option key={school.id} value={school.schoolCode}>
-                {school.schoolName} ({school.schoolCode})
-              </option>
-            ))}
-          </SelectField>
-        )}
-
         <TextField
           label="Class name"
           required

@@ -36,7 +36,6 @@ function toFormState(item: TeacherSubjectMapping | null): FormState {
 
 export default function TeacherSubjectFormModal({
   item,
-  schoolCode,
   classes,
   subjects,
   teachers,
@@ -44,7 +43,6 @@ export default function TeacherSubjectFormModal({
   onSaved,
 }: {
   item: TeacherSubjectMapping | null;
-  schoolCode: string;
   classes: SchoolClass[];
   subjects: Subject[];
   teachers: StudentAdmission[];
@@ -106,7 +104,6 @@ export default function TeacherSubjectFormModal({
       subjectId: Number(form.subjectId),
       sectionId: Number(form.sectionId),
       teacherId: Number(form.teacherId),
-      schoolCode,
     };
 
     setSaving(true);

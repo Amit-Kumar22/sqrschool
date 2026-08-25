@@ -3,8 +3,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { Eye, Plus, Search, Users, X } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
-import { fetchAcrossAllSchools, getSchools, getStaffMembers, type School, type StaffMember, type StaffRole } from '@/lib/schoolService';
-import { useSchoolCode } from '@/lib/useSchoolCode';
+import { getStaffMembers, type StaffMember, type StaffRole } from '@/lib/schoolService';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { RoleBadge } from '@/components/ui/Badge';
@@ -13,8 +12,6 @@ import StaffFormModal from '@/components/staff/StaffFormModal';
 import StaffDetailModal from '@/components/staff/StaffDetailModal';
 
 export default function PrincipalStaffPage() {
-  const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
-
   const [roleFilter, setRoleFilter] = useState<StaffRole | ''>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeSearch, setActiveSearch] = useState('');
@@ -26,35 +23,11 @@ export default function PrincipalStaffPage() {
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewingStaff, setViewingStaff] = useState<StaffMember | null>(null);
 
-  // Only needed when the account has no schoolCode of its own — lets the
-  // "Add staff" form ask which school to attach the new member to, instead
-  // of staying disabled forever for admins who manage more than one school.
-  const [schools, setSchools] = useState<School[]>([]);
-  const [schoolsListLoading, setSchoolsListLoading] = useState(false);
-
-  useEffect(() => {
-    if (schoolsLoading || selectedSchoolCode) return;
-    const loadSchools = async () => {
-      setSchoolsListLoading(true);
-      try {
-        const page = await getSchools();
-        setSchools(page.content);
-      } catch {
-        // Non-fatal — the "Add staff" school picker just stays empty.
-      } finally {
-        setSchoolsListLoading(false);
-      }
-    };
-    loadSchools();
-  }, [schoolsLoading, selectedSchoolCode]);
-
-  const loadStaff = async (schoolCode: string) => {
+  const loadStaff = async () => {
     setLoading(true);
     setError('');
     try {
-      const fetchFor = (code: string) =>
-        getStaffMembers({ schoolCode: code, role: roleFilter || undefined, search: activeSearch || undefined });
-      const content = schoolCode ? (await fetchFor(schoolCode)).content : await fetchAcrossAllSchools(fetchFor);
+      const content = (await getStaffMembers({ role: roleFilter || undefined, search: activeSearch || undefined })).content;
       setStaff(content);
     } catch (err) {
       setError(apiErrorMessage(err, 'Could not load staff from the server.'));
@@ -64,10 +37,9 @@ export default function PrincipalStaffPage() {
   };
 
   useEffect(() => {
-    if (schoolsLoading) return;
-    loadStaff(selectedSchoolCode);
+    loadStaff();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSchoolCode, schoolsLoading, roleFilter, activeSearch]);
+  }, [roleFilter, activeSearch]);
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -81,7 +53,7 @@ export default function PrincipalStaffPage() {
 
   const handleSaved = async () => {
     setFormModalOpen(false);
-    await loadStaff(selectedSchoolCode);
+    await loadStaff();
   };
 
   const columns: DataTableColumn<StaffMember>[] = [
@@ -139,11 +111,7 @@ export default function PrincipalStaffPage() {
         title="Staff Management"
         description="View teaching and non-teaching staff, and add new members to a school."
         actions={
-          <Button
-            icon={Plus}
-            onClick={() => setFormModalOpen(true)}
-            disabled={schoolsLoading || (!selectedSchoolCode && (schoolsListLoading || schools.length === 0))}
-          >
+          <Button icon={Plus} onClick={() => setFormModalOpen(true)}>
             Add staff
           </Button>
         }
@@ -194,9 +162,9 @@ export default function PrincipalStaffPage() {
         </form>
       </div>
 
-      {(error || schoolError) && (
+      {error && (
         <div className="animate-fade-in-up rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error || schoolError}
+          {error}
         </div>
       )}
 
@@ -204,19 +172,12 @@ export default function PrincipalStaffPage() {
         columns={columns}
         data={staff}
         rowKey={(member) => member.id}
-        loading={loading || schoolsLoading}
+        loading={loading}
         emptyTitle="No staff yet"
         emptyDescription="Add your first staff member to get started."
       />
 
-      {formModalOpen && (
-        <StaffFormModal
-          schoolCode={selectedSchoolCode}
-          schools={schools}
-          onClose={() => setFormModalOpen(false)}
-          onSaved={handleSaved}
-        />
-      )}
+      {formModalOpen && <StaffFormModal onClose={() => setFormModalOpen(false)} onSaved={handleSaved} />}
 
       {viewingStaff && <StaffDetailModal staff={viewingStaff} onClose={() => setViewingStaff(null)} />}
     </div>

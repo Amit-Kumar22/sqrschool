@@ -27,10 +27,9 @@ const MONTHS = [
   'December',
 ];
 
-function toFormState(item: FeeStructure | null, schoolCode: string): FeeStructurePayload {
+function toFormState(item: FeeStructure | null): FeeStructurePayload {
   if (!item) {
     return {
-      schoolCode,
       classId: 0,
       academicYearId: 0,
       feeType: 'TUITION_FEE',
@@ -40,7 +39,6 @@ function toFormState(item: FeeStructure | null, schoolCode: string): FeeStructur
     };
   }
   return {
-    schoolCode,
     classId: item.classId,
     academicYearId: item.academicYearId,
     feeType: item.feeType,
@@ -52,20 +50,18 @@ function toFormState(item: FeeStructure | null, schoolCode: string): FeeStructur
 
 export default function FeeStructureFormModal({
   item,
-  schoolCode,
   classes,
   academicYears,
   onClose,
   onSaved,
 }: {
   item: FeeStructure | null;
-  schoolCode: string;
   classes: SchoolClass[];
   academicYears: AcademicYear[];
   onClose: () => void;
   onSaved: (item: FeeStructure) => void;
 }) {
-  const [form, setForm] = useState<FeeStructurePayload>(() => toFormState(item, schoolCode));
+  const [form, setForm] = useState<FeeStructurePayload>(() => toFormState(item));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 

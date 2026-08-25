@@ -5,16 +5,12 @@ import { Layers, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteSection, getSections, type Section } from '@/lib/classSectionService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
-import { fetchAcrossAllSchools } from '@/lib/schoolService';
-import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import Button, { IconButton } from '@/components/ui/Button';
 import SectionFormModal from '@/components/class-section/SectionFormModal';
 
 export default function StaffClassSectionPage() {
-  const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
-
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [classesLoading, setClassesLoading] = useState(false);
   const [selectedClassId, setSelectedClassId] = useState<number | ''>('');
@@ -28,14 +24,11 @@ export default function StaffClassSectionPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (schoolsLoading) return;
     const loadClasses = async () => {
       setClassesLoading(true);
       setError('');
       try {
-        const content = selectedSchoolCode
-          ? (await getClasses({ schoolCode: selectedSchoolCode })).content
-          : await fetchAcrossAllSchools((code) => getClasses({ schoolCode: code }));
+        const content = (await getClasses()).content;
         setClasses(content);
         setSelectedClassId(content.length > 0 ? content[0].id : '');
       } catch (err) {
@@ -45,7 +38,7 @@ export default function StaffClassSectionPage() {
       }
     };
     loadClasses();
-  }, [selectedSchoolCode, schoolsLoading]);
+  }, []);
 
   const loadSections = async (classId: number | '') => {
     // Clear immediately (not just on success) so switching classes never
@@ -147,7 +140,7 @@ export default function StaffClassSectionPage() {
     },
   ];
 
-  const noClassesForSchool = !schoolsLoading && !classesLoading && classes.length === 0;
+  const noClassesForSchool = !classesLoading && classes.length === 0;
   const selectedClassName = classes.find((cls) => cls.id === selectedClassId)?.className;
 
   return (
@@ -188,9 +181,9 @@ export default function StaffClassSectionPage() {
         </label>
       </div>
 
-      {(error || schoolError) && (
+      {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error || schoolError}
+          {error}
         </div>
       )}
 
@@ -198,7 +191,7 @@ export default function StaffClassSectionPage() {
         columns={columns}
         data={sections}
         rowKey={(item) => item.id}
-        loading={loading || schoolsLoading || classesLoading}
+        loading={loading || classesLoading}
         emptyTitle={selectedClassName ? `No sections for ${selectedClassName}` : 'No sections yet'}
         emptyDescription={
           classes.length === 0

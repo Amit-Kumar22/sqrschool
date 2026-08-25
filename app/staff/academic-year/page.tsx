@@ -8,8 +8,6 @@ import {
   getAcademicYears,
   type AcademicYear,
 } from '@/lib/academicYearService';
-import { fetchAcrossAllSchools, getSchools, type School } from '@/lib/schoolService';
-import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
@@ -19,8 +17,6 @@ import AcademicYearFormModal from '@/components/academic-year/AcademicYearFormMo
 const formatDate = (value: string) => (value ? new Date(value).toLocaleDateString() : '—');
 
 export default function StaffAcademicYearPage() {
-  const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
-
   const [items, setItems] = useState<AcademicYear[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,35 +25,11 @@ export default function StaffAcademicYearPage() {
   const [editingItem, setEditingItem] = useState<AcademicYear | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  // Only needed when the account has no schoolCode of its own — lets the
-  // "Add academic year" form ask which school it belongs to, instead of
-  // staying disabled forever for admins who manage more than one school.
-  const [schools, setSchools] = useState<School[]>([]);
-  const [schoolsListLoading, setSchoolsListLoading] = useState(false);
-
-  useEffect(() => {
-    if (schoolsLoading || selectedSchoolCode) return;
-    const loadSchools = async () => {
-      setSchoolsListLoading(true);
-      try {
-        const page = await getSchools();
-        setSchools(page.content);
-      } catch {
-        // Non-fatal — the "Add academic year" school picker just stays empty.
-      } finally {
-        setSchoolsListLoading(false);
-      }
-    };
-    loadSchools();
-  }, [schoolsLoading, selectedSchoolCode]);
-
-  const loadItems = async (schoolCode: string) => {
+  const loadItems = async () => {
     setLoading(true);
     setError('');
     try {
-      const content = schoolCode
-        ? (await getAcademicYears({ schoolCode })).content
-        : await fetchAcrossAllSchools((code) => getAcademicYears({ schoolCode: code }));
+      const content = (await getAcademicYears()).content;
       setItems(content);
     } catch (err) {
       setError(apiErrorMessage(err, 'Could not load academic years from the server.'));
@@ -67,9 +39,8 @@ export default function StaffAcademicYearPage() {
   };
 
   useEffect(() => {
-    if (schoolsLoading) return;
-    loadItems(selectedSchoolCode);
-  }, [selectedSchoolCode, schoolsLoading]);
+    loadItems();
+  }, []);
 
   const openCreateModal = () => {
     setEditingItem(null);
@@ -98,7 +69,7 @@ export default function StaffAcademicYearPage() {
   const handleSaved = async () => {
     setFormModalOpen(false);
     setEditingItem(null);
-    await loadItems(selectedSchoolCode);
+    await loadItems();
   };
 
   const columns: DataTableColumn<AcademicYear>[] = [
@@ -178,19 +149,15 @@ export default function StaffAcademicYearPage() {
         title="Academic Year"
         description="Manage academic year terms for a school."
         actions={
-          <Button
-            icon={Plus}
-            onClick={openCreateModal}
-            disabled={schoolsLoading || (!selectedSchoolCode && (schoolsListLoading || schools.length === 0))}
-          >
+          <Button icon={Plus} onClick={openCreateModal}>
             Add academic year
           </Button>
         }
       />
 
-      {(error || schoolError) && (
+      {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error || schoolError}
+          {error}
         </div>
       )}
 
@@ -198,7 +165,7 @@ export default function StaffAcademicYearPage() {
         columns={columns}
         data={items}
         rowKey={(item) => item.id}
-        loading={loading || schoolsLoading}
+        loading={loading}
         emptyTitle="No academic years yet"
         emptyDescription="Add the first academic year to get started."
       />
@@ -206,8 +173,6 @@ export default function StaffAcademicYearPage() {
       {formModalOpen && (
         <AcademicYearFormModal
           item={editingItem}
-          schoolCode={selectedSchoolCode}
-          schools={schools}
           onClose={() => {
             setFormModalOpen(false);
             setEditingItem(null);

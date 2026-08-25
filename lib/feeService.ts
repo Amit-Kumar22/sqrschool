@@ -2,8 +2,7 @@ import { api } from './api';
 import { API_ENDPOINTS } from './config';
 
 // ─── Fee Structure service ───────────────────────────────────────────────────
-// Dedicated service for the fee-structure-controller endpoints, scoped per
-// school (schoolCode is required on both list and create/update). Every
+// Dedicated service for the fee-structure-controller endpoints. Every
 // endpoint here returns/accepts the raw entity — no {result} envelope.
 
 // Only "TUITION_FEE" is confirmed by the API spec — the rest are the usual
@@ -25,7 +24,6 @@ export interface FeeStructure {
 }
 
 export interface FeeStructurePayload {
-  schoolCode: string;
   classId: number;
   academicYearId: number;
   feeType: FeeType;
@@ -44,8 +42,6 @@ export interface FeeStructurePage {
 }
 
 export interface FeeStructureListParams {
-  /** Required by the backend — fee structures are always scoped to one school. */
-  schoolCode: string;
   classId?: number;
   academicYearId?: number;
   page?: number;
@@ -55,17 +51,16 @@ export interface FeeStructureListParams {
 
 // Fetched with a generous page size since DataTable sorts/paginates
 // client-side over the full result set, same as getClasses/getAcademicYears.
-/** Paginated fee structure list for one school, optionally filtered by class/academic year. Returns the raw Page<FeeStructure> shape — no envelope. */
+/** Paginated fee structure list, optionally filtered by class/academic year. Returns the raw Page<FeeStructure> shape — no envelope. */
 export const getFeeStructures = async ({
-  schoolCode,
   classId,
   academicYearId,
   page = 0,
   size = 200,
   sort,
-}: FeeStructureListParams): Promise<FeeStructurePage> => {
+}: FeeStructureListParams = {}): Promise<FeeStructurePage> => {
   const response = await api.get<FeeStructurePage>(API_ENDPOINTS.FEE_STRUCTURE.LIST, {
-    params: { schoolCode, classId, academicYearId, page, size, sort },
+    params: { classId, academicYearId, page, size, sort },
   });
   return response.data;
 };

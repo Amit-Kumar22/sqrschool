@@ -8,8 +8,6 @@ import { deleteExam, getExams, type Exam } from '@/lib/examService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
 import { getSections, type Section } from '@/lib/classSectionService';
 import { getSubjects, type Subject } from '@/lib/subjectService';
-import { fetchAcrossAllSchools } from '@/lib/schoolService';
-import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { ExamStatusBadge } from '@/components/ui/Badge';
@@ -24,8 +22,6 @@ export default function ExamsPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const basePath = pathname.startsWith('/principal') ? '/principal' : '/staff';
-
-  const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
 
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [classesLoading, setClassesLoading] = useState(false);
@@ -47,14 +43,11 @@ export default function ExamsPageContent() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (schoolsLoading) return;
     const loadClasses = async () => {
       setClassesLoading(true);
       setError('');
       try {
-        const content = selectedSchoolCode
-          ? (await getClasses({ schoolCode: selectedSchoolCode })).content
-          : await fetchAcrossAllSchools((code) => getClasses({ schoolCode: code }));
+        const content = (await getClasses()).content;
         setClasses(content);
       } catch (err) {
         setError(apiErrorMessage(err, 'Could not load classes from the server.'));
@@ -63,17 +56,14 @@ export default function ExamsPageContent() {
       }
     };
     loadClasses();
-  }, [selectedSchoolCode, schoolsLoading]);
+  }, []);
 
   useEffect(() => {
-    if (schoolsLoading) return;
     const loadSubjects = async () => {
       setSubjectsLoading(true);
       setError('');
       try {
-        const content = selectedSchoolCode
-          ? (await getSubjects({ schoolCode: selectedSchoolCode })).content
-          : await fetchAcrossAllSchools((code) => getSubjects({ schoolCode: code }));
+        const content = (await getSubjects()).content;
         setSubjects(content);
       } catch (err) {
         setError(apiErrorMessage(err, 'Could not load subjects from the server.'));
@@ -82,7 +72,7 @@ export default function ExamsPageContent() {
       }
     };
     loadSubjects();
-  }, [selectedSchoolCode, schoolsLoading]);
+  }, []);
 
   // Section filter options depend on the selected class filter.
   useEffect(() => {
@@ -113,9 +103,7 @@ export default function ExamsPageContent() {
         subjectId: subjectFilter || undefined,
         sectionId: sectionFilter || undefined,
       };
-      const content = selectedSchoolCode
-        ? (await getExams({ schoolCode: selectedSchoolCode, ...params })).content
-        : await fetchAcrossAllSchools((code) => getExams({ schoolCode: code, ...params }));
+      const content = (await getExams(params)).content;
       setExams(content);
     } catch (err) {
       setError(apiErrorMessage(err, 'Could not load exams from the server.'));
@@ -125,10 +113,9 @@ export default function ExamsPageContent() {
   };
 
   useEffect(() => {
-    if (schoolsLoading) return;
     loadExams();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSchoolCode, schoolsLoading, classFilter, subjectFilter, sectionFilter]);
+  }, [classFilter, subjectFilter, sectionFilter]);
 
   const openCreateModal = () => {
     setEditingItem(null);
@@ -326,9 +313,9 @@ export default function ExamsPageContent() {
         </SelectField>
       </div>
 
-      {(error || schoolError) && (
+      {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error || schoolError}
+          {error}
         </div>
       )}
 
@@ -336,7 +323,7 @@ export default function ExamsPageContent() {
         columns={columns}
         data={exams}
         rowKey={(item) => item.id}
-        loading={loading || schoolsLoading || classesLoading || subjectsLoading}
+        loading={loading || classesLoading || subjectsLoading}
         emptyTitle="No exams yet"
         emptyDescription={
           classes.length === 0
@@ -350,7 +337,6 @@ export default function ExamsPageContent() {
       {formModalOpen && (
         <ExamFormModal
           item={editingItem}
-          schoolCode={selectedSchoolCode || editingItem?.schoolCode || ''}
           classes={classes}
           subjects={subjects}
           defaultClassId={classFilter}

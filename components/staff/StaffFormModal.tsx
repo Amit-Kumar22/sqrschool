@@ -2,16 +2,15 @@
 
 import { FormEvent, useState } from 'react';
 import { CheckCircle2, Users } from 'lucide-react';
-import { addStaff, type AddStaffPayload, type School, type StaffRole } from '@/lib/schoolService';
+import { addStaff, type AddStaffPayload, type StaffRole } from '@/lib/schoolService';
 import { apiErrorMessage } from '@/lib/api';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { SelectField, TextField } from '@/components/ui/FormField';
 
-function emptyForm(schoolCode: string): AddStaffPayload {
+function emptyForm(): AddStaffPayload {
   return {
     name: '',
-    schoolCode,
     password: '',
     role: 'TEACHER',
     email: '',
@@ -20,34 +19,23 @@ function emptyForm(schoolCode: string): AddStaffPayload {
 }
 
 export default function StaffFormModal({
-  schoolCode,
-  schools,
   onClose,
   onSaved,
 }: {
-  /** The account's own school — auto-fills and hides the school field when set. */
-  schoolCode: string;
-  /** Only needed (and only shown) when schoolCode is empty — lets the admin pick which school this staff member belongs to. */
-  schools?: School[];
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const [form, setForm] = useState<AddStaffPayload>(() => emptyForm(schoolCode));
+  const [form, setForm] = useState<AddStaffPayload>(() => emptyForm());
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const needsSchoolPicker = !schoolCode;
   const setField = (key: keyof AddStaffPayload, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!form.name.trim()) {
       setError('Name is required.');
-      return;
-    }
-    if (needsSchoolPicker && !form.schoolCode) {
-      setError('Please select a school.');
       return;
     }
     if (!form.password.trim()) {
@@ -106,24 +94,6 @@ export default function StaffFormModal({
     >
       <form id="staff-form" onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-2">
         <TextField label="Full name" required value={form.name} onChange={(e) => setField('name', e.target.value)} />
-
-        {needsSchoolPicker && (
-          <SelectField
-            label="School"
-            required
-            value={form.schoolCode}
-            onChange={(e) => setField('schoolCode', e.target.value)}
-          >
-            <option value="" disabled>
-              Select a school
-            </option>
-            {(schools ?? []).map((school) => (
-              <option key={school.id} value={school.schoolCode}>
-                {school.schoolName} ({school.schoolCode})
-              </option>
-            ))}
-          </SelectField>
-        )}
 
         <SelectField label="Role" value={form.role} onChange={(e) => setField('role', e.target.value as StaffRole)}>
           <option value="TEACHER">Teacher</option>

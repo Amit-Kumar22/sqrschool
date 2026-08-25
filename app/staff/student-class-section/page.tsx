@@ -14,8 +14,6 @@ import {
 } from '@/lib/studentService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
 import { getAcademicYears, type AcademicYear } from '@/lib/academicYearService';
-import { fetchAcrossAllSchools } from '@/lib/schoolService';
-import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -30,8 +28,6 @@ interface RosterRow {
 }
 
 export default function StaffStudentClassSectionPage() {
-  const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
-
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
   const [students, setStudents] = useState<StudentAdmission[]>([]);
@@ -50,22 +46,15 @@ export default function StaffStudentClassSectionPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (schoolsLoading) return;
     const loadRefData = async () => {
       setRefDataLoading(true);
       setError('');
       try {
-        const [classesContent, yearsContent, studentsContent] = selectedSchoolCode
-          ? await Promise.all([
-              getClasses({ schoolCode: selectedSchoolCode }).then((p) => p.content),
-              getAcademicYears({ schoolCode: selectedSchoolCode }).then((p) => p.content),
-              getStudentAdmissions({ schoolCode: selectedSchoolCode }).then((p) => p.content),
-            ])
-          : await Promise.all([
-              fetchAcrossAllSchools((code) => getClasses({ schoolCode: code })),
-              fetchAcrossAllSchools((code) => getAcademicYears({ schoolCode: code })),
-              fetchAcrossAllSchools((code) => getStudentAdmissions({ schoolCode: code })),
-            ]);
+        const [classesContent, yearsContent, studentsContent] = await Promise.all([
+          getClasses().then((p) => p.content),
+          getAcademicYears().then((p) => p.content),
+          getStudentAdmissions().then((p) => p.content),
+        ]);
         setClasses(classesContent);
         setAcademicYears(yearsContent);
         setStudents(studentsContent);
@@ -78,7 +67,7 @@ export default function StaffStudentClassSectionPage() {
       }
     };
     loadRefData();
-  }, [selectedSchoolCode, schoolsLoading]);
+  }, []);
 
   const loadRoster = async (classId: number | '', academicYear: string) => {
     setRows([]);
@@ -106,9 +95,9 @@ export default function StaffStudentClassSectionPage() {
   };
 
   useEffect(() => {
-    if (schoolsLoading || refDataLoading) return;
+    if (refDataLoading) return;
     loadRoster(classFilter, yearFilter);
-  }, [schoolsLoading, refDataLoading, classFilter, yearFilter]);
+  }, [refDataLoading, classFilter, yearFilter]);
 
   const openCreateModal = () => {
     setEditingItem(null);
@@ -214,7 +203,7 @@ export default function StaffStudentClassSectionPage() {
     },
   ];
 
-  const dataReady = !schoolsLoading && !refDataLoading;
+  const dataReady = !refDataLoading;
   const missingPrerequisite = !dataReady
     ? ''
     : classes.length === 0
@@ -261,13 +250,13 @@ export default function StaffStudentClassSectionPage() {
         </SelectField>
       </div>
 
-      {(error || schoolError) && (
+      {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error || schoolError}
+          {error}
         </div>
       )}
 
-      {!error && !schoolError && missingPrerequisite && (
+      {!error && missingPrerequisite && (
         <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
           {missingPrerequisite}
         </div>
@@ -277,7 +266,7 @@ export default function StaffStudentClassSectionPage() {
         columns={columns}
         data={rows}
         rowKey={(row) => row.student.id}
-        loading={loading || schoolsLoading || refDataLoading}
+        loading={loading || refDataLoading}
         emptyTitle="No students assigned yet"
         emptyDescription={
           missingPrerequisite || (classFilter ? 'Add the first student assignment for this class.' : 'Select a class to view its roster.')

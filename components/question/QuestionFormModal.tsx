@@ -83,7 +83,6 @@ function toFormState(item: Question | null, nextOrder: number): FormState {
 
 export default function QuestionFormModal({
   item,
-  schoolCode,
   examId,
   subjectId,
   subjectName,
@@ -92,7 +91,6 @@ export default function QuestionFormModal({
   onSaved,
 }: {
   item: Question | null;
-  schoolCode: string;
   examId: number;
   subjectId: number;
   subjectName: string;
@@ -163,7 +161,6 @@ export default function QuestionFormModal({
       : [];
 
     const payload: QuestionPayload = {
-      schoolCode,
       examId,
       questionOrder: form.questionOrder,
       questionText: form.questionText,

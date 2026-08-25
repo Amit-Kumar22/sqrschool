@@ -23,7 +23,6 @@ export default function SchoolDetailModal({
     <Modal
       icon={SchoolIcon}
       title={school ? school.schoolName : 'School details'}
-      subtitle={school?.schoolCode || undefined}
       badge={school && !isLoading ? <StatusBadge active={school.active} /> : undefined}
       size="lg"
       onClose={onClose}

@@ -95,10 +95,7 @@ export default function PrincipalSchoolPage() {
       sortable: true,
       accessor: (school) => school.schoolName,
       render: (school) => (
-        <div>
-          <p className="font-semibold text-slate-900">{school.schoolName}</p>
-          <p className="text-xs text-slate-500">{school.schoolCode || '—'}</p>
-        </div>
+        <p className="font-semibold text-slate-900">{school.schoolName}</p>
       ),
     },
     {

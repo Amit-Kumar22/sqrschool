@@ -2,8 +2,7 @@ import { api } from './api';
 import { API_ENDPOINTS } from './config';
 
 // ─── Class service ───────────────────────────────────────────────────────────
-// Dedicated service for the class-controller endpoints, scoped per school
-// (schoolCode is required on both list and save). Every endpoint here
+// Dedicated service for the class-controller endpoints. Every endpoint here
 // returns/accepts the raw entity — no {result} envelope. Named SchoolClass
 // since `class` is a reserved word.
 
@@ -17,7 +16,6 @@ export interface SchoolClass {
 }
 
 export interface ClassPayload {
-  schoolCode: string;
   className: string;
 }
 
@@ -31,8 +29,6 @@ export interface ClassPage {
 }
 
 export interface ClassListParams {
-  /** Required by the backend — classes are always scoped to one school. */
-  schoolCode: string;
   isActive?: boolean;
   page?: number;
   size?: number;
@@ -40,15 +36,14 @@ export interface ClassListParams {
 
 // Fetched with a generous page size since DataTable sorts/paginates
 // client-side over the full result set, same as getSchools/getAcademicYears.
-/** Paginated class list for one school. Returns the raw Page<SchoolClass> shape — no envelope. */
+/** Paginated class list. Returns the raw Page<SchoolClass> shape — no envelope. */
 export const getClasses = async ({
-  schoolCode,
   isActive = true,
   page = 0,
   size = 200,
-}: ClassListParams): Promise<ClassPage> => {
+}: ClassListParams = {}): Promise<ClassPage> => {
   const response = await api.get<ClassPage>(API_ENDPOINTS.CLASS.LIST, {
-    params: { schoolCode, isActive, page, size },
+    params: { isActive, page, size },
   });
   return response.data;
 };

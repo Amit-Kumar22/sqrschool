@@ -6,7 +6,6 @@ import { apiErrorMessage } from '@/lib/api';
 import { deleteHomework, getHomeworks, type Homework } from '@/lib/homeworkService';
 import { getTeacherSubjectMappings, type TeacherSubjectMapping } from '@/lib/teacherSubjectService';
 import { getUser } from '@/lib/auth';
-import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
@@ -18,8 +17,6 @@ import HomeworkDetailModal from '@/components/homework/HomeworkDetailModal';
 const formatDate = (value: string) => (value ? new Date(value).toLocaleDateString() : '—');
 
 export default function TeacherHomeworkPage() {
-  const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
-
   const [assignments, setAssignments] = useState<TeacherSubjectMapping[]>([]);
   const [assignmentsLoading, setAssignmentsLoading] = useState(false);
   const [totalMappingsInSchool, setTotalMappingsInSchool] = useState(0);
@@ -34,7 +31,6 @@ export default function TeacherHomeworkPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (schoolsLoading) return;
     // Filtering by id doesn't work here: mapping.teacher.id is the Teacher
     // entity's own id, not the login account's id from getUser() — the same
     // two-id-spaces mismatch already found on the Teacher Section page.
@@ -59,13 +55,13 @@ export default function TeacherHomeworkPage() {
       }
     };
     loadAssignments();
-  }, [schoolsLoading]);
+  }, []);
 
   const loadHomeworks = async () => {
     setLoading(true);
     setError('');
     try {
-      const result = await getHomeworks({ schoolCode: selectedSchoolCode });
+      const result = await getHomeworks();
       setHomeworks(result.content);
     } catch (err) {
       setError(apiErrorMessage(err, 'Could not load homework from the server.'));
@@ -75,10 +71,8 @@ export default function TeacherHomeworkPage() {
   };
 
   useEffect(() => {
-    if (schoolsLoading || !selectedSchoolCode) return;
     loadHomeworks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schoolsLoading, selectedSchoolCode]);
+  }, []);
 
   const handleDelete = async (id: number) => {
     if (!confirm('Delete this homework? This cannot be undone.')) return;
@@ -181,7 +175,7 @@ export default function TeacherHomeworkPage() {
     },
   ];
 
-  const canCreate = !schoolsLoading && !assignmentsLoading && assignments.length > 0;
+  const canCreate = !assignmentsLoading && assignments.length > 0;
 
   return (
     <div className="space-y-4">
@@ -201,13 +195,13 @@ export default function TeacherHomeworkPage() {
         }
       />
 
-      {(error || schoolError) && (
+      {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error || schoolError}
+          {error}
         </div>
       )}
 
-      {!error && !schoolError && !assignmentsLoading && assignments.length === 0 && (
+      {!error && !assignmentsLoading && assignments.length === 0 && (
         <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
           {totalMappingsInSchool === 0
             ? 'No teacher-subject assignments exist in this school yet — ask a staff member to assign you to a class first (Staff → Teacher Section).'
@@ -219,14 +213,13 @@ export default function TeacherHomeworkPage() {
         columns={columns}
         data={homeworks}
         rowKey={(item) => item.id}
-        loading={loading || schoolsLoading}
+        loading={loading}
         emptyTitle="No homework yet"
         emptyDescription="Add homework for one of your classes to get started."
       />
 
       {createModalOpen && (
         <HomeworkFormModal
-          schoolCode={selectedSchoolCode}
           assignments={assignments}
           defaultTeacherClassId={assignments[0]?.id ?? ''}
           onClose={() => setCreateModalOpen(false)}

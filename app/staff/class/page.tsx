@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react';
 import { BookOpen, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteClass, getClasses, type SchoolClass } from '@/lib/classService';
-import { fetchAcrossAllSchools, getSchools, type School } from '@/lib/schoolService';
-import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
@@ -13,8 +11,6 @@ import Button, { IconButton } from '@/components/ui/Button';
 import ClassFormModal from '@/components/class/ClassFormModal';
 
 export default function StaffClassPage() {
-  const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
-
   const [items, setItems] = useState<SchoolClass[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -23,35 +19,11 @@ export default function StaffClassPage() {
   const [editingItem, setEditingItem] = useState<SchoolClass | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  // Only needed when the account has no schoolCode of its own — lets the
-  // "Add class" form ask which school to attach the new class to, instead
-  // of staying disabled forever for admins who manage more than one school.
-  const [schools, setSchools] = useState<School[]>([]);
-  const [schoolsListLoading, setSchoolsListLoading] = useState(false);
-
-  useEffect(() => {
-    if (schoolsLoading || selectedSchoolCode) return;
-    const loadSchools = async () => {
-      setSchoolsListLoading(true);
-      try {
-        const page = await getSchools();
-        setSchools(page.content);
-      } catch {
-        // Non-fatal — the "Add class" school picker just stays empty.
-      } finally {
-        setSchoolsListLoading(false);
-      }
-    };
-    loadSchools();
-  }, [schoolsLoading, selectedSchoolCode]);
-
-  const loadItems = async (schoolCode: string) => {
+  const loadItems = async () => {
     setLoading(true);
     setError('');
     try {
-      const content = schoolCode
-        ? (await getClasses({ schoolCode })).content
-        : await fetchAcrossAllSchools((code) => getClasses({ schoolCode: code }));
+      const content = (await getClasses()).content;
       setItems(content);
     } catch (err) {
       setError(apiErrorMessage(err, 'Could not load classes from the server.'));
@@ -61,9 +33,8 @@ export default function StaffClassPage() {
   };
 
   useEffect(() => {
-    if (schoolsLoading) return;
-    loadItems(selectedSchoolCode);
-  }, [selectedSchoolCode, schoolsLoading]);
+    loadItems();
+  }, []);
 
   const openCreateModal = () => {
     setEditingItem(null);
@@ -92,7 +63,7 @@ export default function StaffClassPage() {
   const handleSaved = async () => {
     setFormModalOpen(false);
     setEditingItem(null);
-    await loadItems(selectedSchoolCode);
+    await loadItems();
   };
 
   const columns: DataTableColumn<SchoolClass>[] = [
@@ -153,19 +124,15 @@ export default function StaffClassPage() {
         title="Class"
         description="Manage classes for a school."
         actions={
-          <Button
-            icon={Plus}
-            onClick={openCreateModal}
-            disabled={schoolsLoading || (!selectedSchoolCode && (schoolsListLoading || schools.length === 0))}
-          >
+          <Button icon={Plus} onClick={openCreateModal}>
             Add class
           </Button>
         }
       />
 
-      {(error || schoolError) && (
+      {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error || schoolError}
+          {error}
         </div>
       )}
 
@@ -173,7 +140,7 @@ export default function StaffClassPage() {
         columns={columns}
         data={items}
         rowKey={(item) => item.id}
-        loading={loading || schoolsLoading}
+        loading={loading}
         emptyTitle="No classes yet"
         emptyDescription="Add the first class to get started."
       />
@@ -181,8 +148,6 @@ export default function StaffClassPage() {
       {formModalOpen && (
         <ClassFormModal
           item={editingItem}
-          schoolCode={selectedSchoolCode}
-          schools={schools}
           onClose={() => {
             setFormModalOpen(false);
             setEditingItem(null);

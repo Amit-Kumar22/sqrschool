@@ -5,8 +5,7 @@ import type { AcademicYear } from './academicYearService';
 import type { SchoolClass } from './classService';
 
 // ─── Student Admission service ──────────────────────────────────────────────
-// Dedicated service for the student-admissions-controller endpoints, scoped
-// per school (schoolCode is required on both create and list). Every
+// Dedicated service for the student-admissions-controller endpoints. Every
 // endpoint here returns/accepts the raw entity — no {result} envelope.
 
 export interface StudentAddress {
@@ -20,7 +19,6 @@ export interface StudentAddress {
 }
 
 export interface NewAdmissionPayload {
-  schoolCode: string;
   academicYearId: number;
   name: string;
   phone: string;
@@ -38,7 +36,6 @@ export interface StudentUser {
   phone: string;
   role: Role;
   status: string;
-  schoolCode: string;
   createdAt: string;
 }
 
@@ -76,8 +73,6 @@ export interface StudentAdmissionPage {
 }
 
 export interface StudentAdmissionListParams {
-  /** Required by the backend — admissions are always scoped to one school. */
-  schoolCode: string;
   page?: number;
   size?: number;
   sort?: string[];
@@ -85,15 +80,14 @@ export interface StudentAdmissionListParams {
 
 // Fetched with a generous page size since DataTable sorts/paginates
 // client-side over the full result set, same as getStaffMembers/getClasses.
-/** Paginated student admission list for one school. Returns the raw Page<StudentAdmission> shape — no envelope. */
+/** Paginated student admission list. Returns the raw Page<StudentAdmission> shape — no envelope. */
 export const getStudentAdmissions = async ({
-  schoolCode,
   page = 0,
   size = 200,
   sort,
-}: StudentAdmissionListParams): Promise<StudentAdmissionPage> => {
+}: StudentAdmissionListParams = {}): Promise<StudentAdmissionPage> => {
   const response = await api.get<StudentAdmissionPage>(API_ENDPOINTS.STUDENT_ADMISSION.LIST, {
-    params: { schoolCode, page, size, sort },
+    params: { page, size, sort },
   });
   return response.data;
 };
@@ -143,7 +137,7 @@ export const deleteStudentClassSection = async (id: number): Promise<void> => {
   await api.delete(API_ENDPOINTS.STUDENT_CLASS_SECTION.DELETE(id));
 };
 
-/** One roster member as returned by the class roster endpoint — a lighter shape than StudentUser (no status/schoolCode/createdAt). */
+/** One roster member as returned by the class roster endpoint — a lighter shape than StudentUser (no status/createdAt). */
 export interface RosterStudent {
   id: number;
   fullName: string;

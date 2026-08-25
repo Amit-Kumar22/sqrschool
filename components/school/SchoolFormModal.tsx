@@ -20,7 +20,6 @@ const EMPTY_ADDRESS: SchoolAddress = {
 
 const EMPTY_FORM: SchoolPayload = {
   schoolName: '',
-  schoolCode: '',
   registrationNumber: '',
   affiliationBoard: '',
   establishedYear: new Date().getFullYear(),
@@ -101,7 +100,6 @@ export default function SchoolFormModal({
       <form id="school-form" onSubmit={handleSubmit}>
         <FieldGroup title="Basic information">
           <TextField label="School name" required value={form.schoolName} onChange={(e) => setField('schoolName', e.target.value)} />
-          <TextField label="School code" value={form.schoolCode} onChange={(e) => setField('schoolCode', e.target.value)} />
           <TextField
             label="Registration number"
             value={form.registrationNumber}

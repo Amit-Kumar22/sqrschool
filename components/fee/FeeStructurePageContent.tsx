@@ -6,8 +6,6 @@ import { apiErrorMessage } from '@/lib/api';
 import { deleteFeeStructure, getFeeStructures, type FeeStructure } from '@/lib/feeService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
 import { getAcademicYears, type AcademicYear } from '@/lib/academicYearService';
-import { fetchAcrossAllSchools } from '@/lib/schoolService';
-import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { FeeTypeBadge, StatusBadge } from '@/components/ui/Badge';
@@ -19,8 +17,6 @@ const formatDate = (value: string) => (value ? new Date(value).toLocaleDateStrin
 
 /** Fee structure management page — shared between the Principal and Staff panels (see their /fee-structure routes). */
 export default function FeeStructurePageContent() {
-  const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
-
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [classesLoading, setClassesLoading] = useState(false);
   const [classFilter, setClassFilter] = useState<number | ''>('');
@@ -38,14 +34,11 @@ export default function FeeStructurePageContent() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (schoolsLoading) return;
     const loadClasses = async () => {
       setClassesLoading(true);
       setError('');
       try {
-        const content = selectedSchoolCode
-          ? (await getClasses({ schoolCode: selectedSchoolCode })).content
-          : await fetchAcrossAllSchools((code) => getClasses({ schoolCode: code }));
+        const content = (await getClasses()).content;
         setClasses(content);
       } catch (err) {
         setError(apiErrorMessage(err, 'Could not load classes from the server.'));
@@ -54,17 +47,14 @@ export default function FeeStructurePageContent() {
       }
     };
     loadClasses();
-  }, [selectedSchoolCode, schoolsLoading]);
+  }, []);
 
   useEffect(() => {
-    if (schoolsLoading) return;
     const loadYears = async () => {
       setYearsLoading(true);
       setError('');
       try {
-        const content = selectedSchoolCode
-          ? (await getAcademicYears({ schoolCode: selectedSchoolCode })).content
-          : await fetchAcrossAllSchools((code) => getAcademicYears({ schoolCode: code }));
+        const content = (await getAcademicYears()).content;
         setAcademicYears(content);
       } catch (err) {
         setError(apiErrorMessage(err, 'Could not load academic years from the server.'));
@@ -73,16 +63,14 @@ export default function FeeStructurePageContent() {
       }
     };
     loadYears();
-  }, [selectedSchoolCode, schoolsLoading]);
+  }, []);
 
   const loadFeeStructures = async () => {
     setLoading(true);
     setError('');
     try {
       const params = { classId: classFilter || undefined, academicYearId: yearFilter || undefined };
-      const content = selectedSchoolCode
-        ? (await getFeeStructures({ schoolCode: selectedSchoolCode, ...params })).content
-        : await fetchAcrossAllSchools((code) => getFeeStructures({ schoolCode: code, ...params }));
+      const content = (await getFeeStructures(params)).content;
       setFeeStructures(content);
     } catch (err) {
       setError(apiErrorMessage(err, 'Could not load fee structures from the server.'));
@@ -92,10 +80,9 @@ export default function FeeStructurePageContent() {
   };
 
   useEffect(() => {
-    if (schoolsLoading) return;
     loadFeeStructures();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSchoolCode, schoolsLoading, classFilter, yearFilter]);
+  }, [classFilter, yearFilter]);
 
   const openCreateModal = () => {
     setEditingItem(null);
@@ -249,9 +236,9 @@ export default function FeeStructurePageContent() {
         </SelectField>
       </div>
 
-      {(error || schoolError) && (
+      {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error || schoolError}
+          {error}
         </div>
       )}
 
@@ -259,7 +246,7 @@ export default function FeeStructurePageContent() {
         columns={columns}
         data={feeStructures}
         rowKey={(item) => item.id}
-        loading={loading || schoolsLoading || classesLoading || yearsLoading}
+        loading={loading || classesLoading || yearsLoading}
         emptyTitle="No fee structures yet"
         emptyDescription={
           classes.length === 0
@@ -273,7 +260,6 @@ export default function FeeStructurePageContent() {
       {formModalOpen && (
         <FeeStructureFormModal
           item={editingItem}
-          schoolCode={selectedSchoolCode}
           classes={classes}
           academicYears={academicYears}
           onClose={() => {

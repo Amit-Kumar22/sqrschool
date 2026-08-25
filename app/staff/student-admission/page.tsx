@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react';
 import { Eye, Plus, UserPlus } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { getStudentAdmissions, type StudentAdmission } from '@/lib/studentService';
-import { fetchAcrossAllSchools, getSchools, type School } from '@/lib/schoolService';
-import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
@@ -14,8 +12,6 @@ import StudentAdmissionFormModal from '@/components/student-admission/StudentAdm
 import StudentDetailModal from '@/components/student-admission/StudentDetailModal';
 
 export default function StaffStudentAdmissionPage() {
-  const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
-
   const [students, setStudents] = useState<StudentAdmission[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -23,35 +19,11 @@ export default function StaffStudentAdmissionPage() {
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewingStudent, setViewingStudent] = useState<StudentAdmission | null>(null);
 
-  // Only needed when the account has no schoolCode of its own — lets the
-  // "Add student" form ask which school to admit the student into, instead
-  // of staying disabled forever for admins who manage more than one school.
-  const [schools, setSchools] = useState<School[]>([]);
-  const [schoolsListLoading, setSchoolsListLoading] = useState(false);
-
-  useEffect(() => {
-    if (schoolsLoading || selectedSchoolCode) return;
-    const loadSchools = async () => {
-      setSchoolsListLoading(true);
-      try {
-        const page = await getSchools();
-        setSchools(page.content);
-      } catch {
-        // Non-fatal — the "Add student" school picker just stays empty.
-      } finally {
-        setSchoolsListLoading(false);
-      }
-    };
-    loadSchools();
-  }, [schoolsLoading, selectedSchoolCode]);
-
-  const loadStudents = async (schoolCode: string) => {
+  const loadStudents = async () => {
     setLoading(true);
     setError('');
     try {
-      const content = schoolCode
-        ? (await getStudentAdmissions({ schoolCode })).content
-        : await fetchAcrossAllSchools((code) => getStudentAdmissions({ schoolCode: code }));
+      const content = (await getStudentAdmissions()).content;
       setStudents(content);
     } catch (err) {
       setError(apiErrorMessage(err, 'Could not load students from the server.'));
@@ -61,13 +33,12 @@ export default function StaffStudentAdmissionPage() {
   };
 
   useEffect(() => {
-    if (schoolsLoading) return;
-    loadStudents(selectedSchoolCode);
-  }, [selectedSchoolCode, schoolsLoading]);
+    loadStudents();
+  }, []);
 
   const handleSaved = async () => {
     setFormModalOpen(false);
-    await loadStudents(selectedSchoolCode);
+    await loadStudents();
   };
 
   const columns: DataTableColumn<StudentAdmission>[] = [
@@ -145,19 +116,15 @@ export default function StaffStudentAdmissionPage() {
         title="Student Admission"
         description="View admitted students and add new admissions to a school."
         actions={
-          <Button
-            icon={Plus}
-            onClick={() => setFormModalOpen(true)}
-            disabled={schoolsLoading || (!selectedSchoolCode && (schoolsListLoading || schools.length === 0))}
-          >
+          <Button icon={Plus} onClick={() => setFormModalOpen(true)}>
             Add student
           </Button>
         }
       />
 
-      {(error || schoolError) && (
+      {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error || schoolError}
+          {error}
         </div>
       )}
 
@@ -165,18 +132,13 @@ export default function StaffStudentAdmissionPage() {
         columns={columns}
         data={students}
         rowKey={(item) => item.id}
-        loading={loading || schoolsLoading}
+        loading={loading}
         emptyTitle="No students yet"
         emptyDescription="Admit the first student to get started."
       />
 
       {formModalOpen && (
-        <StudentAdmissionFormModal
-          schoolCode={selectedSchoolCode}
-          schools={schools}
-          onClose={() => setFormModalOpen(false)}
-          onSaved={handleSaved}
-        />
+        <StudentAdmissionFormModal onClose={() => setFormModalOpen(false)} onSaved={handleSaved} />
       )}
 
       {viewingStudent && <StudentDetailModal student={viewingStudent} onClose={() => setViewingStudent(null)} />}

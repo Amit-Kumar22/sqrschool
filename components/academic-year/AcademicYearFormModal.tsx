@@ -8,16 +8,14 @@ import {
   type AcademicYear,
   type AcademicYearPayload,
 } from '@/lib/academicYearService';
-import type { School } from '@/lib/schoolService';
 import { apiErrorMessage } from '@/lib/api';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import { SelectField, TextField, TextareaField } from '@/components/ui/FormField';
+import { TextField, TextareaField } from '@/components/ui/FormField';
 
-function toFormState(item: AcademicYear | null, schoolCode: string): AcademicYearPayload {
-  if (!item) return { schoolCode, startDate: '', endDate: '', description: '' };
+function toFormState(item: AcademicYear | null): AcademicYearPayload {
+  if (!item) return { startDate: '', endDate: '', description: '' };
   return {
-    schoolCode,
     startDate: item.startDate,
     endDate: item.endDate,
     description: item.description,
@@ -26,33 +24,22 @@ function toFormState(item: AcademicYear | null, schoolCode: string): AcademicYea
 
 export default function AcademicYearFormModal({
   item,
-  schoolCode,
-  schools,
   onClose,
   onSaved,
 }: {
   item: AcademicYear | null;
-  /** The account's own school — auto-fills and hides the school field when set. */
-  schoolCode: string;
-  /** Only needed (and only shown) when schoolCode is empty — lets the admin pick which school this academic year belongs to. */
-  schools?: School[];
   onClose: () => void;
   onSaved: (item: AcademicYear) => void;
 }) {
-  const [form, setForm] = useState<AcademicYearPayload>(() => toFormState(item, schoolCode));
+  const [form, setForm] = useState<AcademicYearPayload>(() => toFormState(item));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   const isEditing = !!item;
-  const needsSchoolPicker = !schoolCode;
   const setField = (key: keyof AcademicYearPayload, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (needsSchoolPicker && !form.schoolCode) {
-      setError('Please select a school.');
-      return;
-    }
     if (!form.startDate || !form.endDate) {
       setError('Start and end date are required.');
       return;
@@ -93,24 +80,6 @@ export default function AcademicYearFormModal({
       }
     >
       <form id="academic-year-form" onSubmit={handleSubmit} className="grid gap-3.5">
-        {needsSchoolPicker && (
-          <SelectField
-            label="School"
-            required
-            value={form.schoolCode}
-            onChange={(e) => setField('schoolCode', e.target.value)}
-          >
-            <option value="" disabled>
-              Select a school
-            </option>
-            {(schools ?? []).map((school) => (
-              <option key={school.id} value={school.schoolCode}>
-                {school.schoolName} ({school.schoolCode})
-              </option>
-            ))}
-          </SelectField>
-        )}
-
         <div className="grid grid-cols-2 gap-3.5">
           <TextField
             label="Start date"

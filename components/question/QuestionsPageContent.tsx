@@ -13,7 +13,6 @@ import {
   type Question,
   type QuestionType,
 } from '@/lib/examService';
-import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { DifficultyBadge, QuestionTypeBadge } from '@/components/ui/Badge';
@@ -34,8 +33,6 @@ export default function QuestionsPageContent({ examId }: { examId: number }) {
   const router = useRouter();
   const pathname = usePathname();
   const basePath = pathname.startsWith('/principal') ? '/principal' : '/staff';
-
-  const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
 
   const [exam, setExam] = useState<Exam | null>(null);
   const [examLoading, setExamLoading] = useState(true);
@@ -203,7 +200,7 @@ export default function QuestionsPageContent({ examId }: { examId: number }) {
             title={examLoading ? 'Loading exam…' : `Questions · ${exam?.name ?? ''}`}
             description={exam ? `${exam.schoolClassName} · ${exam.subjectName}` : undefined}
             actions={
-              <Button icon={Plus} onClick={openCreateModal} disabled={!exam || schoolsLoading}>
+              <Button icon={Plus} onClick={openCreateModal} disabled={!exam}>
                 Add question
               </Button>
             }
@@ -221,9 +218,9 @@ export default function QuestionsPageContent({ examId }: { examId: number }) {
         </SelectField>
       </div>
 
-      {(error || schoolError) && (
+      {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error || schoolError}
+          {error}
         </div>
       )}
 
@@ -239,7 +236,6 @@ export default function QuestionsPageContent({ examId }: { examId: number }) {
       {formModalOpen && exam && (
         <QuestionFormModal
           item={editingItem}
-          schoolCode={selectedSchoolCode || exam.schoolCode}
           examId={exam.id}
           subjectId={exam.subjectId}
           subjectName={exam.subjectName}

@@ -12,7 +12,6 @@ import { getClasses, type SchoolClass } from '@/lib/classService';
 import { getSubjects, type Subject } from '@/lib/subjectService';
 import { getAllTeachers } from '@/lib/schoolService';
 import type { StudentAdmission } from '@/lib/studentService';
-import { useSchoolCode } from '@/lib/useSchoolCode';
 import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
@@ -20,8 +19,6 @@ import Button, { IconButton } from '@/components/ui/Button';
 import TeacherSubjectFormModal from '@/components/teacher-subject/TeacherSubjectFormModal';
 
 export default function StaffTeacherSectionPage() {
-  const { schoolCode: selectedSchoolCode, loading: schoolsLoading, error: schoolError } = useSchoolCode();
-
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [teachers, setTeachers] = useState<StudentAdmission[]>([]);
@@ -36,15 +33,14 @@ export default function StaffTeacherSectionPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (schoolsLoading || !selectedSchoolCode) return;
     const loadRefData = async () => {
       setRefDataLoading(true);
       setError('');
       try {
         const [classesPage, subjectsPage, teachersPage] = await Promise.all([
-          getClasses({ schoolCode: selectedSchoolCode }),
-          getSubjects({ schoolCode: selectedSchoolCode }),
-          getAllTeachers({ schoolCode: selectedSchoolCode }),
+          getClasses(),
+          getSubjects(),
+          getAllTeachers(),
         ]);
         setClasses(classesPage.content);
         setSubjects(subjectsPage.content);
@@ -56,7 +52,7 @@ export default function StaffTeacherSectionPage() {
       }
     };
     loadRefData();
-  }, [selectedSchoolCode, schoolsLoading]);
+  }, []);
 
   const loadMappings = async () => {
     setLoading(true);
@@ -72,9 +68,8 @@ export default function StaffTeacherSectionPage() {
   };
 
   useEffect(() => {
-    if (schoolsLoading) return;
     loadMappings();
-  }, [schoolsLoading]);
+  }, []);
 
   const openCreateModal = () => {
     setEditingItem(null);
@@ -173,7 +168,7 @@ export default function StaffTeacherSectionPage() {
     },
   ];
 
-  const dataReady = !schoolsLoading && !refDataLoading;
+  const dataReady = !refDataLoading;
   const missingPrerequisite = !dataReady
     ? ''
     : classes.length === 0
@@ -198,13 +193,13 @@ export default function StaffTeacherSectionPage() {
         }
       />
 
-      {(error || schoolError) && (
+      {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error || schoolError}
+          {error}
         </div>
       )}
 
-      {!error && !schoolError && missingPrerequisite && (
+      {!error && missingPrerequisite && (
         <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
           {missingPrerequisite}
         </div>
@@ -214,7 +209,7 @@ export default function StaffTeacherSectionPage() {
         columns={columns}
         data={mappings}
         rowKey={(item) => item.id}
-        loading={loading || schoolsLoading}
+        loading={loading}
         emptyTitle="No assignments yet"
         emptyDescription={missingPrerequisite || 'Add the first teacher-subject assignment to get started.'}
       />
@@ -222,7 +217,6 @@ export default function StaffTeacherSectionPage() {
       {formModalOpen && (
         <TeacherSubjectFormModal
           item={editingItem}
-          schoolCode={selectedSchoolCode}
           classes={classes}
           subjects={subjects}
           teachers={teachers}

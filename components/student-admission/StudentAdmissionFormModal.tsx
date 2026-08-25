@@ -7,7 +7,6 @@ import { createStudentAdmission, type NewAdmissionPayload, type StudentAddress }
 import { getAcademicYears, type AcademicYear } from '@/lib/academicYearService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
 import { getSections, type Section } from '@/lib/classSectionService';
-import type { School } from '@/lib/schoolService';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { SelectField, TextField } from '@/components/ui/FormField';
@@ -22,9 +21,8 @@ const emptyAddress: StudentAddress = {
   stateName: '',
 };
 
-function emptyForm(schoolCode: string): NewAdmissionPayload {
+function emptyForm(): NewAdmissionPayload {
   return {
-    schoolCode,
     academicYearId: 0,
     name: '',
     phone: '',
@@ -37,24 +35,17 @@ function emptyForm(schoolCode: string): NewAdmissionPayload {
 }
 
 export default function StudentAdmissionFormModal({
-  schoolCode,
-  schools,
   onClose,
   onSaved,
 }: {
-  /** The account's own school — auto-fills and hides the school field when set. */
-  schoolCode: string;
-  /** Only needed (and only shown) when schoolCode is empty — lets the admin pick which school this admission belongs to. */
-  schools?: School[];
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const [form, setForm] = useState<NewAdmissionPayload>(() => emptyForm(schoolCode));
+  const [form, setForm] = useState<NewAdmissionPayload>(() => emptyForm());
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const needsSchoolPicker = !schoolCode;
   const setField = (key: keyof Omit<NewAdmissionPayload, 'address'>, value: string | number) =>
     setForm((f) => ({ ...f, [key]: value }) as NewAdmissionPayload);
   const setAddressField = (key: keyof StudentAddress, value: string) =>
@@ -70,22 +61,11 @@ export default function StudentAdmissionFormModal({
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
   const [yearsLoading, setYearsLoading] = useState(false);
 
-  // Classes and academic years are scoped to whichever school is active —
-  // the account's own, or the one picked from the school selector below.
   useEffect(() => {
-    setClassId('');
-    setSections([]);
-    setField('sectionId', 0);
-    setField('academicYearId', 0);
-    if (!form.schoolCode) {
-      setClasses([]);
-      setAcademicYears([]);
-      return;
-    }
     let cancelled = false;
     setClassesLoading(true);
     setYearsLoading(true);
-    getClasses({ schoolCode: form.schoolCode })
+    getClasses()
       .then((page) => {
         if (!cancelled) setClasses(page.content);
       })
@@ -95,7 +75,7 @@ export default function StudentAdmissionFormModal({
       .finally(() => {
         if (!cancelled) setClassesLoading(false);
       });
-    getAcademicYears({ schoolCode: form.schoolCode })
+    getAcademicYears()
       .then((page) => {
         if (!cancelled) setAcademicYears(page.content);
       })
@@ -108,7 +88,7 @@ export default function StudentAdmissionFormModal({
     return () => {
       cancelled = true;
     };
-  }, [form.schoolCode]);
+  }, []);
 
   // Sections are scoped to whichever class is selected.
   useEffect(() => {
@@ -136,10 +116,6 @@ export default function StudentAdmissionFormModal({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (needsSchoolPicker && !form.schoolCode) {
-      setError('Please select a school.');
-      return;
-    }
     if (!form.name.trim() || !form.phone.trim() || !form.fatherName.trim() || !form.motherName.trim()) {
       setError('Please fill in all required student details.');
       return;
@@ -207,19 +183,6 @@ export default function StudentAdmissionFormModal({
       }
     >
       <form id="student-admission-form" onSubmit={handleSubmit} className="grid gap-2.5">
-        {needsSchoolPicker && (
-          <SelectField label="School" required value={form.schoolCode} onChange={(e) => setField('schoolCode', e.target.value)}>
-            <option value="" disabled>
-              Select a school
-            </option>
-            {(schools ?? []).map((s) => (
-              <option key={s.id} value={s.schoolCode}>
-                {s.schoolName} ({s.schoolCode})
-              </option>
-            ))}
-          </SelectField>
-        )}
-
         <div className="grid gap-2.5 sm:grid-cols-2">
           <TextField label="Student name" required value={form.name} onChange={(e) => setField('name', e.target.value)} />
           <TextField label="Phone" required value={form.phone} onChange={(e) => setField('phone', e.target.value)} />

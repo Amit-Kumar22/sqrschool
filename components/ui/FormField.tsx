@@ -88,3 +88,26 @@ export function TextareaField({ label, hint, required, wrapperClassName, classNa
     </label>
   );
 }
+
+interface CheckboxFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
+  label: string;
+  hint?: string;
+  wrapperClassName?: string;
+}
+
+/** Inline boolean toggle — matches the plain checkbox pattern used across the admin panel's form modals. */
+export function CheckboxField({ label, hint, wrapperClassName, className, ...rest }: CheckboxFieldProps) {
+  return (
+    <label className={`flex items-start gap-2 text-sm ${wrapperClassName ?? ''}`}>
+      <input
+        type="checkbox"
+        className={`mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/30 ${className ?? ''}`}
+        {...rest}
+      />
+      <span>
+        <span className="font-medium text-slate-900">{label}</span>
+        {hint && <span className="block text-xs text-slate-400">{hint}</span>}
+      </span>
+    </label>
+  );
+}

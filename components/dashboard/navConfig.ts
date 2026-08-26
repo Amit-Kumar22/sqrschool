@@ -7,6 +7,7 @@ import {
   CalendarRange,
   ClipboardList,
   Contact2,
+  Globe,
   IndianRupee,
   LayoutDashboard,
   Layers,
@@ -42,6 +43,7 @@ export function getNavItems(role: Role): NavItem[] {
   if (role === 'SUPERADMIN') {
     items.push({ label: 'School Leads', href: '/superadmin/school-leads', icon: Contact2 });
     items.push({ label: 'Theme Settings', href: '/superadmin/settings/theme', icon: Palette });
+    items.push({ label: 'Website Settings', href: '/superadmin/website-setting', icon: Globe });
   }
 
   if (role === 'PRINCIPAL') {
@@ -65,6 +67,7 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Fee Structure', href: '/staff/fee-structure', icon: IndianRupee });
     items.push({ label: 'YouTube Testimonials', href: '/staff/youtube-testimonials', icon: PlaySquare });
     items.push({ label: 'Chatbot Management', href: '/staff/chatbot', icon: Bot });
+    items.push({ label: 'Website Settings', href: '/staff/website-setting', icon: Globe });
   }
 
   if (role === 'TEACHER') {

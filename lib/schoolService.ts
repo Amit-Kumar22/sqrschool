@@ -2,6 +2,7 @@ import { api } from './api';
 import { API_ENDPOINTS } from './config';
 import type { Role } from './auth';
 import type { StudentAdmissionPage } from './studentService';
+import type { Subject } from './subjectService';
 
 // ─── School service ─────────────────────────────────────────────────────────
 // Dedicated service for the school-detail-controller endpoints, kept separate
@@ -155,11 +156,12 @@ export const getStaffMembers = async ({
 };
 
 // /v1/teacher/all-student reuses the exact same DTO as student admissions
-// (admissionNumber, academicYear, section, parentPhoneNumber, etc.) even
-// though it lists teachers — confirmed against the API docs. The top-level
-// `id` is the teacher record's own id (what other endpoints' teacherId
-// expects — confirmed by the backend rejecting the nested user.id with
-// "Teacher detail not found"); `user.fullName` is still fine for display.
+// (admissionNumber, academicYear, schoolClass, studentUser/parentUser, etc.)
+// even though it lists teachers — confirmed against the API docs. The
+// top-level `id` is the teacher record's own id (what other endpoints'
+// teacherId expects — confirmed by the backend rejecting the nested
+// studentUser.id with "Teacher detail not found"); `studentUser.fullName`
+// is still fine for display.
 export interface TeacherListParams {
   page?: number;
   size?: number;
@@ -169,6 +171,72 @@ export interface TeacherListParams {
 export const getAllTeachers = async ({ page = 0, size = 200 }: TeacherListParams = {}): Promise<StudentAdmissionPage> => {
   const response = await api.get<StudentAdmissionPage>(API_ENDPOINTS.TEACHER.ALL_STUDENT, {
     params: { page, size },
+  });
+  return response.data;
+};
+
+// /v1/admin/all-teacher — a distinct, richer teacher roster (subject,
+// qualification, employee code, assigned classes) than getAllTeachers above,
+// which just reuses the student-admission DTO for a bare name/id dropdown.
+// This is what the Principal panel's Staff/Teachers page lists.
+
+export interface TeacherStaffUser {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  role: Role;
+  status: string;
+  createdAt: string;
+}
+
+export interface TeacherAssignedClass {
+  id: number;
+  className: string;
+  description: string | null;
+}
+
+export interface TeacherStaffMember {
+  id: number;
+  created: string;
+  updated: string;
+  teacherUser: TeacherStaffUser;
+  subject: Subject | null;
+  qualification: string | null;
+  experienceYears: number | null;
+  employeeCode: string;
+  assignedClasses: TeacherAssignedClass[];
+  active: boolean;
+}
+
+export interface TeacherStaffPage {
+  content: TeacherStaffMember[];
+  totalElements: number;
+  totalPages: number;
+  pageNumber: number;
+  pageSize: number;
+  last: boolean;
+}
+
+export interface TeacherStaffListParams {
+  page?: number;
+  size?: number;
+  sort?: string[];
+  /** Searches by name, email, phone, or employee code. */
+  search?: string;
+}
+
+// Fetched with a generous page size since DataTable sorts/paginates
+// client-side over the full result set, same as getStaffMembers/getClasses.
+/** Paginated teacher-staff roster. Returns the raw Page shape — no envelope. */
+export const getAllTeacherStaff = async ({
+  page = 0,
+  size = 200,
+  sort,
+  search,
+}: TeacherStaffListParams = {}): Promise<TeacherStaffPage> => {
+  const response = await api.get<TeacherStaffPage>(API_ENDPOINTS.ADMIN.ALL_TEACHER, {
+    params: { page, size, sort, search },
   });
   return response.data;
 };

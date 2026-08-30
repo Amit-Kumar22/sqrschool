@@ -18,6 +18,9 @@ import {
 } from 'lucide-react';
 import PageHeader from '@/components/ui/PageHeader';
 import Tabs, { type TabItem } from '@/components/ui/Tabs';
+import SchoolPageContent from '@/components/school/SchoolPageContent';
+import YoutubeContent from '../youtube-testimonial/YoutubeContent';
+import HolidayPageContent from "../holiday/HolidayPageContent"
 import WebsiteHeaderTab from './WebsiteHeaderTab';
 import WebsiteHeroSlideTab from './WebsiteHeroSlideTab';
 import WebsiteHeroButtonTab from './WebsiteHeroButtonTab';
@@ -32,6 +35,9 @@ import WebsiteContactTab from './WebsiteContactTab';
 import WebsiteFloatingSettingTab from './WebsiteFloatingSettingTab';
 
 const TABS: TabItem[] = [
+  { key: 'school', label: 'School', icon: PanelTop },
+  { key: 'holiday', label: 'Holiday', icon: PanelTop },
+  { key: 'youtube', label: 'Youtube', icon: PanelTop },
   { key: 'header', label: 'Header', icon: PanelTop },
   { key: 'hero-slide', label: 'Hero Slides', icon: GalleryHorizontal },
   { key: 'hero-button', label: 'Hero Buttons', icon: MousePointerClick },
@@ -61,6 +67,9 @@ export default function WebsiteSettingPageContent() {
       <div className="card-premium overflow-hidden">
         <Tabs tabs={TABS} active={active} onChange={setActive} />
         <div className="p-3 sm:p-4">
+          {active === 'school' && <SchoolPageContent />}
+          {active === 'holiday' && <HolidayPageContent />}
+          {active === 'youtube' && <YoutubeContent />}
           {active === 'header' && <WebsiteHeaderTab />}
           {active === 'hero-slide' && <WebsiteHeroSlideTab />}
           {active === 'hero-button' && <WebsiteHeroButtonTab />}

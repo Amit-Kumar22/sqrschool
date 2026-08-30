@@ -55,9 +55,9 @@ export default function StaffStudentClassSectionPage() {
           getAcademicYears().then((p) => p.content),
           getStudentAdmissions().then((p) => p.content),
         ]);
-        setClasses(classesContent);
-        setAcademicYears(yearsContent);
-        setStudents(studentsContent);
+        setClasses(classesContent ?? []);
+        setAcademicYears(yearsContent ?? []);
+        setStudents(studentsContent ?? []);
         setClassFilter((prev) => prev || (classesContent[0]?.id ?? ''));
         setYearFilter((prev) => prev || yearsContent[0]?.yearCode || '');
       } catch (err) {

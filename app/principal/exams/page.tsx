@@ -1,5 +1,5 @@
 import ExamsPageContent from '@/components/exam/ExamsPageContent';
 
-export default function PrincipalExamsPage() {
+export default function StaffExamsPage() {
   return <ExamsPageContent />;
 }

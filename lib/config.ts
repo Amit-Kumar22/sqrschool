@@ -14,13 +14,13 @@ export const API_ENDPOINTS = {
     LOGOUT: '/v1/auth/logout',
   },
   THEMES: {
-    LIST: '/v1/themes',
-    CREATE: '/v1/themes',
-    GET: (id: number) => `/v1/themes/${id}`,
-    UPDATE: (id: number) => `/v1/themes/${id}`,
-    DELETE: (id: number) => `/v1/themes/${id}`,
-    ACTIVE: '/v1/themes/active',
-    ACTIVATE: (id: number) => `/v1/themes/activate-color-theme/${id}`,
+    LIST: '/v1/colour-theme',
+    CREATE: '/v1/colour-theme',
+    GET: (id: number) => `/v1/colour-theme/${id}`,
+    UPDATE: (id: number) => `/v1/colour-theme/${id}`,
+    DELETE: (id: number) => `/v1/colour-theme/${id}`,
+    ACTIVE: '/v1/colour-theme/active',
+    ACTIVATE: (id: number) => `/v1/colour-theme/activate-color-theme/${id}`,
     // Unauthenticated variant of ACTIVE — used for public pages (landing, login)
     // so they don't need a session just to paint the right colors.
     PUBLIC_ACTIVE: '/v1/free/colour-theme',
@@ -40,6 +40,7 @@ export const API_ENDPOINTS = {
   ADMIN: {
     ADD_STAFF: '/v1/admin/add-staff',
     ALL_STAFF: '/v1/admin/all-staff',
+    ALL_TEACHER: '/v1/admin/all-teacher',
   },
   TEACHER: {
     ALL_STUDENT: '/v1/teacher/all-student',
@@ -53,8 +54,10 @@ export const API_ENDPOINTS = {
     ADMIN_LIST: '/v1/student-subject-section-mapping/admin',
   },
   STUDENT_ADMISSION: {
-    CREATE: '/v1/student-admissions/new-addmission',
-    LIST: '/v1/student-admissions/all-student',
+    CREATE: '/v1/student/new-addmission',
+    LIST: '/v1/student/all-student',
+    UPDATE: (studentId: number) => `/v1/student/update-student/${studentId}`,
+    DELETE: (studentId: number) => `/v1/student/delete-student/${studentId}`,
   },
   STUDENT_CLASS_SECTION: {
     CREATE: '/v1/student-class-sections',
@@ -69,6 +72,13 @@ export const API_ENDPOINTS = {
     GET: (id: number) => `/v1/academic-year/${id}`,
     UPDATE: (id: number) => `/v1/academic-year/${id}`,
     DELETE: (id: number) => `/v1/academic-year/${id}`,
+  },
+  HOLIDAY: {
+    LIST: '/v1/holiday',
+    ADD: '/v1/holiday/add',
+    GET: (id: number) => `/v1/holiday/${id}`,
+    UPDATE: (id: number) => `/v1/holiday/${id}`,
+    DELETE: (id: number) => `/v1/holiday/${id}`,
   },
   CLASS: {
     SAVE: '/v1/class/save',

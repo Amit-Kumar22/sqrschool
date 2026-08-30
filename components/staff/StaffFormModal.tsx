@@ -98,6 +98,7 @@ export default function StaffFormModal({
         <SelectField label="Role" value={form.role} onChange={(e) => setField('role', e.target.value as StaffRole)}>
           <option value="TEACHER">Teacher</option>
           <option value="STAFF">Staff</option>
+          <option value="ADMIN">Admin</option>
         </SelectField>
 
         <TextField

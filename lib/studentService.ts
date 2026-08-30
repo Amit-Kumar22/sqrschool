@@ -1,7 +1,6 @@
 import { api } from './api';
 import { API_ENDPOINTS } from './config';
 import type { Role } from './auth';
-import type { AcademicYear } from './academicYearService';
 import type { SchoolClass } from './classService';
 
 // ─── Student Admission service ──────────────────────────────────────────────
@@ -45,22 +44,33 @@ export interface StudentSection {
   schoolClass: SchoolClass;
 }
 
+/** Lighter shape than SchoolClass — the admission list's nested class has no created/updated/active. */
+export interface AdmissionSchoolClass {
+  id: number;
+  className: string;
+  description: string | null;
+}
+
 export interface StudentAdmission {
   id: number;
   created: string;
   updated: string;
-  user: StudentUser;
+  studentUser: StudentUser;
+  parentUser: StudentUser;
   admissionNumber: string;
-  admissionSequence: number;
-  admissionYear: string;
-  academicYear: AcademicYear;
-  section: StudentSection;
+  studentCode: string;
+  academicYear: string;
+  rollNumber: string | null;
+  schoolClass: AdmissionSchoolClass;
   admissionDate: string;
   fatherName: string;
-  parentPhoneNumber: string;
-  password: string;
-  active: boolean;
   motherName: string;
+  bloodGroup: string | null;
+  dob: string | null;
+  address: string;
+  pincode: string;
+  gender: string;
+  active: boolean;
 }
 
 export interface StudentAdmissionPage {
@@ -72,10 +82,15 @@ export interface StudentAdmissionPage {
   last: boolean;
 }
 
+export type FeeStatus = 'PENDING' | 'DUES' | 'PAID';
+
 export interface StudentAdmissionListParams {
   page?: number;
   size?: number;
   sort?: string[];
+  classId?: number;
+  search?: string;
+  feeStatus?: FeeStatus;
 }
 
 // Fetched with a generous page size since DataTable sorts/paginates
@@ -85,9 +100,12 @@ export const getStudentAdmissions = async ({
   page = 0,
   size = 200,
   sort,
+  classId,
+  search,
+  feeStatus,
 }: StudentAdmissionListParams = {}): Promise<StudentAdmissionPage> => {
   const response = await api.get<StudentAdmissionPage>(API_ENDPOINTS.STUDENT_ADMISSION.LIST, {
-    params: { page, size, sort },
+    params: { page, size, sort, classId, search, feeStatus },
   });
   return response.data;
 };
@@ -96,6 +114,27 @@ export const getStudentAdmissions = async ({
 // from the caller's point of view, which then reloads the list.
 export const createStudentAdmission = async (data: NewAdmissionPayload): Promise<void> => {
   await api.post(API_ENDPOINTS.STUDENT_ADMISSION.CREATE, data);
+};
+
+export interface UpdateStudentPayload {
+  name: string;
+  fatherName: string;
+  motherName: string;
+  parentEmail: string;
+  parentPhone: string;
+  classId: number;
+  dob: string;
+  address: string;
+  pincode: string;
+  gender: string;
+}
+
+export const updateStudent = async (studentId: number, data: UpdateStudentPayload): Promise<void> => {
+  await api.put(API_ENDPOINTS.STUDENT_ADMISSION.UPDATE(studentId), data);
+};
+
+export const deleteStudent = async (studentId: number): Promise<void> => {
+  await api.put(API_ENDPOINTS.STUDENT_ADMISSION.DELETE(studentId));
 };
 
 // ─── Student Class Section service ──────────────────────────────────────────

@@ -154,7 +154,7 @@ export default function StudentClassSectionFormModal({
             // same id-space lesson learned from the teacher-subject mapping
             // ("Teacher detail not found" when the login account id was sent).
             <option key={admission.id} value={admission.id}>
-              {admission.user.fullName} ({admission.admissionNumber})
+              {admission.studentUser?.fullName} ({admission.admissionNumber})
             </option>
           ))}
         </SelectField>

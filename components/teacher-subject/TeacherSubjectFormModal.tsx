@@ -203,7 +203,7 @@ export default function TeacherSubjectFormModal({
             // linked login account's user.id — confirmed by the backend
             // rejecting user.id with "Teacher detail not found".
             <option key={teacher.id} value={teacher.id}>
-              {teacher.user.fullName}
+              {teacher.studentUser?.fullName}
             </option>
           ))}
         </SelectField>

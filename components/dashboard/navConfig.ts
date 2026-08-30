@@ -4,6 +4,7 @@ import {
   BookMarked,
   BookOpen,
   Building2,
+  CalendarDays,
   CalendarRange,
   ClipboardList,
   Contact2,
@@ -43,35 +44,45 @@ export function getNavItems(role: Role): NavItem[] {
   if (role === 'SUPERADMIN') {
     items.push({ label: 'School Leads', href: '/superadmin/school-leads', icon: Contact2 });
     items.push({ label: 'Theme Settings', href: '/superadmin/settings/theme', icon: Palette });
-    items.push({ label: 'Website Settings', href: '/superadmin/website-setting', icon: Globe });
+    items.push({ label: 'Staff', href: '/superadmin/staff', icon: Users });
   }
 
-  if (role === 'PRINCIPAL') {
-    items.push({ label: 'School', href: '/principal/school', icon: School });
-    items.push({ label: 'Staff', href: '/principal/staff', icon: Users });
-    items.push({ label: 'Exams', href: '/principal/exams', icon: ClipboardList });
-    items.push({ label: 'Teacher Assignments', href: '/principal/teacher-section', icon: UserCog });
-    items.push({ label: 'Fee Structure', href: '/principal/fee-structure', icon: IndianRupee });
-  }
+  // if (role === 'PRINCIPAL') {
+  //   items.push({ label: 'School', href: '/principal/school', icon: School });
+  //   items.push({ label: 'Staff', href: '/principal/staff', icon: Users });
+  //   items.push({ label: 'Exams', href: '/principal/exams', icon: ClipboardList });
+  //   items.push({ label: 'Teacher Assignments', href: '/principal/teacher-section', icon: UserCog });
+  //   items.push({ label: 'Fee Structure', href: '/principal/fee-structure', icon: IndianRupee });
+  // }
 
-  if (role === 'STAFF') {
-    items.push({ label: 'School Infrastructure', href: '/staff/infrastructure', icon: Building2 });
-    items.push({ label: 'Academic Year', href: '/staff/academic-year', icon: CalendarRange });
-    items.push({ label: 'Class', href: '/staff/class', icon: BookOpen });
-    items.push({ label: 'Class Section', href: '/staff/class-section', icon: Layers });
-    items.push({ label: 'Subject', href: '/staff/subject', icon: BookMarked });
-    items.push({ label: 'Student Admission', href: '/staff/student-admission', icon: UserPlus });
-    items.push({ label: 'Student Class Section', href: '/staff/student-class-section', icon: UsersRound });
-    items.push({ label: 'Teacher Section', href: '/staff/teacher-section', icon: UserCog });
-    items.push({ label: 'Exams', href: '/staff/exams', icon: ClipboardList });
-    items.push({ label: 'Fee Structure', href: '/staff/fee-structure', icon: IndianRupee });
-    items.push({ label: 'YouTube Testimonials', href: '/staff/youtube-testimonials', icon: PlaySquare });
-    items.push({ label: 'Chatbot Management', href: '/staff/chatbot', icon: Bot });
-    items.push({ label: 'Website Settings', href: '/staff/website-setting', icon: Globe });
+  if (role === 'ADMIN' || 'PRINCIPAL') {
+    items.push({ label: 'Students', href: '/principal/student-admission', icon: UserPlus });
+    items.push({ label: 'Teachers', href: '/principal/staff', icon: Users });
+    items.push({ label: 'Classes', href: '/principal/class', icon: BookOpen });
+    items.push({ label: 'Attedance', href: '/principal/attedance', icon: BookMarked });
+    items.push({ label: 'Fees', href: '/principal/fee-structure', icon: IndianRupee });
+    items.push({ label: 'Time Table', href: '/principal/time-table', icon: IndianRupee });
+    items.push({ label: 'Notice', href: '/principal/notice', icon: IndianRupee });
+    items.push({ label: 'Homework', href: '/principal/homework', icon: NotebookPen });
+    items.push({ label: 'Communication', href: '/principal/Communication', icon: NotebookPen });
+    items.push({ label: 'Report', href: '/principal/report', icon: NotebookPen });
+    items.push({ label: 'Role & Permission', href: '/principal/role-permission', icon: NotebookPen });
+    items.push({ label: 'Subject & Class', href: '/principal/subject-class', icon: BookMarked });
+    items.push({ label: 'Test & Exam', href: '/principal/exams', icon: ClipboardList });
+    items.push({ label: 'Study Material', href: '/principal/study-material', icon: ClipboardList });
+    items.push({ label: 'Chatbot Management', href: '/principal/chatbot', icon: Bot });
+
+    // items.push({ label: 'Subject', href: '/principal/subject', icon: BookMarked });
+    
+    // items.push({ label: 'Teacher Section', href: '/principal/teacher-section', icon: UserCog });
+
+    
+    items.push({ label: 'Website Settings', href: '/principal/website-setting', icon: Globe });
   }
 
   if (role === 'TEACHER') {
     items.push({ label: 'Homework', href: '/teacher/homework', icon: NotebookPen });
+    items.push({ label: 'Holidays', href: '/teacher/holiday', icon: CalendarDays });
   }
 
   items.push({ label: 'My Profile', href: `/${base}/profile`, icon: UserCircle });
@@ -85,4 +96,5 @@ export const ROLE_LABELS: Record<Role, string> = {
   TEACHER: 'Teacher',
   STAFF: 'Staff',
   STUDENT: 'Student',
+  ADMIN: "Admin",
 };

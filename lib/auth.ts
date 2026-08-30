@@ -4,7 +4,7 @@
 // proxy.ts (Next's server-side request hook) can read them and enforce
 // role-based routing before a page ever renders.
 
-export type Role = 'SUPERADMIN' | 'PRINCIPAL' | 'TEACHER' | 'STAFF' | 'STUDENT';
+export type Role = 'SUPERADMIN' | 'PRINCIPAL' | 'TEACHER' | 'STAFF' | 'STUDENT' | 'ADMIN';
 
 // Backend quirk: principal accounts carry role "ADMIN" over the wire (both
 // /auth/login and /profile), not "PRINCIPAL". Routing, nav and ProtectedRoute

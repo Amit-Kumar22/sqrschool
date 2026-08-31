@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ExternalLink, Pencil, PlaySquare, Plus, Trash2 } from 'lucide-react';
+import { ExternalLink, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import {
   deleteYoutubeTestimonial,
   getYoutubeTestimonials,
   type YoutubeTestimonial,
 } from '@/lib/youtubeTestimonialService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -143,16 +143,13 @@ export default function StaffYoutubeTestimonialsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        icon={PlaySquare}
-        title="YouTube Testimonials"
-        description="Manage the YouTube testimonial videos shown on the public site."
-        actions={
-          <Button icon={Plus} onClick={openCreateModal}>
-            Add testimonial
-          </Button>
-        }
-      />
+      <SetPageTitle title="YouTube Testimonials" />
+
+      <div className="flex justify-end">
+        <Button icon={Plus} onClick={openCreateModal}>
+          Add testimonial
+        </Button>
+      </div>
 
       {error && (
         <div className="animate-fade-in-up rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

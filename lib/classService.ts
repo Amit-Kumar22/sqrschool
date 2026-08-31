@@ -35,7 +35,7 @@ export interface ClassListParams {
 }
 
 // Fetched with a generous page size since DataTable sorts/paginates
-// client-side over the full result set, same as getSchools/getAcademicYears.
+// client-side over the full result set, same as getSchools/getExams.
 /** Paginated class list. Returns the raw Page<SchoolClass> shape — no envelope. */
 export const getClasses = async ({
   isActive = true,

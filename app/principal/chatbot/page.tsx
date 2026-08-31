@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
-import { Bot, Loader2, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
+import { Loader2, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import {
   deleteChatbotEntry,
@@ -9,7 +9,7 @@ import {
   searchChatbotEntries,
   type ChatbotEntry,
 } from '@/lib/chatbotService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -160,47 +160,44 @@ export default function StaffChatbotPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        icon={Bot}
-        title="Chatbot Management"
-        description="Manage keyword/answer pairs that power the site chatbot."
-        actions={
-          <Button icon={Plus} onClick={openCreateModal}>
-            Add entry
-          </Button>
-        }
-      />
+      <SetPageTitle title="Chatbot Management" />
 
-      <form onSubmit={handleSearch} className="flex max-w-sm items-center gap-2">
-        <div className="relative flex-1">
-          <Search size={15} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by keyword"
-            className="h-9 w-full rounded-md border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={searching || !searchTerm.trim()}
-          title="Search"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {searching ? <Loader2 size={15} className="animate-spin" /> : <Search size={15} />}
-        </button>
-        {activeSearch && (
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <form onSubmit={handleSearch} className="flex max-w-sm items-center gap-2">
+          <div className="relative flex-1">
+            <Search size={15} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by keyword"
+              className="h-9 w-full rounded-md border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
+            />
+          </div>
           <button
-            type="button"
-            onClick={clearSearch}
-            title="Clear search"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition-colors hover:bg-slate-100"
+            type="submit"
+            disabled={searching || !searchTerm.trim()}
+            title="Search"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            <X size={15} />
+            {searching ? <Loader2 size={15} className="animate-spin" /> : <Search size={15} />}
           </button>
-        )}
-      </form>
+          {activeSearch && (
+            <button
+              type="button"
+              onClick={clearSearch}
+              title="Clear search"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition-colors hover:bg-slate-100"
+            >
+              <X size={15} />
+            </button>
+          )}
+        </form>
+
+        <Button icon={Plus} onClick={openCreateModal}>
+          Add entry
+        </Button>
+      </div>
 
       {error && (
         <div className="animate-fade-in-up rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

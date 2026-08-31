@@ -67,7 +67,7 @@ export interface ExamListParams {
 }
 
 // Fetched with a generous page size since DataTable sorts/paginates
-// client-side over the full result set, same as getClasses/getAcademicYears.
+// client-side over the full result set, same as getClasses/getSchools.
 /** Paginated exam list, optionally filtered by class/subject/section. Returns the raw Page<Exam> shape — no envelope. */
 export const getExams = async ({
   classId,

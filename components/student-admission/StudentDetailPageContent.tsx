@@ -122,7 +122,6 @@ export default function StudentDetailPageContent({ studentId }: { studentId: num
       <div className="grid gap-4 lg:grid-cols-2">
         <DetailCard title="Admission" icon={GraduationCap} accent="from-indigo-500 via-violet-400 to-indigo-500" iconBg="bg-indigo-50 text-indigo-600">
           <DetailRow label="Admission date" value={formatDate(student.admissionDate)} />
-          <DetailRow label="Academic year" value={student.academicYear} />
           <DetailRow label="Class" value={student.schoolClass?.className} />
           <DetailRow label="Roll number" value={student.rollNumber} />
         </DetailCard>

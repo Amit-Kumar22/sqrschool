@@ -38,7 +38,7 @@ export interface HolidayListParams {
 }
 
 // Fetched with a generous page size since DataTable sorts/paginates
-// client-side over the full result set, same as getExams/getAcademicYears.
+// client-side over the full result set, same as getExams/getClasses.
 /** Paginated holiday list. Returns the raw Page<Holiday> shape — no envelope. */
 export const getHolidays = async ({ page = 0, size = 200, sort }: HolidayListParams = {}): Promise<HolidayPage> => {
   const response = await api.get<HolidayPage>(API_ENDPOINTS.HOLIDAY.LIST, {

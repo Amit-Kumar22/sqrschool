@@ -2,11 +2,11 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, Pencil, Plus, Search, Trash2, UserPlus, X } from 'lucide-react';
+import { Eye, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteStudent, getStudentAdmissions, type FeeStatus, type StudentAdmission } from '@/lib/studentService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -131,11 +131,6 @@ export default function StaffStudentAdmissionPage() {
       render: (item) => <span className="text-slate-600">{item.schoolClass?.className || '—'}</span>,
     },
     {
-      key: 'academicYear',
-      header: 'Academic Year',
-      render: (item) => <span className="text-slate-600">{item.academicYear || '—'}</span>,
-    },
-    {
       key: 'fatherName',
       header: "Father's Name",
       accessor: (item) => item.fatherName,
@@ -195,79 +190,76 @@ export default function StaffStudentAdmissionPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={UserPlus}
-        title="Student Admission"
-        description="View admitted students and add new admissions to a school."
-        actions={
-          <Button icon={Plus} onClick={() => setFormModalOpen(true)}>
-            Add student
-          </Button>
-        }
-      />
+      <SetPageTitle title="Student Admission" />
 
-      <div className="flex flex-wrap items-end gap-2">
-        <SelectField
-          label="Class"
-          required
-          wrapperClassName="w-40"
-          value={classFilter}
-          disabled={classesLoading || classes.length === 0}
-          onChange={(e) => setClassFilter(e.target.value ? Number(e.target.value) : '')}
-        >
-          <option value="" disabled>
-            {classesLoading ? 'Loading…' : 'Select a class'}
-          </option>
-          {classes.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.className}
-            </option>
-          ))}
-        </SelectField>
-
-        <SelectField
-          label="Fee status"
-          wrapperClassName="w-40"
-          value={feeStatusFilter}
-          onChange={(e) => setFeeStatusFilter(e.target.value as FeeStatus | '')}
-        >
-          <option value="">All fee statuses</option>
-          {FEE_STATUS_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </SelectField>
-
-        <form onSubmit={handleSearch} className="flex items-center gap-2">
-          <div className="relative">
-            <Search size={15} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search students"
-              className="h-10 w-52 rounded-lg border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 shadow-premium-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 focus:outline-none"
-            />
-          </div>
-          <button
-            type="submit"
-            title="Search"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white transition-colors hover:bg-indigo-700"
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div className="flex flex-wrap items-end gap-2">
+          <SelectField
+            label="Class"
+            required
+            wrapperClassName="w-40"
+            value={classFilter}
+            disabled={classesLoading || classes.length === 0}
+            onChange={(e) => setClassFilter(e.target.value ? Number(e.target.value) : '')}
           >
-            <Search size={15} />
-          </button>
-          {activeSearch && (
+            <option value="" disabled>
+              {classesLoading ? 'Loading…' : 'Select a class'}
+            </option>
+            {classes.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.className}
+              </option>
+            ))}
+          </SelectField>
+
+          <SelectField
+            label="Fee status"
+            wrapperClassName="w-40"
+            value={feeStatusFilter}
+            onChange={(e) => setFeeStatusFilter(e.target.value as FeeStatus | '')}
+          >
+            <option value="">All fee statuses</option>
+            {FEE_STATUS_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </SelectField>
+
+          <form onSubmit={handleSearch} className="flex items-center gap-2">
+            <div className="relative">
+              <Search size={15} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search students"
+                className="h-10 w-52 rounded-lg border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 shadow-premium-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 focus:outline-none"
+              />
+            </div>
             <button
-              type="button"
-              onClick={clearSearch}
-              title="Clear search"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:bg-slate-100"
+              type="submit"
+              title="Search"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white transition-colors hover:bg-indigo-700"
             >
-              <X size={15} />
+              <Search size={15} />
             </button>
-          )}
-        </form>
+            {activeSearch && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                title="Clear search"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:bg-slate-100"
+              >
+                <X size={15} />
+              </button>
+            )}
+          </form>
+        </div>
+
+        <Button icon={Plus} onClick={() => setFormModalOpen(true)}>
+          Add student
+        </Button>
       </div>
 
       {error && (

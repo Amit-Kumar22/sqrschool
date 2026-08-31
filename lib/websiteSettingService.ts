@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from './config';
 // CMS-style endpoints behind the public marketing site — header, hero,
 // sections, features, stats, toppers, gallery, socials, contact and the
 // floating widgets. Every resource shares the same raw Page<T> shape (no
-// {result} envelope), same as lib/academicYearService.ts.
+// {result} envelope), same as lib/feeService.ts.
 
 export interface WebsitePage<T> {
   content: T[];

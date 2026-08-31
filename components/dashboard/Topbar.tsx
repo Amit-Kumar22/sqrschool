@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, LogOut, Menu, UserCircle } from 'lucide-react';
 import { getRoleBasePath, type SessionUser } from '@/lib/auth';
 import { ROLE_LABELS } from './navConfig';
+import { usePageTitleValue } from './PageTitleContext';
 
 interface TopbarProps {
   user: SessionUser | null;
@@ -14,6 +15,7 @@ interface TopbarProps {
 
 /** Fixed premium dark chrome — unified with Sidebar, intentionally not theme-bound (see Sidebar.tsx). */
 export default function Topbar({ user, onOpenSidebar, onLogout }: TopbarProps) {
+  const pageTitle = usePageTitleValue();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -37,17 +39,15 @@ export default function Topbar({ user, onOpenSidebar, onLogout }: TopbarProps) {
     <header className="relative z-20 flex h-16 shrink-0 items-center justify-between bg-gradient-to-r from-indigo-950 via-[#151235] to-indigo-950 px-4 shadow-premium sm:px-6">
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
 
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 items-center gap-3">
         <button
-          className="rounded-md p-1.5 text-slate-200 transition-colors hover:bg-white/10 lg:hidden"
+          className="shrink-0 rounded-md p-1.5 text-slate-200 transition-colors hover:bg-white/10 lg:hidden"
           onClick={onOpenSidebar}
           aria-label="Open menu"
         >
           <Menu size={22} />
         </button>
-        <span className="hidden text-sm font-medium text-slate-300 lg:block">
-          {user ? `Welcome back, ${user.fullName.split(' ')[0]}` : ''}
-        </span>
+        <span className="truncate text-sm font-semibold text-white sm:text-base">{pageTitle}</span>
       </div>
 
       <div className="flex items-center gap-3">

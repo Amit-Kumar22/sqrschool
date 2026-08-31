@@ -1,29 +1,28 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { IndianRupee, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteFeeStructure, getFeeStructures, type FeeStructure } from '@/lib/feeService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
-import { getAcademicYears, type AcademicYear } from '@/lib/academicYearService';
-import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
-import { FeeTypeBadge, StatusBadge } from '@/components/ui/Badge';
+import { FeeFrequencyBadge, FeeTypeBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
-import { SelectField } from '@/components/ui/FormField';
+import TabPill from '@/components/ui/TabPill';
 import FeeStructureFormModal from '@/components/fee/FeeStructureFormModal';
 
 const formatDate = (value: string) => (value ? new Date(value).toLocaleDateString() : '—');
 
-/** Fee structure management page — shared between the Principal and Staff panels (see their /fee-structure routes). */
+/** Fee structure management panel — one tab of the Fee Management page. Classes are browsed as pills rather than a dropdown since a school only has a handful. */
 export default function FeeStructurePageContent() {
   const [classes, setClasses] = useState<SchoolClass[]>([]);
-  const [classesLoading, setClassesLoading] = useState(false);
+  // Starts true (not false) so the fee-structures effect below skips its
+  // first run on mount — otherwise it fires with classFilter still '' in
+  // the same commit as loadClasses's own setClassesLoading(true), before
+  // that update has flushed, and fetches the unfiltered list once before
+  // classes resolve and correct it.
+  const [classesLoading, setClassesLoading] = useState(true);
   const [classFilter, setClassFilter] = useState<number | ''>('');
-
-  const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
-  const [yearsLoading, setYearsLoading] = useState(false);
-  const [yearFilter, setYearFilter] = useState<number | ''>('');
 
   const [feeStructures, setFeeStructures] = useState<FeeStructure[]>([]);
   const [loading, setLoading] = useState(false);
@@ -40,6 +39,7 @@ export default function FeeStructurePageContent() {
       try {
         const content = (await getClasses()).content;
         setClasses(content);
+        setClassFilter((prev) => prev || (content[0]?.id ?? ''));
       } catch (err) {
         setError(apiErrorMessage(err, 'Could not load classes from the server.'));
       } finally {
@@ -49,27 +49,11 @@ export default function FeeStructurePageContent() {
     loadClasses();
   }, []);
 
-  useEffect(() => {
-    const loadYears = async () => {
-      setYearsLoading(true);
-      setError('');
-      try {
-        const content = (await getAcademicYears()).content;
-        setAcademicYears(content);
-      } catch (err) {
-        setError(apiErrorMessage(err, 'Could not load academic years from the server.'));
-      } finally {
-        setYearsLoading(false);
-      }
-    };
-    loadYears();
-  }, []);
-
   const loadFeeStructures = async () => {
     setLoading(true);
     setError('');
     try {
-      const params = { classId: classFilter || undefined, academicYearId: yearFilter || undefined };
+      const params = { classId: classFilter || undefined };
       const content = (await getFeeStructures(params)).content;
       setFeeStructures(content);
     } catch (err) {
@@ -80,9 +64,10 @@ export default function FeeStructurePageContent() {
   };
 
   useEffect(() => {
+    if (classesLoading) return;
     loadFeeStructures();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [classFilter, yearFilter]);
+  }, [classesLoading, classFilter]);
 
   const openCreateModal = () => {
     setEditingItem(null);
@@ -116,16 +101,11 @@ export default function FeeStructurePageContent() {
 
   const columns: DataTableColumn<FeeStructure>[] = [
     {
-      key: 'className',
-      header: 'Class',
+      key: 'title',
+      header: 'Title',
       sortable: true,
-      accessor: (item) => item.className,
-      render: (item) => (
-        <div>
-          <p className="font-semibold text-slate-900">{item.className}</p>
-          <p className="text-xs text-slate-500">{item.yearCode}</p>
-        </div>
-      ),
+      accessor: (item) => item.title,
+      render: (item) => <p className="font-semibold text-slate-900">{item.title}</p>,
     },
     {
       key: 'feeType',
@@ -135,27 +115,26 @@ export default function FeeStructurePageContent() {
       render: (item) => <FeeTypeBadge feeType={item.feeType} />,
     },
     {
+      key: 'academicYear',
+      header: 'Academic Year',
+      sortable: true,
+      accessor: (item) => item.academicYear,
+      render: (item) => <span className="text-slate-600">{item.academicYear || '—'}</span>,
+    },
+    {
+      key: 'frequency',
+      header: 'Frequency',
+      sortable: true,
+      accessor: (item) => item.frequency,
+      render: (item) => <FeeFrequencyBadge frequency={item.frequency} />,
+    },
+    {
       key: 'amount',
       header: 'Amount',
+      align: 'right',
       sortable: true,
       accessor: (item) => item.amount,
       render: (item) => <span className="font-medium text-slate-700">₹{item.amount.toLocaleString('en-IN')}</span>,
-    },
-    {
-      key: 'dueMonth',
-      header: 'Due month',
-      sortable: true,
-      accessor: (item) => item.dueMonth,
-      render: (item) => (
-        <span className="text-slate-600">
-          {new Date(2000, item.dueMonth - 1, 1).toLocaleString('en-US', { month: 'long' })}
-        </span>
-      ),
-    },
-    {
-      key: 'optional',
-      header: 'Optional',
-      render: (item) => <StatusBadge active={item.optional} activeLabel="Optional" inactiveLabel="Mandatory" />,
     },
     {
       key: 'createdAt',
@@ -195,45 +174,23 @@ export default function FeeStructurePageContent() {
     },
   ];
 
+  const selectedClassName = classes.find((cls) => cls.id === classFilter)?.className;
+
   return (
-    <div className="space-y-4">
-      <PageHeader
-        icon={IndianRupee}
-        title="Fee Structure"
-        description="Define fee structures per class and academic year."
-        actions={
-          <Button icon={Plus} onClick={openCreateModal} disabled={classesLoading || classes.length === 0 || yearsLoading || academicYears.length === 0}>
-            Add fee structure
-          </Button>
-        }
-      />
-
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <SelectField
-          label="Class"
-          value={classFilter}
-          onChange={(e) => setClassFilter(e.target.value ? Number(e.target.value) : '')}
-        >
-          <option value="">All classes</option>
-          {classes.map((cls) => (
-            <option key={cls.id} value={cls.id}>
-              {cls.className}
-            </option>
-          ))}
-        </SelectField>
-
-        <SelectField
-          label="Academic year"
-          value={yearFilter}
-          onChange={(e) => setYearFilter(e.target.value ? Number(e.target.value) : '')}
-        >
-          <option value="">All academic years</option>
-          {academicYears.map((year) => (
-            <option key={year.id} value={year.id}>
-              {year.yearCode}
-            </option>
-          ))}
-        </SelectField>
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="scrollbar-thin flex flex-wrap gap-1 overflow-x-auto">
+          {classesLoading && classes.length === 0 ? (
+            <span className="px-1 text-xs text-slate-400">Loading classes…</span>
+          ) : (
+            classes.map((cls) => (
+              <TabPill key={cls.id} label={cls.className} active={classFilter === cls.id} onClick={() => setClassFilter(cls.id)} />
+            ))
+          )}
+        </div>
+        <Button icon={Plus} size="sm" onClick={openCreateModal} disabled={classesLoading || classes.length === 0}>
+          Add Fee Structure
+        </Button>
       </div>
 
       {error && (
@@ -242,18 +199,20 @@ export default function FeeStructurePageContent() {
         </div>
       )}
 
+      <p className="text-sm font-semibold text-slate-900">
+        {selectedClassName ? `Class ${selectedClassName} — Fee Structures` : 'Fee Structures'}
+      </p>
+
       <DataTable
         columns={columns}
         data={feeStructures}
         rowKey={(item) => item.id}
-        loading={loading || classesLoading || yearsLoading}
+        loading={loading || classesLoading}
         emptyTitle="No fee structures yet"
         emptyDescription={
           classes.length === 0
             ? 'Add a class before defining a fee structure.'
-            : academicYears.length === 0
-              ? 'Add an academic year before defining a fee structure.'
-              : 'Add the first fee structure to get started.'
+            : 'Add the first fee structure to get started.'
         }
       />
 
@@ -261,7 +220,6 @@ export default function FeeStructurePageContent() {
         <FeeStructureFormModal
           item={editingItem}
           classes={classes}
-          academicYears={academicYears}
           onClose={() => {
             setFormModalOpen(false);
             setEditingItem(null);

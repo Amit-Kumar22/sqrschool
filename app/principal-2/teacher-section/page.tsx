@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { UserCog } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { getTeacherSubjectMappingsAdmin, type TeacherSubjectMapping } from '@/lib/teacherSubjectService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 
@@ -69,7 +68,7 @@ export default function PrincipalTeacherSectionPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader icon={UserCog} title="Teacher Assignments" description="View teacher-subject-section assignments across the school." />
+      <SetPageTitle title="Teacher Assignments" />
 
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

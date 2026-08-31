@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Pencil, Plus, Trash2, UserCog } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import {
   deleteTeacherSubjectMapping,
@@ -12,7 +12,7 @@ import { getClasses, type SchoolClass } from '@/lib/classService';
 import { getSubjects, type Subject } from '@/lib/subjectService';
 import { getAllTeachers } from '@/lib/schoolService';
 import type { StudentAdmission } from '@/lib/studentService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -182,16 +182,13 @@ export default function StaffTeacherSectionPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={UserCog}
-        title="Teacher Section"
-        description="Assign teachers to a subject for a class section."
-        actions={
-          <Button icon={Plus} onClick={openCreateModal} disabled={!canCreate} title={missingPrerequisite || undefined}>
-            Add assignment
-          </Button>
-        }
-      />
+      <SetPageTitle title="Teacher Section" />
+
+      <div className="flex justify-end">
+        <Button icon={Plus} onClick={openCreateModal} disabled={!canCreate} title={missingPrerequisite || undefined}>
+          Add assignment
+        </Button>
+      </div>
 
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

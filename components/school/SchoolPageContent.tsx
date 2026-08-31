@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Eye, Pencil, Plus, School as SchoolIcon, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteSchool, getSchoolDetail, getSchools, type School } from '@/lib/schoolService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -184,16 +184,13 @@ export default function SchoolPageContent() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        icon={SchoolIcon}
-        title="School Management"
-        description="View and manage school records — profile, contact details and address."
-        actions={
-          <Button icon={Plus} onClick={openCreateModal}>
-            Add school
-          </Button>
-        }
-      />
+      <SetPageTitle title="School Management" />
+
+      <div className="flex justify-end">
+        <Button icon={Plus} onClick={openCreateModal}>
+          Add school
+        </Button>
+      </div>
 
       {error && (
         <div className="animate-fade-in-up rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

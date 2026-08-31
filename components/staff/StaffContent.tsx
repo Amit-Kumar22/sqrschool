@@ -1,10 +1,10 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
-import { Eye, Plus, Search, Users, X } from 'lucide-react';
+import { Eye, Plus, Search, X } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { getStaffMembers, type StaffMember, type StaffRole } from '@/lib/schoolService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { RoleBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -106,61 +106,58 @@ export default function PrincipalStaffPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        icon={Users}
-        title="Staff Management"
-        description="View teaching and non-teaching staff, and add new members to a school."
-        actions={
-          <Button icon={Plus} onClick={() => setFormModalOpen(true)}>
-            Add staff
-          </Button>
-        }
-      />
+      <SetPageTitle title="Staff Management" />
 
-      <div className="flex flex-wrap items-center gap-2">
-        <label className="block text-sm">
-          <span className="sr-only">Role</span>
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value as StaffRole | '')}
-            className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
-          >
-            <option value="">All roles</option>
-            <option value="TEACHER">Teacher</option>
-            <option value="STAFF">Staff</option>
-            <option value="ADMIN">Admin</option>
-          </select>
-        </label>
-
-        <form onSubmit={handleSearch} className="flex items-center gap-2">
-          <div className="relative">
-            <Search size={15} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search staff"
-              className="h-9 w-48 rounded-md border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
-            />
-          </div>
-          <button
-            type="submit"
-            title="Search"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-white transition-colors hover:bg-indigo-700"
-          >
-            <Search size={15} />
-          </button>
-          {activeSearch && (
-            <button
-              type="button"
-              onClick={clearSearch}
-              title="Clear search"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition-colors hover:bg-slate-100"
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="block text-sm">
+            <span className="sr-only">Role</span>
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value as StaffRole | '')}
+              className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
             >
-              <X size={15} />
+              <option value="">All roles</option>
+              <option value="TEACHER">Teacher</option>
+              <option value="STAFF">Staff</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </label>
+
+          <form onSubmit={handleSearch} className="flex items-center gap-2">
+            <div className="relative">
+              <Search size={15} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search staff"
+                className="h-9 w-48 rounded-md border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
+              />
+            </div>
+            <button
+              type="submit"
+              title="Search"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-white transition-colors hover:bg-indigo-700"
+            >
+              <Search size={15} />
             </button>
-          )}
-        </form>
+            {activeSearch && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                title="Clear search"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition-colors hover:bg-slate-100"
+              >
+                <X size={15} />
+              </button>
+            )}
+          </form>
+        </div>
+
+        <Button icon={Plus} onClick={() => setFormModalOpen(true)}>
+          Add staff
+        </Button>
       </div>
 
       {error && (

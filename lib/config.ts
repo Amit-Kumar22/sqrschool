@@ -66,13 +66,6 @@ export const API_ENDPOINTS = {
     UPDATE: (id: number) => `/v1/student-class-sections/${id}`,
     DELETE: (id: number) => `/v1/student-class-sections/${id}`,
   },
-  ACADEMIC_YEAR: {
-    LIST: '/v1/academic-year',
-    CREATE: '/v1/academic-year',
-    GET: (id: number) => `/v1/academic-year/${id}`,
-    UPDATE: (id: number) => `/v1/academic-year/${id}`,
-    DELETE: (id: number) => `/v1/academic-year/${id}`,
-  },
   HOLIDAY: {
     LIST: '/v1/holiday',
     ADD: '/v1/holiday/add',
@@ -155,6 +148,15 @@ export const API_ENDPOINTS = {
     GET: (id: number) => `/v1/fee-structures/${id}`,
     UPDATE: (id: number) => `/v1/fee-structures/${id}`,
     DELETE: (id: number) => `/v1/fee-structures/${id}`,
+  },
+  STUDENT_FEE: {
+    LIST: '/v1/student-fees',
+    GET: (id: number) => `/v1/student-fees/${id}`,
+    DELETE: (id: number) => `/v1/student-fees/${id}`,
+    GENERATE: '/v1/student-fees/generate',
+    MARK_OVERDUE: '/v1/student-fees/overdue/mark',
+    PAYMENTS: (id: number) => `/v1/student-fees/${id}/payments`,
+    ALL_PAYMENTS: '/v1/student-fees/all-payment',
   },
   // Public/unauthenticated endpoints consumed by the marketing home page —
   // no session required, see lib/freeService.ts.

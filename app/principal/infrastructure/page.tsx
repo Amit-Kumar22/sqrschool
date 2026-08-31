@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Building2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import {
   deleteInfrastructure,
   getInfrastructureList,
   type Infrastructure,
 } from '@/lib/infrastructureService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -129,16 +129,13 @@ export default function StaffInfrastructurePage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        icon={Building2}
-        title="School Infrastructure"
-        description="Manage the infrastructure facilities shown on the school's public profile."
-        actions={
-          <Button icon={Plus} onClick={openCreateModal}>
-            Add infrastructure
-          </Button>
-        }
-      />
+      <SetPageTitle title="School Infrastructure" />
+
+      <div className="flex justify-end">
+        <Button icon={Plus} onClick={openCreateModal}>
+          Add infrastructure
+        </Button>
+      </div>
 
       {error && (
         <div className="animate-fade-in-up rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

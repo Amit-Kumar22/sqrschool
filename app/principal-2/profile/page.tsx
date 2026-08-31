@@ -1,11 +1,10 @@
-import { UserCircle } from 'lucide-react';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import ProfileView from '@/components/profile/ProfileView';
 
 export default function PrincipalProfilePage() {
   return (
     <div className="space-y-6">
-      <PageHeader icon={UserCircle} title="My Profile" description="View and update your account details." />
+      <SetPageTitle title="My Profile" />
       <ProfileView />
     </div>
   );

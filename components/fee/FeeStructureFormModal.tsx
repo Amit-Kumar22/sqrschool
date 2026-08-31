@@ -2,62 +2,55 @@
 
 import { FormEvent, useState } from 'react';
 import { IndianRupee } from 'lucide-react';
-import { createFeeStructure, updateFeeStructure, type FeeStructure, type FeeStructurePayload, type FeeType } from '@/lib/feeService';
+import { createFeeStructure, updateFeeStructure, type FeeFrequency, type FeeStructure, type FeeStructurePayload, type FeeType } from '@/lib/feeService';
 import type { SchoolClass } from '@/lib/classService';
-import type { AcademicYear } from '@/lib/academicYearService';
 import { apiErrorMessage } from '@/lib/api';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import { SelectField, TextField } from '@/components/ui/FormField';
+import { SelectField, TextareaField, TextField } from '@/components/ui/FormField';
 
 const FEE_TYPE_OPTIONS: FeeType[] = ['TUITION_FEE', 'ADMISSION_FEE', 'EXAM_FEE', 'TRANSPORT_FEE', 'LIBRARY_FEE', 'MISCELLANEOUS_FEE'];
 
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
+const FEE_FREQUENCY_OPTIONS: FeeFrequency[] = ['ONE_TIME', 'MONTHLY', 'QUARTERLY', 'HALF_YEARLY', 'ANNUALLY'];
+
+const formatEnumLabel = (value: string) =>
+  value
+    .toLowerCase()
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 
 function toFormState(item: FeeStructure | null): FeeStructurePayload {
   if (!item) {
     return {
+      title: '',
       classId: 0,
-      academicYearId: 0,
+      academicYear: '',
       feeType: 'TUITION_FEE',
+      frequency: 'ONE_TIME',
       amount: 0,
-      dueMonth: 1,
-      optional: false,
+      description: '',
     };
   }
   return {
+    title: item.title,
     classId: item.classId,
-    academicYearId: item.academicYearId,
+    academicYear: item.academicYear,
     feeType: item.feeType,
+    frequency: item.frequency,
     amount: item.amount,
-    dueMonth: item.dueMonth,
-    optional: item.optional,
+    description: item.description,
   };
 }
 
 export default function FeeStructureFormModal({
   item,
   classes,
-  academicYears,
   onClose,
   onSaved,
 }: {
   item: FeeStructure | null;
   classes: SchoolClass[];
-  academicYears: AcademicYear[];
   onClose: () => void;
   onSaved: (item: FeeStructure) => void;
 }) {
@@ -70,20 +63,20 @@ export default function FeeStructureFormModal({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!form.title.trim()) {
+      setError('Please enter a title.');
+      return;
+    }
     if (!form.classId) {
       setError('Please select a class.');
       return;
     }
-    if (!form.academicYearId) {
-      setError('Please select an academic year.');
+    if (!form.academicYear.trim()) {
+      setError('Please enter an academic year.');
       return;
     }
     if (!form.amount || form.amount <= 0) {
       setError('Amount must be greater than zero.');
-      return;
-    }
-    if (!form.dueMonth || form.dueMonth < 1 || form.dueMonth > 12) {
-      setError('Please select a due month.');
       return;
     }
 
@@ -118,6 +111,14 @@ export default function FeeStructureFormModal({
       }
     >
       <form id="fee-structure-form" onSubmit={handleSubmit} className="grid gap-3.5">
+        <TextField
+          label="Title"
+          required
+          placeholder="e.g. Tuition Fee — Quarter 2"
+          value={form.title}
+          onChange={(e) => setField('title', e.target.value)}
+        />
+
         <div className="grid grid-cols-2 gap-3.5">
           <SelectField
             label="Class"
@@ -135,21 +136,13 @@ export default function FeeStructureFormModal({
             ))}
           </SelectField>
 
-          <SelectField
+          <TextField
             label="Academic year"
             required
-            value={form.academicYearId || ''}
-            onChange={(e) => setField('academicYearId', Number(e.target.value))}
-          >
-            <option value="" disabled>
-              Select a year
-            </option>
-            {academicYears.map((year) => (
-              <option key={year.id} value={year.id}>
-                {year.yearCode}
-              </option>
-            ))}
-          </SelectField>
+            placeholder="e.g. 2025-26"
+            value={form.academicYear}
+            onChange={(e) => setField('academicYear', e.target.value)}
+          />
         </div>
 
         <SelectField
@@ -160,11 +153,7 @@ export default function FeeStructureFormModal({
         >
           {FEE_TYPE_OPTIONS.map((type) => (
             <option key={type} value={type}>
-              {type
-                .toLowerCase()
-                .split('_')
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ')}
+              {formatEnumLabel(type)}
             </option>
           ))}
         </SelectField>
@@ -181,31 +170,25 @@ export default function FeeStructureFormModal({
           />
 
           <SelectField
-            label="Due month"
+            label="Frequency"
             required
-            value={form.dueMonth || ''}
-            onChange={(e) => setField('dueMonth', Number(e.target.value))}
+            value={form.frequency}
+            onChange={(e) => setField('frequency', e.target.value as FeeFrequency)}
           >
-            <option value="" disabled>
-              Select a month
-            </option>
-            {MONTHS.map((month, idx) => (
-              <option key={month} value={idx + 1}>
-                {month}
+            {FEE_FREQUENCY_OPTIONS.map((freq) => (
+              <option key={freq} value={freq}>
+                {formatEnumLabel(freq)}
               </option>
             ))}
           </SelectField>
         </div>
 
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={form.optional}
-            onChange={(e) => setField('optional', e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/30"
-          />
-          This fee is optional
-        </label>
+        <TextareaField
+          label="Description"
+          value={form.description}
+          onChange={(e) => setField('description', e.target.value)}
+          rows={2}
+        />
 
         {error && <div className="animate-fade-in-up rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>}
       </form>

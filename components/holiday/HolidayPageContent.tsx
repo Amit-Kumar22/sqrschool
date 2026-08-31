@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CalendarDays, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteHoliday, getHolidays, type Holiday } from '@/lib/holidayService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -129,16 +129,13 @@ export default function HolidayPageContent() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={CalendarDays}
-        title="Holidays"
-        description="Manage the school's holiday calendar."
-        actions={
-          <Button icon={Plus} onClick={openCreateModal}>
-            Add holiday
-          </Button>
-        }
-      />
+      <SetPageTitle title="Holidays" />
+
+      <div className="flex justify-end">
+        <Button icon={Plus} onClick={openCreateModal}>
+          Add holiday
+        </Button>
+      </div>
 
       {error && (
         <div className="animate-fade-in-up rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

@@ -4,7 +4,6 @@ import { FormEvent, useEffect, useState } from 'react';
 import { CheckCircle2, UserPlus } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { createStudentAdmission, type NewAdmissionPayload, type StudentAddress } from '@/lib/studentService';
-import { getAcademicYears, type AcademicYear } from '@/lib/academicYearService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
 import { getSections, type Section } from '@/lib/classSectionService';
 import Modal from '@/components/ui/Modal';
@@ -23,7 +22,6 @@ const emptyAddress: StudentAddress = {
 
 function emptyForm(): NewAdmissionPayload {
   return {
-    academicYearId: 0,
     name: '',
     phone: '',
     fatherName: '',
@@ -58,13 +56,9 @@ export default function StudentAdmissionFormModal({
   const [sections, setSections] = useState<Section[]>([]);
   const [sectionsLoading, setSectionsLoading] = useState(false);
 
-  const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
-  const [yearsLoading, setYearsLoading] = useState(false);
-
   useEffect(() => {
     let cancelled = false;
     setClassesLoading(true);
-    setYearsLoading(true);
     getClasses()
       .then((page) => {
         if (!cancelled) setClasses(page.content);
@@ -74,16 +68,6 @@ export default function StudentAdmissionFormModal({
       })
       .finally(() => {
         if (!cancelled) setClassesLoading(false);
-      });
-    getAcademicYears()
-      .then((page) => {
-        if (!cancelled) setAcademicYears(page.content);
-      })
-      .catch(() => {
-        if (!cancelled) setAcademicYears([]);
-      })
-      .finally(() => {
-        if (!cancelled) setYearsLoading(false);
       });
     return () => {
       cancelled = true;
@@ -126,10 +110,6 @@ export default function StudentAdmissionFormModal({
     }
     if (!classId || !form.sectionId) {
       setError('Please select a class and section.');
-      return;
-    }
-    if (!form.academicYearId) {
-      setError('Please select an academic year.');
       return;
     }
 
@@ -228,31 +208,13 @@ export default function StudentAdmissionFormModal({
           </SelectField>
         </div>
 
-        <div className="grid gap-2.5 sm:grid-cols-2">
-          <SelectField
-            label="Academic year"
-            required
-            value={form.academicYearId || ''}
-            disabled={yearsLoading || academicYears.length === 0}
-            onChange={(e) => setField('academicYearId', e.target.value ? Number(e.target.value) : 0)}
-          >
-            <option value="" disabled>
-              {yearsLoading ? 'Loading…' : 'Select academic year'}
-            </option>
-            {academicYears.map((y) => (
-              <option key={y.id} value={y.id}>
-                {y.yearCode}
-              </option>
-            ))}
-          </SelectField>
-          <TextField
-            label="Password"
-            type="password"
-            required
-            value={form.password}
-            onChange={(e) => setField('password', e.target.value)}
-          />
-        </div>
+        <TextField
+          label="Password"
+          type="password"
+          required
+          value={form.password}
+          onChange={(e) => setField('password', e.target.value)}
+        />
 
         <p className="mt-1.5 text-xs font-semibold tracking-wide text-slate-400 uppercase">Address</p>
 

@@ -33,7 +33,7 @@ export interface SubjectListParams {
 }
 
 // Fetched with a generous page size since DataTable sorts/paginates
-// client-side over the full result set, same as getClasses/getAcademicYears.
+// client-side over the full result set, same as getClasses/getSchools.
 /** Paginated subject list, optionally filtered by name. Returns the raw Page<Subject> shape — no envelope. */
 export const getSubjects = async ({
   subjectName,

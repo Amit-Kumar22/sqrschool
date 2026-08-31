@@ -5,7 +5,7 @@ import { CalendarClock, Contact2, Eye, Search, Sparkles, X } from 'lucide-react'
 import { apiErrorMessage } from '@/lib/api';
 import { getSchoolLeads, type SchoolLead } from '@/lib/schoolLeadService';
 import type { LucideIcon } from 'lucide-react';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { LeadStatusBadge } from '@/components/ui/Badge';
 import { IconButton } from '@/components/ui/Button';
@@ -126,11 +126,7 @@ export default function SchoolLeadsPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={Contact2}
-        title="School Leads"
-        description="Track prospective schools and follow up on outreach."
-      />
+      <SetPageTitle title="School Leads" />
 
       <div className="flex flex-wrap gap-3">
         <MiniStat icon={Contact2} label="Total leads" value={loading ? '—' : String(leads.length)} />

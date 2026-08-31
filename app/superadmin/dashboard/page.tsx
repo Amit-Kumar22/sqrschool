@@ -1,16 +1,12 @@
-import { Building2, LayoutDashboard, Palette, ShieldCheck, Users } from 'lucide-react';
-import PageHeader from '@/components/ui/PageHeader';
+import { Building2, Palette, ShieldCheck, Users } from 'lucide-react';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import StatCard from '@/components/dashboard/StatCard';
 import ComingSoonPanel from '@/components/dashboard/ComingSoonPanel';
 
 export default function SuperAdminDashboard() {
   return (
     <div className="space-y-6">
-      <PageHeader
-        icon={LayoutDashboard}
-        title="Super Admin Dashboard"
-        description="Manage school-wide theming and oversee every panel from one place."
-      />
+      <SetPageTitle title="Super Admin Dashboard" />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard index={0} icon={Users} label="Total Users" value="—" />

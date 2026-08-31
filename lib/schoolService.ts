@@ -141,7 +141,7 @@ export interface StaffListParams {
 }
 
 // Fetched with a generous page size since DataTable sorts/paginates
-// client-side over the full result set, same as getSchools/getAcademicYears.
+// client-side over the full result set, same as getSchools/getClasses.
 /** Paginated staff list. Returns the raw Page<StaffMember> shape — no envelope. */
 export const getStaffMembers = async ({
   role,
@@ -156,7 +156,7 @@ export const getStaffMembers = async ({
 };
 
 // /v1/teacher/all-student reuses the exact same DTO as student admissions
-// (admissionNumber, academicYear, schoolClass, studentUser/parentUser, etc.)
+// (admissionNumber, schoolClass, studentUser/parentUser, etc.)
 // even though it lists teachers — confirmed against the API docs. The
 // top-level `id` is the teacher record's own id (what other endpoints'
 // teacherId expects — confirmed by the backend rejecting the nested

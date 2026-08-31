@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BookMarked, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteSubject, getSubjects, type Subject } from '@/lib/subjectService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import Button, { IconButton } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/FormField';
@@ -115,25 +115,22 @@ export default function StaffSubjectPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={BookMarked}
-        title="Subject"
-        description="Manage subjects for a school."
-        actions={
-          <Button icon={Plus} onClick={openCreateModal}>
-            Add subject
-          </Button>
-        }
-      />
+      <SetPageTitle title="Subject" />
 
-      <TextField
-        label="Search"
-        icon={Search}
-        placeholder="Search by subject name"
-        value={nameFilter}
-        onChange={(e) => setNameFilter(e.target.value)}
-        wrapperClassName="max-w-xs"
-      />
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <TextField
+          label="Search"
+          icon={Search}
+          placeholder="Search by subject name"
+          value={nameFilter}
+          onChange={(e) => setNameFilter(e.target.value)}
+          wrapperClassName="max-w-xs"
+        />
+
+        <Button icon={Plus} onClick={openCreateModal}>
+          Add subject
+        </Button>
+      </div>
 
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

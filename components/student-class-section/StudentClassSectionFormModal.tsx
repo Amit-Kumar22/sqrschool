@@ -11,7 +11,6 @@ import {
 } from '@/lib/studentService';
 import { getSections, type Section } from '@/lib/classSectionService';
 import type { SchoolClass } from '@/lib/classService';
-import type { AcademicYear } from '@/lib/academicYearService';
 import { apiErrorMessage } from '@/lib/api';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
@@ -21,16 +20,14 @@ interface FormState {
   studentId: number | '';
   schoolClassId: number | '';
   sectionId: number | '';
-  academicYear: string;
 }
 
-function toFormState(item: StudentClassSection | null, defaultAcademicYear: string): FormState {
-  if (!item) return { studentId: '', schoolClassId: '', sectionId: '', academicYear: defaultAcademicYear };
+function toFormState(item: StudentClassSection | null): FormState {
+  if (!item) return { studentId: '', schoolClassId: '', sectionId: '' };
   return {
     studentId: item.student.id,
     schoolClassId: item.schoolClass.id,
     sectionId: item.section.id,
-    academicYear: item.academicYear,
   };
 }
 
@@ -38,20 +35,16 @@ export default function StudentClassSectionFormModal({
   item,
   classes,
   students,
-  academicYears,
-  defaultAcademicYear,
   onClose,
   onSaved,
 }: {
   item: StudentClassSection | null;
   classes: SchoolClass[];
   students: StudentAdmission[];
-  academicYears: AcademicYear[];
-  defaultAcademicYear: string;
   onClose: () => void;
   onSaved: (item: StudentClassSection) => void;
 }) {
-  const [form, setForm] = useState<FormState>(() => toFormState(item, defaultAcademicYear));
+  const [form, setForm] = useState<FormState>(() => toFormState(item));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -97,16 +90,11 @@ export default function StudentClassSectionFormModal({
       setError('Please select a section.');
       return;
     }
-    if (!form.academicYear) {
-      setError('Please select an academic year.');
-      return;
-    }
 
     const payload: StudentClassSectionPayload = {
       studentId: Number(form.studentId),
       classId: Number(form.schoolClassId),
       sectionId: Number(form.sectionId),
-      academicYear: form.academicYear,
     };
 
     setSaving(true);
@@ -125,7 +113,7 @@ export default function StudentClassSectionFormModal({
     <Modal
       icon={UsersRound}
       title={isEditing ? 'Edit assignment' : 'Add assignment'}
-      subtitle={isEditing ? "Update this student's class section." : 'Assign a student to a class section for an academic year.'}
+      subtitle={isEditing ? "Update this student's class section." : 'Assign a student to a class section.'}
       size="sm"
       onClose={onClose}
       footer={
@@ -191,22 +179,6 @@ export default function StudentClassSectionFormModal({
           {sections.map((section) => (
             <option key={section.id} value={section.id}>
               {section.sectionName}
-            </option>
-          ))}
-        </SelectField>
-
-        <SelectField
-          label="Academic year"
-          required
-          value={form.academicYear}
-          onChange={(e) => setField('academicYear', e.target.value)}
-        >
-          <option value="" disabled>
-            Select an academic year
-          </option>
-          {academicYears.map((year) => (
-            <option key={year.id} value={year.yearCode}>
-              {year.yearCode}
             </option>
           ))}
         </SelectField>

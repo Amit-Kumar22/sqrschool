@@ -18,7 +18,6 @@ export interface StudentAddress {
 }
 
 export interface NewAdmissionPayload {
-  academicYearId: number;
   name: string;
   phone: string;
   fatherName: string;
@@ -59,7 +58,6 @@ export interface StudentAdmission {
   parentUser: StudentUser;
   admissionNumber: string;
   studentCode: string;
-  academicYear: string;
   rollNumber: string | null;
   schoolClass: AdmissionSchoolClass;
   admissionDate: string;
@@ -139,14 +137,13 @@ export const deleteStudent = async (studentId: number): Promise<void> => {
 
 // ─── Student Class Section service ──────────────────────────────────────────
 // Dedicated service for the student-class-section-controller endpoints —
-// assigns a student to a class + section for an academic year. Every
-// endpoint here returns/accepts the raw entity — no {result} envelope.
+// assigns a student to a class + section. Every endpoint here
+// returns/accepts the raw entity — no {result} envelope.
 
 export interface StudentClassSectionPayload {
   studentId: number;
   classId: number;
   sectionId: number;
-  academicYear: string;
 }
 
 export interface StudentClassSection {
@@ -154,7 +151,6 @@ export interface StudentClassSection {
   student: StudentUser;
   schoolClass: SchoolClass;
   section: StudentSection;
-  academicYear: string;
 }
 
 export const createStudentClassSection = async (data: StudentClassSectionPayload): Promise<StudentClassSection> => {
@@ -185,12 +181,11 @@ export interface RosterStudent {
   role: Role;
 }
 
-/** One section's roster for a class + academic year. */
+/** One section's roster for a class. */
 export interface ClassSectionRoster {
   classId: number;
   className: string;
   sectionName: string;
-  academicYear: string;
   students: RosterStudent[];
 }
 
@@ -206,22 +201,20 @@ export interface ClassSectionRosterPage {
 export interface ClassSectionRosterParams {
   /** Required by the backend — the roster is always scoped to one class. */
   classId: number;
-  academicYear?: string;
   page?: number;
   size?: number;
   sort?: string[];
 }
 
-/** Every section of a class, each with its rostered students for an academic year. Returns the raw Page shape — no envelope. */
+/** Every section of a class, each with its rostered students. Returns the raw Page shape — no envelope. */
 export const getClassSectionRoster = async ({
   classId,
-  academicYear,
   page = 0,
   size = 200,
   sort,
 }: ClassSectionRosterParams): Promise<ClassSectionRosterPage> => {
   const response = await api.get<ClassSectionRosterPage>(API_ENDPOINTS.STUDENT_CLASS_SECTION.ROSTER(classId), {
-    params: { classId, academicYear, page, size, sort },
+    params: { classId, page, size, sort },
   });
   return response.data;
 };

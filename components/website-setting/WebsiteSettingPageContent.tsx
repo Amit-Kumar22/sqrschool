@@ -16,7 +16,7 @@ import {
   Sparkles,
   Trophy,
 } from 'lucide-react';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import Tabs, { type TabItem } from '@/components/ui/Tabs';
 import SchoolPageContent from '@/components/school/SchoolPageContent';
 import YoutubeContent from '../youtube-testimonial/YoutubeContent';
@@ -55,14 +55,12 @@ const TABS: TabItem[] = [
 /** Website Settings — a tabbed CMS for the public marketing site, shared between the Staff and Super Admin panels. */
 export default function WebsiteSettingPageContent() {
   const [active, setActive] = useState(TABS[0].key);
+  const activeTabLabel = TABS.find((tab) => tab.key === active)?.label ?? 'Website Settings';
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={Globe}
-        title="Website Settings"
-        description="Manage the public marketing website's header, hero, sections and content."
-      />
+      {/* Wins over any SetPageTitle the active tab's own content sets (e.g. SchoolPageContent, YoutubeContent) — this effect always fires last since it's the parent and re-runs on every tab switch. */}
+      <SetPageTitle title={activeTabLabel} />
 
       <div className="card-premium overflow-hidden">
         <Tabs tabs={TABS} active={active} onChange={setActive} />

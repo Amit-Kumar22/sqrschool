@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CheckCircle2, Loader2, Palette, Pencil, Plus, Trash2 } from 'lucide-react';
+import { CheckCircle2, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { activateTheme, apiErrorMessage, deleteTheme, getThemes, type Theme } from '@/lib/api';
 import { useTheme as useActiveTheme } from '@/contexts/ThemeContext';
 import type { ThemePreset } from '@/lib/themePresets';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 import ThemePresetGallery from '@/components/theme/ThemePresetGallery';
@@ -184,19 +184,16 @@ export default function ThemeSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        icon={Palette}
-        title="Theme & Branding"
-        description="Control the color palette and background used across the whole site — pick a preset or design your own."
-        actions={
-          <button
-            onClick={openCreateModal}
-            className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-premium-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-premium"
-          >
-            <Plus size={16} /> New theme
-          </button>
-        }
-      />
+      <SetPageTitle title="Theme & Branding" />
+
+      <div className="flex justify-end">
+        <button
+          onClick={openCreateModal}
+          className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-premium-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-premium"
+        >
+          <Plus size={16} /> New theme
+        </button>
+      </div>
 
       {error && (
         <div className="animate-fade-in-up rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

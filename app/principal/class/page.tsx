@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BookOpen, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteClass, getClasses, type SchoolClass } from '@/lib/classService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -119,16 +119,13 @@ export default function StaffClassPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={BookOpen}
-        title="Class"
-        description="Manage classes for a school."
-        actions={
-          <Button icon={Plus} onClick={openCreateModal}>
-            Add class
-          </Button>
-        }
-      />
+      <SetPageTitle title="Class" />
+
+      <div className="flex justify-end">
+        <Button icon={Plus} onClick={openCreateModal}>
+          Add class
+        </Button>
+      </div>
 
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

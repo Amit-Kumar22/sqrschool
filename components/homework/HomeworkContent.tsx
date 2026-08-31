@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CalendarPlus, Eye, NotebookPen, Plus, Trash2 } from 'lucide-react';
+import { CalendarPlus, Eye, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteHomework, getHomeworks, type Homework } from '@/lib/homeworkService';
 import { getTeacherSubjectMappings, type TeacherSubjectMapping } from '@/lib/teacherSubjectService';
 import { getUser } from '@/lib/auth';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -179,21 +179,18 @@ export default function TeacherHomeworkPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={NotebookPen}
-        title="Homework"
-        description="Set and track homework for your classes."
-        actions={
-          <Button
-            icon={Plus}
-            onClick={() => setCreateModalOpen(true)}
-            disabled={!canCreate}
-            title={!canCreate && !assignmentsLoading ? 'No assigned classes found for your account.' : undefined}
-          >
-            Add homework
-          </Button>
-        }
-      />
+      <SetPageTitle title="Homework" />
+
+      <div className="flex justify-end">
+        <Button
+          icon={Plus}
+          onClick={() => setCreateModalOpen(true)}
+          disabled={!canCreate}
+          title={!canCreate && !assignmentsLoading ? 'No assigned classes found for your account.' : undefined}
+        >
+          Add homework
+        </Button>
+      </div>
 
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

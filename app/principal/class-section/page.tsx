@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Layers, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteSection, getSections, type Section } from '@/lib/classSectionService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import Button, { IconButton } from '@/components/ui/Button';
 import SectionFormModal from '@/components/class-section/SectionFormModal';
@@ -145,16 +145,7 @@ export default function StaffClassSectionPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={Layers}
-        title="Class Section"
-        description="Manage sections within a class."
-        actions={
-          <Button icon={Plus} onClick={openCreateModal} disabled={classesLoading || classes.length === 0}>
-            Add section
-          </Button>
-        }
-      />
+      <SetPageTitle title="Class Section" />
 
       {noClassesForSchool && !error && (
         <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
@@ -162,7 +153,7 @@ export default function StaffClassSectionPage() {
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <label className="block text-sm">
           <span className="sr-only">Class</span>
           <select
@@ -179,6 +170,10 @@ export default function StaffClassSectionPage() {
             ))}
           </select>
         </label>
+
+        <Button icon={Plus} onClick={openCreateModal} disabled={classesLoading || classes.length === 0}>
+          Add section
+        </Button>
       </div>
 
       {error && (

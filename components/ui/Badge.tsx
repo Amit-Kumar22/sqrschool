@@ -128,6 +128,62 @@ export function FeeTypeBadge({ feeType }: { feeType: string }) {
   );
 }
 
+// Only "ONE_TIME" is confirmed by the fee-structure API spec — unrecognized
+// values fall back to a neutral slate pill instead of breaking, same
+// approach as FEE_TYPE_STYLES above.
+const FEE_FREQUENCY_STYLES: Record<string, string> = {
+  ONE_TIME: 'bg-slate-100 text-slate-600 ring-slate-200',
+  MONTHLY: 'bg-indigo-50 text-indigo-700 ring-indigo-600/20',
+  QUARTERLY: 'bg-sky-50 text-sky-700 ring-sky-600/20',
+  HALF_YEARLY: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  ANNUALLY: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+};
+
+/** Pill for a fee structure's billing cadence — tinted by known frequency, neutral for anything else. */
+export function FeeFrequencyBadge({ frequency }: { frequency: string }) {
+  const style = FEE_FREQUENCY_STYLES[frequency] ?? 'bg-slate-100 text-slate-600 ring-slate-200';
+  const label = frequency
+    ? frequency
+        .toLowerCase()
+        .split('_')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+    : 'Unknown';
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${style}`}
+    >
+      {label}
+    </span>
+  );
+}
+
+// All four values are confirmed by the student-fees API spec's "Available
+// values" list.
+const STUDENT_FEE_STATUS_STYLES: Record<string, string> = {
+  PENDING: 'bg-slate-100 text-slate-600 ring-slate-200',
+  PARTIAL: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  PAID: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  OVERDUE: 'bg-red-50 text-red-700 ring-red-600/20',
+};
+
+/** Pill for a student fee's collection status — tinted by lifecycle stage. */
+export function StudentFeeStatusBadge({ status }: { status: string }) {
+  const style = STUDENT_FEE_STATUS_STYLES[status] ?? 'bg-slate-100 text-slate-600 ring-slate-200';
+  const label = status
+    ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
+    : 'Unknown';
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${style}`}
+    >
+      {label}
+    </span>
+  );
+}
+
 // All four values are confirmed by the question API spec's "Available
 // values" list — kept as a lookup (rather than a hardcoded switch) purely
 // for consistency with the other badges in this file.

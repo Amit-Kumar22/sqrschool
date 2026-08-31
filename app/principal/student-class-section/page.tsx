@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Pencil, Plus, Trash2, UsersRound } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import {
   deleteStudentClassSection,
@@ -13,8 +13,7 @@ import {
   type StudentClassSection,
 } from '@/lib/studentService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
-import { getAcademicYears, type AcademicYear } from '@/lib/academicYearService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import Button, { IconButton } from '@/components/ui/Button';
 import { SelectField } from '@/components/ui/FormField';
@@ -24,17 +23,14 @@ interface RosterRow {
   student: RosterStudent;
   className: string;
   sectionName: string;
-  academicYear: string;
 }
 
 export default function StaffStudentClassSectionPage() {
   const [classes, setClasses] = useState<SchoolClass[]>([]);
-  const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
   const [students, setStudents] = useState<StudentAdmission[]>([]);
   const [refDataLoading, setRefDataLoading] = useState(false);
 
   const [classFilter, setClassFilter] = useState<number | ''>('');
-  const [yearFilter, setYearFilter] = useState('');
 
   const [rows, setRows] = useState<RosterRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -50,18 +46,15 @@ export default function StaffStudentClassSectionPage() {
       setRefDataLoading(true);
       setError('');
       try {
-        const [classesContent, yearsContent, studentsContent] = await Promise.all([
+        const [classesContent, studentsContent] = await Promise.all([
           getClasses().then((p) => p.content),
-          getAcademicYears().then((p) => p.content),
           getStudentAdmissions().then((p) => p.content),
         ]);
         setClasses(classesContent ?? []);
-        setAcademicYears(yearsContent ?? []);
         setStudents(studentsContent ?? []);
         setClassFilter((prev) => prev || (classesContent[0]?.id ?? ''));
-        setYearFilter((prev) => prev || yearsContent[0]?.yearCode || '');
       } catch (err) {
-        setError(apiErrorMessage(err, 'Could not load classes, academic years or students from the server.'));
+        setError(apiErrorMessage(err, 'Could not load classes or students from the server.'));
       } finally {
         setRefDataLoading(false);
       }
@@ -69,21 +62,20 @@ export default function StaffStudentClassSectionPage() {
     loadRefData();
   }, []);
 
-  const loadRoster = async (classId: number | '', academicYear: string) => {
+  const loadRoster = async (classId: number | '') => {
     setRows([]);
     if (!classId) return;
 
     setLoading(true);
     setError('');
     try {
-      const result = await getClassSectionRoster({ classId, academicYear: academicYear || undefined });
+      const result = await getClassSectionRoster({ classId });
       setRows(
         result.content.flatMap((group) =>
           group.students.map((student) => ({
             student,
             className: group.className,
             sectionName: group.sectionName,
-            academicYear: group.academicYear,
           })),
         ),
       );
@@ -96,8 +88,8 @@ export default function StaffStudentClassSectionPage() {
 
   useEffect(() => {
     if (refDataLoading) return;
-    loadRoster(classFilter, yearFilter);
-  }, [refDataLoading, classFilter, yearFilter]);
+    loadRoster(classFilter);
+  }, [refDataLoading, classFilter]);
 
   const openCreateModal = () => {
     setEditingItem(null);
@@ -128,7 +120,7 @@ export default function StaffStudentClassSectionPage() {
     setError('');
     try {
       await deleteStudentClassSection(row.student.id);
-      await loadRoster(classFilter, yearFilter);
+      await loadRoster(classFilter);
     } catch (err) {
       setError(apiErrorMessage(err, 'Could not remove that assignment.'));
     } finally {
@@ -139,7 +131,7 @@ export default function StaffStudentClassSectionPage() {
   const handleSaved = async () => {
     setFormModalOpen(false);
     setEditingItem(null);
-    await loadRoster(classFilter, yearFilter);
+    await loadRoster(classFilter);
   };
 
   const columns: DataTableColumn<RosterRow>[] = [
@@ -163,13 +155,6 @@ export default function StaffStudentClassSectionPage() {
           {row.className} · {row.sectionName}
         </span>
       ),
-    },
-    {
-      key: 'academicYear',
-      header: 'Academic Year',
-      sortable: true,
-      accessor: (row) => row.academicYear,
-      render: (row) => <span className="text-slate-600">{row.academicYear}</span>,
     },
     {
       key: 'actions',
@@ -208,46 +193,32 @@ export default function StaffStudentClassSectionPage() {
     ? ''
     : classes.length === 0
       ? 'Add a class before assigning a student.'
-      : academicYears.length === 0
-        ? 'Add an academic year before assigning a student.'
-        : students.length === 0
-          ? 'Add a student admission before assigning a student.'
-          : '';
+      : students.length === 0
+        ? 'Add a student admission before assigning a student.'
+        : '';
   const canCreate = dataReady && !missingPrerequisite;
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={UsersRound}
-        title="Student Class Section"
-        description="Assign students to a class section for an academic year."
-        actions={
-          <Button icon={Plus} onClick={openCreateModal} disabled={!canCreate} title={missingPrerequisite || undefined}>
-            Add assignment
-          </Button>
-        }
-      />
+      <SetPageTitle title="Student Class Section" />
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <SelectField label="Class" value={classFilter} onChange={(e) => setClassFilter(e.target.value ? Number(e.target.value) : '')}>
-          <option value="" disabled>
-            Select a class
-          </option>
-          {classes.map((cls) => (
-            <option key={cls.id} value={cls.id}>
-              {cls.className}
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <SelectField label="Class" value={classFilter} onChange={(e) => setClassFilter(e.target.value ? Number(e.target.value) : '')}>
+            <option value="" disabled>
+              Select a class
             </option>
-          ))}
-        </SelectField>
+            {classes.map((cls) => (
+              <option key={cls.id} value={cls.id}>
+                {cls.className}
+              </option>
+            ))}
+          </SelectField>
+        </div>
 
-        <SelectField label="Academic year" value={yearFilter} onChange={(e) => setYearFilter(e.target.value)}>
-          <option value="">All academic years</option>
-          {academicYears.map((year) => (
-            <option key={year.id} value={year.yearCode}>
-              {year.yearCode}
-            </option>
-          ))}
-        </SelectField>
+        <Button icon={Plus} onClick={openCreateModal} disabled={!canCreate} title={missingPrerequisite || undefined}>
+          Add assignment
+        </Button>
       </div>
 
       {error && (
@@ -278,8 +249,6 @@ export default function StaffStudentClassSectionPage() {
           item={editingItem}
           classes={classes}
           students={students}
-          academicYears={academicYears}
-          defaultAcademicYear={yearFilter}
           onClose={() => {
             setFormModalOpen(false);
             setEditingItem(null);

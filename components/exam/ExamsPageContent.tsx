@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { ClipboardList, FileQuestion, Pencil, Plus, Trash2 } from 'lucide-react';
+import { FileQuestion, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteExam, getExams, type Exam } from '@/lib/examService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
 import { getSections, type Section } from '@/lib/classSectionService';
 import { getSubjects, type Subject } from '@/lib/subjectService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { ExamStatusBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -256,61 +256,58 @@ export default function ExamsPageContent() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={ClipboardList}
-        title="Exams"
-        description="Schedule and manage exams for a class."
-        actions={
-          <Button
-            icon={Plus}
-            onClick={openCreateModal}
-            disabled={classesLoading || classes.length === 0 || subjectsLoading || subjects.length === 0}
+      <SetPageTitle title="Exams" />
+
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <SelectField
+            label="Class"
+            value={classFilter}
+            onChange={(e) => setClassFilter(e.target.value ? Number(e.target.value) : '')}
           >
-            Add exam
-          </Button>
-        }
-      />
+            <option value="">All classes</option>
+            {classes.map((cls) => (
+              <option key={cls.id} value={cls.id}>
+                {cls.className}
+              </option>
+            ))}
+          </SelectField>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <SelectField
-          label="Class"
-          value={classFilter}
-          onChange={(e) => setClassFilter(e.target.value ? Number(e.target.value) : '')}
-        >
-          <option value="">All classes</option>
-          {classes.map((cls) => (
-            <option key={cls.id} value={cls.id}>
-              {cls.className}
-            </option>
-          ))}
-        </SelectField>
+          <SelectField
+            label="Section"
+            value={sectionFilter}
+            disabled={!classFilter}
+            onChange={(e) => setSectionFilter(e.target.value ? Number(e.target.value) : '')}
+          >
+            <option value="">All sections</option>
+            {filterSections.map((section) => (
+              <option key={section.id} value={section.id}>
+                {section.sectionName}
+              </option>
+            ))}
+          </SelectField>
 
-        <SelectField
-          label="Section"
-          value={sectionFilter}
-          disabled={!classFilter}
-          onChange={(e) => setSectionFilter(e.target.value ? Number(e.target.value) : '')}
-        >
-          <option value="">All sections</option>
-          {filterSections.map((section) => (
-            <option key={section.id} value={section.id}>
-              {section.sectionName}
-            </option>
-          ))}
-        </SelectField>
+          <SelectField
+            label="Subject"
+            value={subjectFilter}
+            onChange={(e) => setSubjectFilter(e.target.value ? Number(e.target.value) : '')}
+          >
+            <option value="">All subjects</option>
+            {subjects.map((subject) => (
+              <option key={subject.id} value={subject.id}>
+                {subject.subjectName}
+              </option>
+            ))}
+          </SelectField>
+        </div>
 
-        <SelectField
-          label="Subject"
-          value={subjectFilter}
-          onChange={(e) => setSubjectFilter(e.target.value ? Number(e.target.value) : '')}
+        <Button
+          icon={Plus}
+          onClick={openCreateModal}
+          disabled={classesLoading || classes.length === 0 || subjectsLoading || subjects.length === 0}
         >
-          <option value="">All subjects</option>
-          {subjects.map((subject) => (
-            <option key={subject.id} value={subject.id}>
-              {subject.subjectName}
-            </option>
-          ))}
-        </SelectField>
+          Add exam
+        </Button>
       </div>
 
       {error && (

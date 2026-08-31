@@ -5,6 +5,7 @@ import { logoutUser } from '@/lib/api';
 import { clearAuth, getUser, type Role, type SessionUser } from '@/lib/auth';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
+import { PageTitleProvider } from './PageTitleContext';
 
 const COLLAPSE_STORAGE_KEY = 'sqr.sidebarCollapsed';
 
@@ -50,20 +51,22 @@ export default function AppShell({ role, children }: AppShellProps) {
     // Fixed-height, non-scrolling shell: sidebar and topbar stay put, only
     // <main> scrolls. (Previously the whole document scrolled, which
     // carried the sidebar/topbar away with the page on any tall panel.)
-    <div className="flex h-screen overflow-hidden bg-slate-50">
-      <Sidebar
-        role={role}
-        open={sidebarOpen}
-        collapsed={collapsed}
-        onToggleCollapsed={toggleCollapsed}
-        onClose={() => setSidebarOpen(false)}
-        onLogout={handleLogout}
-      />
+    <PageTitleProvider>
+      <div className="flex h-screen overflow-hidden bg-slate-50">
+        <Sidebar
+          role={role}
+          open={sidebarOpen}
+          collapsed={collapsed}
+          onToggleCollapsed={toggleCollapsed}
+          onClose={() => setSidebarOpen(false)}
+          onLogout={handleLogout}
+        />
 
-      <div className="flex h-screen flex-1 flex-col overflow-hidden">
-        <Topbar user={user} onOpenSidebar={() => setSidebarOpen(true)} onLogout={handleLogout} />
-        <main className="scrollbar-thin flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+        <div className="flex h-screen flex-1 flex-col overflow-hidden">
+          <Topbar user={user} onOpenSidebar={() => setSidebarOpen(true)} onLogout={handleLogout} />
+          <main className="scrollbar-thin flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+        </div>
       </div>
-    </div>
+    </PageTitleProvider>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { ArrowLeft, FileQuestion, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import {
   deleteQuestion,
@@ -13,7 +13,7 @@ import {
   type Question,
   type QuestionType,
 } from '@/lib/examService';
-import PageHeader from '@/components/ui/PageHeader';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { DifficultyBadge, QuestionTypeBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -181,9 +181,12 @@ export default function QuestionsPageContent({ examId }: { examId: number }) {
     },
   ];
 
+  const pageTitle = examLoading ? 'Loading exam…' : `Questions · ${exam?.name ?? ''}`;
+
   if (examError) {
     return (
       <div className="space-y-4">
+        <SetPageTitle title="Questions" />
         <IconButton icon={ArrowLeft} label="Back to exams" variant="default" onClick={() => router.push(`${basePath}/exams`)} />
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{examError}</div>
       </div>
@@ -192,30 +195,24 @@ export default function QuestionsPageContent({ examId }: { examId: number }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <IconButton icon={ArrowLeft} label="Back to exams" variant="default" onClick={() => router.push(`${basePath}/exams`)} />
-        <div className="min-w-0 flex-1">
-          <PageHeader
-            icon={FileQuestion}
-            title={examLoading ? 'Loading exam…' : `Questions · ${exam?.name ?? ''}`}
-            description={exam ? `${exam.schoolClassName} · ${exam.subjectName}` : undefined}
-            actions={
-              <Button icon={Plus} onClick={openCreateModal} disabled={!exam}>
-                Add question
-              </Button>
-            }
-          />
-        </div>
-      </div>
+      <SetPageTitle title={pageTitle} />
 
-      <div className="max-w-xs">
-        <SelectField label="Type" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as QuestionType | '')}>
-          {TYPE_FILTERS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </SelectField>
+      <IconButton icon={ArrowLeft} label="Back to exams" variant="default" onClick={() => router.push(`${basePath}/exams`)} />
+
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div className="max-w-xs">
+          <SelectField label="Type" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as QuestionType | '')}>
+            {TYPE_FILTERS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </SelectField>
+        </div>
+
+        <Button icon={Plus} onClick={openCreateModal} disabled={!exam}>
+          Add question
+        </Button>
       </div>
 
       {error && (

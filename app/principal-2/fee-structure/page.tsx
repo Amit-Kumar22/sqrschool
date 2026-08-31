@@ -1,5 +1,5 @@
-import FeeStructurePageContent from '@/components/fee/FeeStructurePageContent';
+import FeeManagementPageContent from '@/components/fee/FeeManagementPageContent';
 
 export default function PrincipalFeeStructurePage() {
-  return <FeeStructurePageContent />;
+  return <FeeManagementPageContent />;
 }

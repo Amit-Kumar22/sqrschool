@@ -179,7 +179,7 @@ export default function ProfileView() {
           </Button>
         </form>
 
-        <form
+        {/* <form
           onSubmit={handlePasswordSubmit}
           style={{ animationDelay: '120ms' }}
           className="card-premium animate-fade-in-up relative overflow-hidden p-4"
@@ -217,7 +217,7 @@ export default function ProfileView() {
           <Button type="submit" icon={Save} loading={savingPassword} className="mt-4">
             {savingPassword ? 'Updating…' : 'Update password'}
           </Button>
-        </form>
+        </form> */}
       </div>
     </div>
   );

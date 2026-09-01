@@ -128,32 +128,34 @@ export default function AssignSubjectsTab() {
 
   return (
     <div className="card-premium space-y-4 p-4">
-      <div className="flex items-center gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-premium-sm">
-          <Landmark size={17} />
-        </span>
-        <div>
-          <h2 className="text-base font-semibold text-slate-900">Assign Subject</h2>
-          <p className="text-xs text-slate-500">Select one class and assign subjects to it.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-premium-sm">
+            <Landmark size={17} />
+          </span>
+          <div>
+            <h2 className="text-base font-semibold text-slate-900">Assign Subject</h2>
+            <p className="text-xs text-slate-500">Select one class and assign subjects to it.</p>
+          </div>
         </div>
-      </div>
 
-      <SelectField
-        label="Select Class"
-        value={classId}
-        disabled={!dataReady || classes.length === 0}
-        onChange={(e) => setClassId(e.target.value ? Number(e.target.value) : '')}
-        wrapperClassName="max-w-sm"
-      >
-        <option value="" disabled>
-          {dataReady ? (classes.length === 0 ? 'No classes yet' : 'Select a class') : 'Loading classes…'}
-        </option>
-        {classes.map((cls) => (
-          <option key={cls.id} value={cls.id}>
-            {cls.className}
+        <SelectField
+          label="Select Class"
+          value={classId}
+          disabled={!dataReady || classes.length === 0}
+          onChange={(e) => setClassId(e.target.value ? Number(e.target.value) : '')}
+          wrapperClassName="w-full sm:w-56"
+        >
+          <option value="" disabled>
+            {dataReady ? (classes.length === 0 ? 'No classes yet' : 'Select a class') : 'Loading classes…'}
           </option>
-        ))}
-      </SelectField>
+          {classes.map((cls) => (
+            <option key={cls.id} value={cls.id}>
+              {cls.className}
+            </option>
+          ))}
+        </SelectField>
+      </div>
 
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
@@ -162,15 +164,15 @@ export default function AssignSubjectsTab() {
       <div>
         <p className="mb-2 text-sm font-semibold text-slate-700">Select Subjects to Assign</p>
         {loading ? (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="skeleton h-16 rounded-xl" />
+              <div key={i} className="skeleton h-12 rounded-lg" />
             ))}
           </div>
         ) : subjects.length === 0 ? (
           <p className="text-sm text-slate-500">Add a subject first, from the Subjects tab.</p>
         ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
             {subjects.map((subject) => {
               const isAssigned = assignedSubjectIds.has(subject.id);
               const isChecked = selected.has(subject.id);
@@ -180,7 +182,7 @@ export default function AssignSubjectsTab() {
                   type="button"
                   disabled={isAssigned}
                   onClick={() => toggleSubject(subject.id)}
-                  className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-colors ${
+                  className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-left transition-colors ${
                     isAssigned
                       ? 'cursor-not-allowed border-slate-100 bg-slate-50/60'
                       : isChecked
@@ -189,20 +191,20 @@ export default function AssignSubjectsTab() {
                   }`}
                 >
                   <span
-                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
                       isAssigned ? 'border-slate-200' : isChecked ? 'border-amber-500 bg-amber-500 text-white' : 'border-slate-300'
                     }`}
                   >
-                    {isChecked && !isAssigned && <Check size={12} strokeWidth={3} />}
+                    {isChecked && !isAssigned && <Check size={10} strokeWidth={3} />}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className={`block truncate text-sm font-semibold ${isAssigned ? 'text-slate-400' : 'text-slate-900'}`}>
+                    <span className={`block truncate text-xs font-semibold ${isAssigned ? 'text-slate-400' : 'text-slate-900'}`}>
                       {subject.subjectName}
                     </span>
-                    <span className={`block text-xs ${isAssigned ? 'text-slate-300' : 'text-slate-500'}`}>{subject.subjectCode}</span>
+                    <span className={`block text-[11px] ${isAssigned ? 'text-slate-300' : 'text-slate-500'}`}>{subject.subjectCode}</span>
                   </span>
                   {isAssigned && (
-                    <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-400">
+                    <span className="shrink-0 rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-400">
                       assigned
                     </span>
                   )}

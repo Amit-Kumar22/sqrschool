@@ -1,27 +1,26 @@
 import type { LucideIcon } from 'lucide-react';
 import {
+  BarChart3,
   Bot,
-  BookMarked,
   BookOpen,
-  Building2,
   CalendarClock,
   CalendarDays,
-  CalendarRange,
+  ClipboardCheck,
   ClipboardList,
   Contact2,
   Globe,
   IndianRupee,
   LayoutDashboard,
   Layers,
+  Library,
+  Megaphone,
+  MessageSquare,
   NotebookPen,
   Palette,
-  PlaySquare,
-  School,
+  ShieldCheck,
   UserCircle,
-  UserCog,
   UserPlus,
   Users,
-  UsersRound,
 } from 'lucide-react';
 import type { Role } from '@/lib/auth';
 
@@ -60,17 +59,17 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Students', href: '/principal/student-admission', icon: UserPlus });
     items.push({ label: 'Teachers', href: '/principal/staff', icon: Users });
     items.push({ label: 'Classes', href: '/principal/class', icon: BookOpen });
-    items.push({ label: 'Attedance', href: '/principal/attedance', icon: BookMarked });
+    items.push({ label: 'Attedance', href: '/principal/attedance', icon: ClipboardCheck });
     items.push({ label: 'Fees', href: '/principal/fee-structure', icon: IndianRupee });
     items.push({ label: 'Time Table', href: '/principal/time-table', icon: CalendarClock });
-    items.push({ label: 'Notice', href: '/principal/notice', icon: IndianRupee });
+    items.push({ label: 'Notice', href: '/principal/notice', icon: Megaphone });
     items.push({ label: 'Homework', href: '/principal/homework', icon: NotebookPen });
-    items.push({ label: 'Communication', href: '/principal/Communication', icon: NotebookPen });
-    items.push({ label: 'Report', href: '/principal/report', icon: NotebookPen });
-    items.push({ label: 'Role & Permission', href: '/principal/role-permission', icon: NotebookPen });
-    items.push({ label: 'Subject & Class', href: '/principal/subject-class', icon: BookMarked });
+    items.push({ label: 'Communication', href: '/principal/Communication', icon: MessageSquare });
+    items.push({ label: 'Report', href: '/principal/report', icon: BarChart3 });
+    items.push({ label: 'Role & Permission', href: '/principal/role-permission', icon: ShieldCheck });
+    items.push({ label: 'Subject & Class', href: '/principal/subject-class', icon: Layers });
     items.push({ label: 'Test & Exam', href: '/principal/exams', icon: ClipboardList });
-    items.push({ label: 'Study Material', href: '/principal/study-material', icon: ClipboardList });
+    items.push({ label: 'Study Material', href: '/principal/study-material', icon: Library });
     items.push({ label: 'Chatbot Management', href: '/principal/chatbot', icon: Bot });
 
     // items.push({ label: 'Subject', href: '/principal/subject', icon: BookMarked });

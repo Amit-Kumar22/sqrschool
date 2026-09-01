@@ -55,7 +55,7 @@ export function getNavItems(role: Role): NavItem[] {
   //   items.push({ label: 'Fee Structure', href: '/principal/fee-structure', icon: IndianRupee });
   // }
 
-  if (role === 'ADMIN' || 'PRINCIPAL') {
+  if (role === 'ADMIN' || role === 'PRINCIPAL') {
     items.push({ label: 'Students', href: '/principal/student-admission', icon: UserPlus });
     items.push({ label: 'Teachers', href: '/principal/staff', icon: Users });
     items.push({ label: 'Classes', href: '/principal/class', icon: BookOpen });

@@ -162,7 +162,7 @@ export default function ThemeSettingsPage() {
               setModalOpen(true);
             }}
             title="Edit theme"
-            className="rounded-md p-1.5 text-indigo-600 transition-colors hover:bg-indigo-50"
+            className="rounded-md p-1.5 text-amber-700 transition-colors hover:bg-amber-50"
           >
             <Pencil size={15} />
           </button>
@@ -189,7 +189,7 @@ export default function ThemeSettingsPage() {
       <div className="flex justify-end">
         <button
           onClick={openCreateModal}
-          className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-premium-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-premium"
+          className="flex items-center gap-1.5 rounded-md bg-amber-700 px-4 py-2 text-sm font-semibold text-white shadow-premium-sm transition-all hover:-translate-y-0.5 hover:bg-amber-800 hover:shadow-premium"
         >
           <Plus size={16} /> New theme
         </button>

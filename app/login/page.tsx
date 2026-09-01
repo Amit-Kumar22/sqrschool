@@ -68,8 +68,8 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      {/* ── Branding panel ── */}
-      <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-br from-primary via-primary to-secondary p-10 text-white lg:flex xl:p-14">
+      {/* ── Branding panel — fixed premium dark chrome, unified with the panel's Sidebar/Topbar. Deliberately NOT built from the admin-editable site theme (only companyName is pulled from it); see Sidebar.tsx. ── */}
+      <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-br from-amber-950 via-[#2b1706] to-stone-950 p-10 text-white lg:flex xl:p-14">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.15]"
           style={{
@@ -78,10 +78,10 @@ export default function LoginPage() {
           }}
         />
         <div className="pointer-events-none absolute -top-24 -right-24 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
-        <div className="animate-float pointer-events-none absolute bottom-10 left-10 h-48 w-48 rounded-full bg-button-bg/20 blur-3xl" />
+        <div className="animate-float pointer-events-none absolute bottom-10 left-10 h-48 w-48 rounded-full bg-amber-500/20 blur-3xl" />
 
         <Link href="/" className="relative flex items-center gap-2 font-semibold">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-gradient-to-br from-button-bg to-button-bg/70 text-button-text shadow-glow-button">
+          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-gradient-to-br from-amber-400 to-amber-600 text-amber-950 shadow-premium-sm">
             <GraduationCap size={20} />
           </span>
           <span>{theme.companyName || 'SQR School'}</span>
@@ -106,7 +106,7 @@ export default function LoginPage() {
                 style={{ animationDelay: `${150 + idx * 90}ms` }}
                 className="animate-fade-in-up flex items-start gap-2.5 text-sm text-white/90"
               >
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-button-bg/90 text-button-text shadow-glow-button">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-400 text-amber-950 shadow-glow-amber">
                   <ShieldCheck size={12} />
                 </span>
                 {item}
@@ -120,26 +120,26 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* ── Login form ── */}
+      {/* ── Login form — fixed panel chrome, same reasoning as the branding panel above. ── */}
       <div className="flex w-full flex-1 items-center justify-center px-4 py-12 lg:w-1/2">
-        <div className="animate-scale-in relative w-full max-w-sm overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-8 shadow-glow-primary-lg">
-          <span className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-primary via-button-bg to-primary" />
+        <div className="animate-scale-in relative w-full max-w-sm overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-8 shadow-glow-amber-lg">
+          <span className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-amber-500 via-orange-400 to-amber-500" />
 
           <div className="mb-8 flex flex-col items-center lg:items-start">
-            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary text-white shadow-glow-primary lg:hidden">
+            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-glow-amber lg:hidden">
               <GraduationCap size={22} />
             </span>
-            <h2 className="text-2xl font-bold text-heading">Welcome back</h2>
-            <p className="mt-1.5 text-sm text-ink/60">Sign in to your portal to continue.</p>
+            <h2 className="text-2xl font-bold text-slate-900">Welcome back</h2>
+            <p className="mt-1.5 text-sm text-slate-500">Sign in to your portal to continue.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-heading">
+              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-900">
                 Email address
               </label>
               <div className="relative">
-                <Mail size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink/35" />
+                <Mail size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
                 <input
                   id="email"
                   type="email"
@@ -148,17 +148,17 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@sqrschool.edu"
-                  className="h-11 w-full rounded-lg border border-black/10 bg-white pr-3 pl-10 text-sm text-ink shadow-premium-sm placeholder:text-ink/40 focus:border-primary focus:ring-2 focus:ring-primary/25 focus:outline-none"
+                  className="h-11 w-full rounded-lg border border-slate-200 bg-white pr-3 pl-10 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-heading">
+              <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-900">
                 Password
               </label>
               <div className="relative">
-                <Lock size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink/35" />
+                <Lock size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -167,13 +167,13 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="h-11 w-full rounded-lg border border-black/10 bg-white pr-10 pl-10 text-sm text-ink shadow-premium-sm placeholder:text-ink/40 focus:border-primary focus:ring-2 focus:ring-primary/25 focus:outline-none"
+                  className="h-11 w-full rounded-lg border border-slate-200 bg-white pr-10 pl-10 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute top-1/2 right-3 -translate-y-1/2 text-ink/35 transition-colors hover:text-ink/70"
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -189,14 +189,14 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-sm font-semibold text-white shadow-glow-primary transition-all hover:-translate-y-0.5 hover:shadow-glow-primary-lg disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-amber-700 text-sm font-semibold text-white shadow-glow-amber transition-all hover:-translate-y-0.5 hover:bg-amber-800 hover:shadow-glow-amber-lg disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
             >
               {loading && <Loader2 size={16} className="animate-spin" />}
               {loading ? 'Signing in…' : 'Sign In'}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-xs text-ink/50 lg:text-left">
+          <p className="mt-6 text-center text-xs text-slate-400 lg:text-left">
             Having trouble signing in? Contact your school administrator.
           </p>
         </div>

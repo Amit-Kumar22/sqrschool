@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { ArrowLeft, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, ChevronLeft, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import {
   deleteQuestion,
@@ -28,15 +28,33 @@ const TYPE_FILTERS: { value: QuestionType | ''; label: string }[] = [
   { value: 'LONG_ANSWER', label: 'Long Answer' },
 ];
 
-/** Question bank management for one exam — reached via the "Manage questions" action on the Exams table. */
-export default function QuestionsPageContent({ examId }: { examId: number }) {
+/**
+ * Question bank management for one exam+subject pair — reached from the
+ * "Manage Questions" action on the Exams table. A multi-subject Exam has no
+ * single subject of its own, so when the caller doesn't pin one via
+ * subjectId/subjectName (the row-level action doesn't — an exam can have
+ * several), this shows a subject picker built from the exam's own subjects
+ * list before loading any questions.
+ */
+export default function QuestionsPageContent({
+  examId,
+  subjectId,
+  subjectName,
+}: {
+  examId: number;
+  subjectId?: number;
+  subjectName?: string;
+}) {
   const router = useRouter();
   const pathname = usePathname();
-  const basePath = pathname.startsWith('/principal') ? '/principal' : '/staff';
+  const basePath = pathname.startsWith('/principal-2') ? '/principal-2' : pathname.startsWith('/staff') ? '/staff' : '/principal';
 
   const [exam, setExam] = useState<Exam | null>(null);
   const [examLoading, setExamLoading] = useState(true);
   const [examError, setExamError] = useState('');
+
+  const [activeSubjectId, setActiveSubjectId] = useState<number | null>(subjectId && subjectId > 0 ? subjectId : null);
+  const [activeSubjectName, setActiveSubjectName] = useState(subjectName ?? '');
 
   const [typeFilter, setTypeFilter] = useState<QuestionType | ''>('');
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -57,13 +75,13 @@ export default function QuestionsPageContent({ examId }: { examId: number }) {
   }, [examId]);
 
   const loadQuestions = async () => {
-    if (!exam) return;
+    if (!activeSubjectId) return;
     setLoading(true);
     setError('');
     try {
       const result = typeFilter
-        ? await getQuestionsBySubjectAndType({ subjectId: exam.subjectId, type: typeFilter })
-        : await getQuestionsBySubject({ subjectId: exam.subjectId });
+        ? await getQuestionsBySubjectAndType({ subjectId: activeSubjectId, type: typeFilter })
+        : await getQuestionsBySubject({ subjectId: activeSubjectId });
       setQuestions(result.content);
     } catch (err) {
       setError(apiErrorMessage(err, 'Could not load questions from the server.'));
@@ -75,7 +93,12 @@ export default function QuestionsPageContent({ examId }: { examId: number }) {
   useEffect(() => {
     loadQuestions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exam, typeFilter]);
+  }, [activeSubjectId, typeFilter]);
+
+  const chooseSubject = (id: number, name: string) => {
+    setActiveSubjectId(id);
+    setActiveSubjectName(name);
+  };
 
   const openCreateModal = () => {
     setEditingItem(null);
@@ -140,7 +163,7 @@ export default function QuestionsPageContent({ examId }: { examId: number }) {
       key: 'answer',
       header: 'Answer',
       render: (item) => {
-        const correct = item.options.find((o) => o.correct);
+        const correct = item.options?.find((o) => o.correct);
         return correct ? (
           <span className="text-slate-600">{correct.optionText}</span>
         ) : item.modelAnswer ? (
@@ -181,7 +204,7 @@ export default function QuestionsPageContent({ examId }: { examId: number }) {
     },
   ];
 
-  const pageTitle = examLoading ? 'Loading exam…' : `Questions · ${exam?.name ?? ''}`;
+  const pageTitle = examLoading ? 'Loading exam…' : `Questions · ${exam?.title ?? ''}${activeSubjectName ? ` · ${activeSubjectName}` : ''}`;
 
   if (examError) {
     return (
@@ -193,11 +216,54 @@ export default function QuestionsPageContent({ examId }: { examId: number }) {
     );
   }
 
+  if (!examLoading && !activeSubjectId) {
+    return (
+      <div className="space-y-4">
+        <SetPageTitle title="Questions" />
+        <IconButton icon={ArrowLeft} label="Back to exams" variant="default" onClick={() => router.push(`${basePath}/exams`)} />
+
+        <div className="card-premium p-4">
+          <h2 className="text-sm font-semibold text-slate-900">{exam?.title}</h2>
+          <p className="mt-0.5 text-xs text-slate-500">Choose a subject to manage its questions.</p>
+
+          {exam && exam.subjects.length === 0 ? (
+            <p className="mt-4 text-sm text-slate-400">This exam has no subjects yet — add one from the Exams tab first.</p>
+          ) : (
+            <div className="mt-3 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+              {exam?.subjects.map((sub) => (
+                <button
+                  key={sub.id}
+                  type="button"
+                  onClick={() => chooseSubject(sub.subjectId, sub.subjectName)}
+                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-left transition-colors hover:border-amber-300 hover:bg-amber-50/40"
+                >
+                  <BookOpen size={15} className="shrink-0 text-amber-500" />
+                  <span className="truncate text-sm font-semibold text-slate-900">{sub.subjectName}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <SetPageTitle title={pageTitle} />
 
-      <IconButton icon={ArrowLeft} label="Back to exams" variant="default" onClick={() => router.push(`${basePath}/exams`)} />
+      <div className="flex items-center gap-2">
+        <IconButton icon={ArrowLeft} label="Back to exams" variant="default" onClick={() => router.push(`${basePath}/exams`)} />
+        {exam && exam.subjects.length > 1 && (
+          <button
+            type="button"
+            onClick={() => setActiveSubjectId(null)}
+            className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-700"
+          >
+            <ChevronLeft size={13} /> Change subject
+          </button>
+        )}
+      </div>
 
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div className="max-w-xs">
@@ -210,7 +276,7 @@ export default function QuestionsPageContent({ examId }: { examId: number }) {
           </SelectField>
         </div>
 
-        <Button icon={Plus} onClick={openCreateModal} disabled={!exam}>
+        <Button icon={Plus} onClick={openCreateModal}>
           Add question
         </Button>
       </div>
@@ -230,12 +296,12 @@ export default function QuestionsPageContent({ examId }: { examId: number }) {
         emptyDescription="Add the first question for this subject."
       />
 
-      {formModalOpen && exam && (
+      {formModalOpen && activeSubjectId && (
         <QuestionFormModal
           item={editingItem}
-          examId={exam.id}
-          subjectId={exam.subjectId}
-          subjectName={exam.subjectName}
+          examId={examId}
+          subjectId={activeSubjectId}
+          subjectName={activeSubjectName}
           nextOrder={questions.length + 1}
           onClose={() => {
             setFormModalOpen(false);

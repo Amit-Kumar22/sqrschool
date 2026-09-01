@@ -142,7 +142,7 @@ export default function SchoolLeadsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by school, city, phone or email"
-            className="h-9 w-full rounded-md border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
+            className="h-9 w-full rounded-md border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 focus:outline-none"
           />
         </div>
         {search && (
@@ -182,7 +182,7 @@ export default function SchoolLeadsPage() {
 function MiniStat({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
   return (
     <div className="card-premium flex items-center gap-2.5 px-3.5 py-2">
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
         <Icon size={14} />
       </span>
       <div className="leading-tight">

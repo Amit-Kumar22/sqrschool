@@ -96,7 +96,7 @@ export default function YoutubeTestimonialFormModal({
             type="checkbox"
             checked={form.isActive}
             onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
-            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/30"
+            className="h-4 w-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500/30"
           />
           <span className="font-medium text-slate-700">Active</span>
         </label>

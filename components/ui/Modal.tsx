@@ -3,17 +3,15 @@ import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { IconButton } from './Button';
 
-type Accent = 'indigo' | 'amber' | 'emerald' | 'rose';
+type Accent = 'amber' | 'emerald' | 'rose';
 
 const ACCENT_BAR: Record<Accent, string> = {
-  indigo: 'from-indigo-500 via-violet-400 to-indigo-500',
   amber: 'from-amber-400 via-orange-400 to-amber-400',
   emerald: 'from-emerald-500 via-teal-400 to-emerald-500',
   rose: 'from-rose-500 via-red-400 to-rose-500',
 };
 
 const ACCENT_BADGE: Record<Accent, string> = {
-  indigo: 'from-indigo-600 to-indigo-700',
   amber: 'from-amber-400 to-amber-600',
   emerald: 'from-emerald-500 to-emerald-700',
   rose: 'from-rose-500 to-rose-700',
@@ -45,7 +43,7 @@ interface ModalProps {
  * icon-only close button, scrollable body (so long forms never overflow the
  * viewport) and an optional sticky footer for actions.
  */
-export default function Modal({ icon: Icon, title, subtitle, badge, accent = 'indigo', size = 'md', onClose, footer, children }: ModalProps) {
+export default function Modal({ icon: Icon, title, subtitle, badge, accent = 'amber', size = 'md', onClose, footer, children }: ModalProps) {
   return (
     <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/60 p-4 backdrop-blur-sm">
       <div className={`animate-scale-in relative w-full ${SIZE_CLASSES[size]} overflow-hidden rounded-2xl bg-white shadow-premium-lg`}>

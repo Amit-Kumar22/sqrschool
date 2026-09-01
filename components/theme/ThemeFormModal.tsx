@@ -189,7 +189,7 @@ function ColorInput({
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="h-8 w-full min-w-0 rounded border border-slate-200 px-2 font-mono text-xs focus:border-indigo-500 focus:outline-none"
+          className="h-8 w-full min-w-0 rounded border border-slate-200 px-2 font-mono text-xs focus:border-amber-500 focus:outline-none"
           placeholder="#000000"
         />
       </div>

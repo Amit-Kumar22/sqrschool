@@ -14,7 +14,7 @@ export default function ThemePresetGallery({ onUse }: { onUse: (preset: ThemePre
   return (
     <div className="card-premium p-5">
       <div className="flex items-center gap-2">
-        <Sparkles size={16} className="text-indigo-600" />
+        <Sparkles size={16} className="text-amber-700" />
         <h2 className="text-sm font-semibold text-slate-900">Recommended presets</h2>
       </div>
       <p className="mt-1 text-sm text-slate-500">
@@ -27,11 +27,11 @@ export default function ThemePresetGallery({ onUse }: { onUse: (preset: ThemePre
             key={preset.key}
             style={{ animationDelay: `${idx * 45}ms` }}
             className={`animate-fade-in-up group relative flex flex-col overflow-hidden rounded-xl border bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-premium-lg ${
-              preset.recommended ? 'border-indigo-300 ring-1 ring-indigo-100' : 'border-slate-200'
+              preset.recommended ? 'border-amber-300 ring-1 ring-amber-100' : 'border-slate-200'
             }`}
           >
             {preset.recommended && (
-              <span className="absolute top-2 right-2 z-10 rounded-full bg-indigo-600 px-2 py-0.5 text-[10px] font-semibold text-white shadow-premium-sm">
+              <span className="absolute top-2 right-2 z-10 rounded-full bg-amber-700 px-2 py-0.5 text-[10px] font-semibold text-white shadow-premium-sm">
                 Recommended
               </span>
             )}
@@ -57,7 +57,7 @@ export default function ThemePresetGallery({ onUse }: { onUse: (preset: ThemePre
               <button
                 type="button"
                 onClick={() => onUse(preset)}
-                className="mt-3 flex items-center justify-center gap-1.5 rounded-md border border-indigo-200 px-3 py-1.5 text-xs font-semibold text-indigo-600 transition-colors hover:bg-indigo-600 hover:text-white"
+                className="mt-3 flex items-center justify-center gap-1.5 rounded-md border border-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-700 transition-colors hover:bg-amber-700 hover:text-white"
               >
                 <Wand2 size={13} /> Use this preset
               </button>

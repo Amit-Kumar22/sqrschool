@@ -138,7 +138,7 @@ export default function DayBookReport() {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 shadow-premium-sm transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 focus:outline-none"
+            className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 shadow-premium-sm transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
           />
         </div>
         <Button icon={Download} size="sm" variant="secondary" onClick={exportCsv} disabled={payments.length === 0}>

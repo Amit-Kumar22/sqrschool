@@ -115,7 +115,7 @@ export default function PrincipalStaffPage() {
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value as StaffRole | '')}
-              className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
+              className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 focus:outline-none"
             >
               <option value="">All roles</option>
               <option value="TEACHER">Teacher</option>
@@ -132,13 +132,13 @@ export default function PrincipalStaffPage() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search staff"
-                className="h-9 w-48 rounded-md border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
+                className="h-9 w-48 rounded-md border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 focus:outline-none"
               />
             </div>
             <button
               type="submit"
               title="Search"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-white transition-colors hover:bg-indigo-700"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-amber-700 text-white transition-colors hover:bg-amber-800"
             >
               <Search size={15} />
             </button>

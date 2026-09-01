@@ -64,7 +64,7 @@ export default function SchoolDetailModal({
                     href={school.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-indigo-600 hover:underline"
+                    className="inline-flex items-center gap-1 text-amber-700 hover:underline"
                   >
                     <Globe size={12} /> {school.website}
                   </a>

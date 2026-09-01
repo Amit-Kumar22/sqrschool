@@ -100,7 +100,7 @@ export default function DataTable<T>({
       <div className="scrollbar-thin overflow-x-auto">
         <table className="w-full min-w-full border-collapse text-left text-sm tabular-nums">
           <thead>
-            <tr className="bg-gradient-to-r from-indigo-950 via-indigo-800 to-indigo-950">
+            <tr className="bg-gradient-to-r from-amber-950 via-amber-800 to-amber-950">
               {columns.map((col) => (
                 <th
                   key={col.key}
@@ -146,7 +146,7 @@ export default function DataTable<T>({
               <tr>
                 <td colSpan={columns.length} className="px-4 py-16 text-center">
                   <div className="mx-auto flex max-w-xs flex-col items-center gap-2">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-50 text-amber-700">
                       <Inbox size={20} />
                     </span>
                     <p className="text-sm font-semibold text-slate-900">{emptyTitle}</p>
@@ -160,13 +160,13 @@ export default function DataTable<T>({
                   key={rowKey(row)}
                   onClick={() => onRowClick?.(row)}
                   style={{ animationDelay: `${Math.min(idx, 8) * 35}ms` }}
-                  className={`animate-fade-in-up group transition-colors even:bg-slate-50/70 hover:bg-indigo-50/60 ${onRowClick ? 'cursor-pointer' : ''}`}
+                  className={`animate-fade-in-up group transition-colors even:bg-slate-50/70 hover:bg-amber-50/60 ${onRowClick ? 'cursor-pointer' : ''}`}
                 >
                   {columns.map((col, colIdx) => (
                     <td
                       key={col.key}
                       className={`px-4 py-3.5 align-middle text-slate-700 ${alignClass(col.align)} ${col.className ?? ''} ${
-                        colIdx === 0 ? 'border-l-2 border-transparent transition-colors group-hover:border-indigo-500' : ''
+                        colIdx === 0 ? 'border-l-2 border-transparent transition-colors group-hover:border-amber-500' : ''
                       }`}
                     >
                       {col.render ? col.render(row) : (col.accessor?.(row) ?? null)}
@@ -196,7 +196,7 @@ export default function DataTable<T>({
             >
               <ChevronLeft size={14} />
             </PageButton>
-            <span className="flex h-7 min-w-7 items-center justify-center rounded-md bg-indigo-600 px-2 text-xs font-semibold text-white">
+            <span className="flex h-7 min-w-7 items-center justify-center rounded-md bg-amber-700 px-2 text-xs font-semibold text-white">
               {currentPage}
             </span>
             <PageButton

@@ -5,44 +5,93 @@ import { API_ENDPOINTS } from './config';
 // Dedicated service for the exam-controller endpoints. Every endpoint here
 // returns/accepts the raw entity — no {result} envelope.
 
-// Only "DRAFT" is confirmed by the API spec — the rest are the expected
-// lifecycle stages. Unrecognized values still render fine (see
-// ExamStatusBadge's fallback in components/ui/Badge.tsx) rather than erroring.
-export type ExamStatus = 'DRAFT' | 'PUBLISHED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED';
+// All 5 values are confirmed by the exam API spec's "Available values" list
+// (ACTIVE replaces the older ONGOING value this app used previously).
+export type ExamStatus = 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 
-export interface ExamSection {
+export const EXAM_STATUS_OPTIONS: ExamStatus[] = ['DRAFT', 'PUBLISHED', 'ACTIVE', 'COMPLETED', 'CANCELLED'];
+
+// All 19 values are confirmed by the exam API spec's "Available values" list.
+export type ExamType =
+  | 'CLASS_TEST'
+  | 'UNIT_TEST'
+  | 'PERIODIC_TEST'
+  | 'MID_TERM_EXAM'
+  | 'HALF_YEARLY_EXAM'
+  | 'ANNUAL_EXAM'
+  | 'PRE_BOARD_EXAM'
+  | 'BOARD_EXAM'
+  | 'PRACTICAL_EXAM'
+  | 'INTERNAL_ASSESSMENT'
+  | 'PROJECT_ASSESSMENT'
+  | 'VIVA'
+  | 'ENTRANCE_EXAM'
+  | 'SCHOLARSHIP_EXAM'
+  | 'OLYMPIAD'
+  | 'COMPETITIVE_EXAM'
+  | 'MOCK_EXAM'
+  | 'RE_EXAM'
+  | 'SUPPLEMENTARY_EXAM';
+
+export const EXAM_TYPE_OPTIONS: ExamType[] = [
+  'CLASS_TEST',
+  'UNIT_TEST',
+  'PERIODIC_TEST',
+  'MID_TERM_EXAM',
+  'HALF_YEARLY_EXAM',
+  'ANNUAL_EXAM',
+  'PRE_BOARD_EXAM',
+  'BOARD_EXAM',
+  'PRACTICAL_EXAM',
+  'INTERNAL_ASSESSMENT',
+  'PROJECT_ASSESSMENT',
+  'VIVA',
+  'ENTRANCE_EXAM',
+  'SCHOLARSHIP_EXAM',
+  'OLYMPIAD',
+  'COMPETITIVE_EXAM',
+  'MOCK_EXAM',
+  'RE_EXAM',
+  'SUPPLEMENTARY_EXAM',
+];
+
+// A multi-subject exam's per-subject schedule entry — attached/replaced via
+// the separate EXAM.SUBJECTS endpoint rather than living on ExamPayload.
+export interface ExamSubjectPayload {
+  subjectId: number;
+  /** ISO date string. */
+  examDate: string;
+  durationMinutes: number;
+  totalMarks: number;
+  passingMarks: number;
+}
+
+export interface ExamSubjectSchedule extends ExamSubjectPayload {
   id: number;
-  name: string;
+  subjectName: string;
 }
 
 export interface Exam {
   id: number;
-  name: string;
+  title: string;
+  examType: ExamType;
   description: string;
-  schoolId: number;
-  schoolName: string;
-  schoolClassId: number;
-  schoolClassName: string;
-  subjectId: number;
-  subjectName: string;
-  sections: ExamSection[];
-  durationMinutes: number;
-  totalMarks: number;
-  passingMarks: number;
+  classId: number;
+  className: string;
   startDate: string;
   endDate: string;
   status: ExamStatus;
+  subjects: ExamSubjectSchedule[];
+  createdAt: string;
 }
 
+// Exam "header" only — subjects are attached separately via setExamSubjects,
+// since the backend exposes them as their own sub-resource.
 export interface ExamPayload {
-  name: string;
+  title: string;
+  examType: ExamType;
   description: string;
-  schoolClassId: number;
-  subjectId: number;
-  sectionIds: number[];
-  durationMinutes: number;
-  totalMarks: number;
-  passingMarks: number;
+  classId: number;
   startDate: string;
   endDate: string;
   status: ExamStatus;
@@ -59,26 +108,28 @@ export interface ExamPage {
 
 export interface ExamListParams {
   classId?: number;
-  subjectId?: number;
-  sectionId?: number;
+  examType?: ExamType;
+  status?: ExamStatus;
+  search?: string;
   page?: number;
   size?: number;
   sort?: string[];
 }
 
-// Fetched with a generous page size since DataTable sorts/paginates
+// Fetched with a generous page size since the tab lists sort/render
 // client-side over the full result set, same as getClasses/getSchools.
-/** Paginated exam list, optionally filtered by class/subject/section. Returns the raw Page<Exam> shape — no envelope. */
+/** Paginated exam list, optionally filtered by class/type/status/search. Returns the raw Page<Exam> shape — no envelope. */
 export const getExams = async ({
   classId,
-  subjectId,
-  sectionId,
+  examType,
+  status,
+  search,
   page = 0,
   size = 200,
   sort,
 }: ExamListParams = {}): Promise<ExamPage> => {
   const response = await api.get<ExamPage>(API_ENDPOINTS.EXAM.LIST, {
-    params: { classId, subjectId, sectionId, page, size, sort },
+    params: { classId, examType, status, search, page, size, sort },
   });
   return response.data;
 };
@@ -88,18 +139,38 @@ export const getExam = async (id: number): Promise<Exam> => {
   return response.data;
 };
 
+// Some POST/mutating endpoints in this API wrap their response in
+// {result: ...} while others return the raw entity (already true of
+// SCHOOL.CREATE/THEMES.CREATE elsewhere in this app) — the exam spec didn't
+// document a response shape for these, so unwrap defensively rather than
+// assume and risk `.id` silently coming back undefined (which then breaks
+// EXAM.SUBJECTS's Long path variable downstream).
+function unwrapExam(data: Exam | { result: Exam }): Exam {
+  return (data as { result: Exam })?.result ?? (data as Exam);
+}
+
 export const createExam = async (data: ExamPayload): Promise<Exam> => {
-  const response = await api.post<Exam>(API_ENDPOINTS.EXAM.CREATE, data);
-  return response.data;
+  const response = await api.post<Exam | { result: Exam }>(API_ENDPOINTS.EXAM.CREATE, data);
+  return unwrapExam(response.data);
 };
 
 export const updateExam = async (id: number, data: ExamPayload): Promise<Exam> => {
-  const response = await api.put<Exam>(API_ENDPOINTS.EXAM.UPDATE(id), data);
-  return response.data;
+  const response = await api.put<Exam | { result: Exam }>(API_ENDPOINTS.EXAM.UPDATE(id), data);
+  return unwrapExam(response.data);
 };
 
 export const deleteExam = async (id: number): Promise<void> => {
   await api.delete(API_ENDPOINTS.EXAM.DELETE(id));
+};
+
+/** Replaces the exam's full per-subject schedule — pair with clearExamSubjects on edit to avoid appending duplicates. */
+export const setExamSubjects = async (examId: number, subjects: ExamSubjectPayload[]): Promise<Exam> => {
+  const response = await api.post<Exam | { result: Exam }>(API_ENDPOINTS.EXAM.SUBJECTS(examId), subjects);
+  return unwrapExam(response.data);
+};
+
+export const clearExamSubjects = async (examId: number): Promise<void> => {
+  await api.delete(API_ENDPOINTS.EXAM.SUBJECTS(examId));
 };
 
 // ─── Question service ────────────────────────────────────────────────────────
@@ -140,7 +211,9 @@ export interface Question {
   subjectId: number;
   subjectName: string;
   modelAnswer: string;
-  options: QuestionOption[];
+  // The backend returns null (not []) for question types with no options,
+  // e.g. SHORT_ANSWER/LONG_ANSWER, which just use modelAnswer instead.
+  options: QuestionOption[] | null;
 }
 
 export interface QuestionPayload {

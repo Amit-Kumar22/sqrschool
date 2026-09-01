@@ -160,7 +160,7 @@ export default function StaffClassSectionPage() {
             value={selectedClassId}
             onChange={(e) => setSelectedClassId(e.target.value ? Number(e.target.value) : '')}
             disabled={classesLoading || classes.length === 0}
-            className="h-9 min-w-40 rounded-md border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none disabled:opacity-50"
+            className="h-9 min-w-40 rounded-md border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 focus:outline-none disabled:opacity-50"
           >
             {classes.length === 0 && <option value="">No classes yet</option>}
             {classes.map((cls) => (

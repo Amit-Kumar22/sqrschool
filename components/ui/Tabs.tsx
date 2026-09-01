@@ -29,7 +29,7 @@ export default function Tabs({ tabs, active, onChange }: TabsProps) {
             aria-current={isActive}
             className={`flex shrink-0 items-center gap-1.5 border-b-2 px-2.5 py-2.5 text-xs font-semibold whitespace-nowrap transition-colors ${
               isActive
-                ? 'border-indigo-600 text-indigo-700'
+                ? 'border-amber-700 text-amber-700'
                 : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'
             }`}
           >

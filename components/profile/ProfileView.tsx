@@ -100,14 +100,14 @@ export default function ProfileView() {
     <div className="grid gap-4 lg:grid-cols-3">
       {/* ── Summary card ── */}
       <div className="card-premium animate-fade-in-up relative overflow-hidden lg:col-span-1">
-        <div className="h-12 bg-gradient-to-br from-indigo-600 via-indigo-600 to-violet-600" />
+        <div className="h-12 bg-gradient-to-br from-amber-600 via-orange-500 to-amber-700" />
         <div className="flex flex-col items-center px-4 pb-4 text-center">
-          <div className="-mt-7 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-sm font-semibold text-indigo-950 shadow-glow-amber ring-4 ring-white">
+          <div className="-mt-7 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-sm font-semibold text-amber-950 shadow-glow-amber ring-4 ring-white">
             {initials}
           </div>
           <h2 className="mt-2 text-sm font-semibold text-slate-900">{profile?.fullName}</h2>
           {profile && (
-            <span className="mt-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600">
+            <span className="mt-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
               {ROLE_LABELS[profile.role]}
             </span>
           )}
@@ -133,9 +133,9 @@ export default function ProfileView() {
           style={{ animationDelay: '60ms' }}
           className="card-premium animate-fade-in-up relative overflow-hidden p-4"
         >
-          <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-indigo-500" />
+          <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-500 via-orange-400 to-amber-500" />
           <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
               <UserCircle size={14} />
             </span>
             <h3 className="text-sm font-semibold text-slate-900">Edit profile</h3>

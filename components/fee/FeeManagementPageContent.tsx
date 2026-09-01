@@ -6,16 +6,18 @@ import TabPill from '@/components/ui/TabPill';
 import FeeStructurePageContent from './FeeStructurePageContent';
 import CollectFeeTab from './CollectFeeTab';
 import ReportsTab from './ReportsTab';
+import ConcessionsTab from './ConcessionsTab';
 
-type TopTab = 'structure' | 'collect' | 'reports';
+type TopTab = 'structure' | 'collect' | 'reports' | 'concessions';
 
 const TOP_TABS: { key: TopTab; label: string }[] = [
   { key: 'structure', label: 'Fee Structure' },
   { key: 'collect', label: 'Collect Fee' },
   { key: 'reports', label: 'Reports' },
+  { key: 'concessions', label: 'Concessions' },
 ];
 
-/** Fee Management — class-wise fee structure, collection & reports. Dashboard and Concessions are shown as disabled tabs until their APIs exist. */
+/** Fee Management — class-wise fee structure, collection, reports & concessions. Dashboard is shown as a disabled tab until its API exists. */
 export default function FeeManagementPageContent() {
   const [tab, setTab] = useState<TopTab>('structure');
 
@@ -28,12 +30,12 @@ export default function FeeManagementPageContent() {
         {TOP_TABS.map((t) => (
           <TabPill key={t.key} label={t.label} active={tab === t.key} onClick={() => setTab(t.key)} />
         ))}
-        <TabPill label="Concessions" disabled />
       </div>
 
       {tab === 'structure' && <FeeStructurePageContent />}
       {tab === 'collect' && <CollectFeeTab />}
       {tab === 'reports' && <ReportsTab />}
+      {tab === 'concessions' && <ConcessionsTab />}
     </div>
   );
 }

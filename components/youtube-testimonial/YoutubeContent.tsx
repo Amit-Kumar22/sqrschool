@@ -87,7 +87,7 @@ export default function StaffYoutubeTestimonialsPage() {
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="inline-flex items-center gap-1 text-indigo-600 hover:underline"
+          className="inline-flex items-center gap-1 text-amber-700 hover:underline"
         >
           <span className="max-w-56 truncate">{item.videoUrl}</span>
           <ExternalLink size={12} className="shrink-0" />

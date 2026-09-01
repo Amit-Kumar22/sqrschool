@@ -118,6 +118,14 @@ export const API_ENDPOINTS = {
     GET: (id: number) => `/v1/exams/${id}`,
     UPDATE: (id: number) => `/v1/exams/${id}`,
     DELETE: (id: number) => `/v1/exams/${id}`,
+    SUBJECTS: (examId: number) => `/v1/exams/${examId}/subjects`,
+  },
+  TEST_EXAM: {
+    LIST: '/v1/test-exam',
+    CREATE: '/v1/test-exam',
+    GET: (id: number) => `/v1/test-exam/${id}`,
+    UPDATE: (id: number) => `/v1/test-exam/${id}`,
+    DELETE: (id: number) => `/v1/test-exam/${id}`,
   },
   HOME_WORK: {
     LIST: '/v1/home-work',
@@ -157,6 +165,26 @@ export const API_ENDPOINTS = {
     MARK_OVERDUE: '/v1/student-fees/overdue/mark',
     PAYMENTS: (id: number) => `/v1/student-fees/${id}/payments`,
     ALL_PAYMENTS: '/v1/student-fees/all-payment',
+  },
+  STUDENT_CONCESSION: {
+    LIST: '/v1/student-concessions',
+    CREATE: '/v1/student-concessions',
+    GET: (id: number) => `/v1/student-concessions/${id}`,
+    UPDATE: (id: number) => `/v1/student-concessions/${id}`,
+    DELETE: (id: number) => `/v1/student-concessions/${id}`,
+  },
+  PERIOD: {
+    LIST: '/v1/periods',
+    CREATE: '/v1/periods',
+    GET: (id: number) => `/v1/periods/${id}`,
+    UPDATE: (id: number) => `/v1/periods/${id}`,
+    DELETE: (id: number) => `/v1/periods/${id}`,
+  },
+  WEEKLY_TIMETABLE: {
+    LIST: '/v1/weekly-timetables',
+    CREATE: '/v1/weekly-timetables',
+    UPDATE: (id: number) => `/v1/weekly-timetables/${id}`,
+    DELETE: (id: number) => `/v1/weekly-timetables/${id}`,
   },
   // Public/unauthenticated endpoints consumed by the marketing home page —
   // no session required, see lib/freeService.ts.

@@ -21,7 +21,7 @@ export function StatusBadge({ active, activeLabel = 'Active', inactiveLabel = 'I
 /** Small neutral pill for labeling a record's role (staff, student, etc). */
 export function RoleBadge({ role }: { role: string }) {
   return (
-    <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700 ring-1 ring-inset ring-indigo-600/20">
+    <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 ring-1 ring-inset ring-amber-600/20">
       {role}
     </span>
   );
@@ -65,13 +65,11 @@ export function LeadStatusBadge({ status }: { status: string }) {
   );
 }
 
-// Only "DRAFT" is confirmed by the exam API spec — unrecognized values fall
-// back to a neutral slate pill instead of breaking, same approach as
-// LEAD_STATUS_STYLES above.
+// All 5 values are confirmed by the exam API spec's "Available values" list.
 const EXAM_STATUS_STYLES: Record<string, string> = {
   DRAFT: 'bg-slate-100 text-slate-600 ring-slate-200',
   PUBLISHED: 'bg-sky-50 text-sky-700 ring-sky-600/20',
-  ONGOING: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  ACTIVE: 'bg-amber-50 text-amber-700 ring-amber-600/20',
   COMPLETED: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
   CANCELLED: 'bg-red-50 text-red-700 ring-red-600/20',
 };
@@ -229,6 +227,62 @@ export function DifficultyBadge({ difficulty }: { difficulty: string }) {
   const style = DIFFICULTY_STYLES[difficulty] ?? 'bg-slate-100 text-slate-600 ring-slate-200';
   const label = difficulty
     ? difficulty.charAt(0).toUpperCase() + difficulty.slice(1).toLowerCase()
+    : 'Unknown';
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${style}`}
+    >
+      {label}
+    </span>
+  );
+}
+
+// Only "SIBLING" is confirmed by the student-concessions API spec —
+// unrecognized values fall back to a neutral slate pill instead of breaking,
+// same approach as the other badges in this file.
+const CONCESSION_TYPE_STYLES: Record<string, string> = {
+  SIBLING: 'bg-indigo-50 text-indigo-700 ring-indigo-600/20',
+  STAFF_WARD: 'bg-sky-50 text-sky-700 ring-sky-600/20',
+  SCHOLARSHIP: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  FINANCIAL_AID: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  OTHER: 'bg-slate-100 text-slate-600 ring-slate-200',
+};
+
+/** Pill for a concession's category — tinted by known type, neutral for anything else. */
+export function ConcessionTypeBadge({ type }: { type: string }) {
+  const style = CONCESSION_TYPE_STYLES[type] ?? 'bg-slate-100 text-slate-600 ring-slate-200';
+  const label = type
+    ? type
+        .toLowerCase()
+        .split('_')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+    : 'Unknown';
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${style}`}
+    >
+      {label}
+    </span>
+  );
+}
+
+// Only "ACTIVE" is confirmed by the student-concessions API spec —
+// unrecognized values fall back to a neutral slate pill instead of breaking,
+// same approach as the other badges in this file.
+const CONCESSION_STATUS_STYLES: Record<string, string> = {
+  ACTIVE: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  INACTIVE: 'bg-slate-100 text-slate-600 ring-slate-200',
+  EXPIRED: 'bg-red-50 text-red-700 ring-red-600/20',
+};
+
+/** Pill for a concession's lifecycle status — tinted by known state, neutral for anything else. */
+export function ConcessionStatusBadge({ status }: { status: string }) {
+  const style = CONCESSION_STATUS_STYLES[status] ?? 'bg-slate-100 text-slate-600 ring-slate-200';
+  const label = status
+    ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
     : 'Unknown';
 
   return (

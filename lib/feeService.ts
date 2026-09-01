@@ -244,3 +244,99 @@ export const getAllFeePayments = async ({
   });
   return response.data;
 };
+
+// ─── Student Concession service ─────────────────────────────────────────────
+// Dedicated service for the student-concessions-controller endpoints — a
+// concession is a discount granted to a student against one of their fee
+// structures (sibling discount, staff-ward waiver, scholarship, etc). Every
+// endpoint here returns/accepts the raw entity — no {result} envelope.
+
+// Only "SIBLING" is confirmed by the API spec — the rest are the usual
+// concession categories for a school. Unrecognized values still render fine
+// (see ConcessionTypeBadge's fallback in components/ui/Badge.tsx) rather than
+// erroring.
+export type ConcessionType = 'SIBLING' | 'STAFF_WARD' | 'SCHOLARSHIP' | 'FINANCIAL_AID' | 'OTHER';
+
+// Only "FIXED_AMOUNT" is confirmed by the API spec — "PERCENTAGE" is the
+// obvious counterpart given discountValue is paired with this field.
+export type DiscountType = 'FIXED_AMOUNT' | 'PERCENTAGE';
+
+// Only "ACTIVE" is confirmed by the API spec — the rest are the usual
+// lifecycle states for a granted concession. Unrecognized values still
+// render fine (see ConcessionStatusBadge's fallback in components/ui/Badge.tsx)
+// rather than erroring.
+export type ConcessionStatus = 'ACTIVE' | 'INACTIVE' | 'EXPIRED';
+
+export interface StudentConcession {
+  id: number;
+  studentId: number;
+  feeStructureId: number;
+  type: ConcessionType;
+  discountType: DiscountType;
+  discountValue: number;
+  maxDiscountAmount: number;
+  status: ConcessionStatus;
+  remarks: string;
+  createdAt: string;
+}
+
+export interface StudentConcessionPayload {
+  studentId: number;
+  feeStructureId: number;
+  type: ConcessionType;
+  discountType: DiscountType;
+  discountValue: number;
+  remarks: string;
+}
+
+export interface StudentConcessionPage {
+  content: StudentConcession[];
+  totalElements: number;
+  totalPages: number;
+  pageNumber: number;
+  pageSize: number;
+  last: boolean;
+}
+
+export interface StudentConcessionListParams {
+  studentId?: number;
+  feeStructureId?: number;
+  page?: number;
+  size?: number;
+  sort?: string[];
+}
+
+// Fetched with a generous page size since DataTable sorts/paginates
+// client-side over the full result set, same as getFeeStructures/getStudentFees.
+/** Paginated concession list, optionally filtered by student/fee structure. Returns the raw Page<StudentConcession> shape — no envelope. */
+export const getStudentConcessions = async ({
+  studentId,
+  feeStructureId,
+  page = 0,
+  size = 200,
+  sort,
+}: StudentConcessionListParams = {}): Promise<StudentConcessionPage> => {
+  const response = await api.get<StudentConcessionPage>(API_ENDPOINTS.STUDENT_CONCESSION.LIST, {
+    params: { studentId, feeStructureId, page, size, sort },
+  });
+  return response.data;
+};
+
+export const getStudentConcession = async (id: number): Promise<StudentConcession> => {
+  const response = await api.get<StudentConcession>(API_ENDPOINTS.STUDENT_CONCESSION.GET(id));
+  return response.data;
+};
+
+export const createStudentConcession = async (data: StudentConcessionPayload): Promise<StudentConcession> => {
+  const response = await api.post<StudentConcession>(API_ENDPOINTS.STUDENT_CONCESSION.CREATE, data);
+  return response.data;
+};
+
+export const updateStudentConcession = async (id: number, data: StudentConcessionPayload): Promise<StudentConcession> => {
+  const response = await api.put<StudentConcession>(API_ENDPOINTS.STUDENT_CONCESSION.UPDATE(id), data);
+  return response.data;
+};
+
+export const deleteStudentConcession = async (id: number): Promise<void> => {
+  await api.delete(API_ENDPOINTS.STUDENT_CONCESSION.DELETE(id));
+};

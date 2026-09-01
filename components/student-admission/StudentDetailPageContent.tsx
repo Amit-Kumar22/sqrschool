@@ -89,10 +89,10 @@ export default function StudentDetailPageContent({ studentId }: { studentId: num
       <BackButton onClick={backToList} />
 
       <div className="card-premium animate-fade-in-up relative overflow-hidden">
-        <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-amber-400" />
+        <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-500 via-orange-400 to-amber-400" />
         <div className="flex flex-wrap items-center justify-between gap-4 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-lg font-semibold text-white shadow-glow-indigo">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-700 to-orange-800 text-lg font-semibold text-white shadow-glow-amber">
               {initials || '?'}
             </div>
             <div>
@@ -120,7 +120,7 @@ export default function StudentDetailPageContent({ studentId }: { studentId: num
       {error && <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <DetailCard title="Admission" icon={GraduationCap} accent="from-indigo-500 via-violet-400 to-indigo-500" iconBg="bg-indigo-50 text-indigo-600">
+        <DetailCard title="Admission" icon={GraduationCap} accent="from-sky-500 via-blue-400 to-sky-500" iconBg="bg-sky-50 text-sky-600">
           <DetailRow label="Admission date" value={formatDate(student.admissionDate)} />
           <DetailRow label="Class" value={student.schoolClass?.className} />
           <DetailRow label="Roll number" value={student.rollNumber} />
@@ -166,7 +166,7 @@ function BackButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-indigo-600"
+      className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-amber-700"
     >
       <ArrowLeft size={15} /> Back to students
     </button>

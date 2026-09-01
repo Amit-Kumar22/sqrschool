@@ -4,6 +4,7 @@ import {
   BookMarked,
   BookOpen,
   Building2,
+  CalendarClock,
   CalendarDays,
   CalendarRange,
   ClipboardList,
@@ -61,7 +62,7 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Classes', href: '/principal/class', icon: BookOpen });
     items.push({ label: 'Attedance', href: '/principal/attedance', icon: BookMarked });
     items.push({ label: 'Fees', href: '/principal/fee-structure', icon: IndianRupee });
-    items.push({ label: 'Time Table', href: '/principal/time-table', icon: IndianRupee });
+    items.push({ label: 'Time Table', href: '/principal/time-table', icon: CalendarClock });
     items.push({ label: 'Notice', href: '/principal/notice', icon: IndianRupee });
     items.push({ label: 'Homework', href: '/principal/homework', icon: NotebookPen });
     items.push({ label: 'Communication', href: '/principal/Communication', icon: NotebookPen });

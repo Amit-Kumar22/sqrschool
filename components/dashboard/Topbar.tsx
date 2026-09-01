@@ -36,7 +36,7 @@ export default function Topbar({ user, onOpenSidebar, onLogout }: TopbarProps) {
     .toUpperCase();
 
   return (
-    <header className="relative z-20 flex h-16 shrink-0 items-center justify-between bg-gradient-to-r from-indigo-950 via-[#151235] to-indigo-950 px-4 shadow-premium sm:px-6">
+    <header className="relative z-20 flex h-16 shrink-0 items-center justify-between bg-gradient-to-r from-amber-950 via-[#2b1706] to-amber-950 px-4 shadow-premium sm:px-6">
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
 
       <div className="flex min-w-0 items-center gap-3">
@@ -64,7 +64,7 @@ export default function Topbar({ user, onOpenSidebar, onLogout }: TopbarProps) {
             aria-haspopup="menu"
             aria-expanded={menuOpen}
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-xs font-semibold text-indigo-950 shadow-premium-sm">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-xs font-semibold text-amber-950 shadow-premium-sm">
               {initials}
             </div>
             <ChevronDown size={14} className={`text-slate-300 transition-transform ${menuOpen ? 'rotate-180' : ''}`} />

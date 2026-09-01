@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useMemo, useState } from 'react';
+import { Fragment, ReactNode, useMemo, useState } from 'react';
 import {
   ChevronDown,
   ChevronLeft,
@@ -38,6 +38,10 @@ interface DataTableProps<T> {
   onRowClick?: (row: T) => void;
   /** Rows per page. Set to 0 to disable pagination entirely. Defaults to 10. */
   pageSize?: number;
+  /** When set alongside `renderDetail`, marks which rows currently show their detail row. */
+  isRowExpanded?: (row: T) => boolean;
+  /** Extra full-width row rendered directly under a row when `isRowExpanded(row)` is true — e.g. an accordion detail panel. */
+  renderDetail?: (row: T) => ReactNode;
 }
 
 const alignClass = (align?: 'left' | 'center' | 'right') =>
@@ -59,6 +63,8 @@ export default function DataTable<T>({
   emptyDescription = 'There is nothing to show here yet.',
   onRowClick,
   pageSize = 10,
+  isRowExpanded,
+  renderDetail,
 }: DataTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
@@ -156,23 +162,31 @@ export default function DataTable<T>({
               </tr>
             ) : (
               paginated.map((row, idx) => (
-                <tr
-                  key={rowKey(row)}
-                  onClick={() => onRowClick?.(row)}
-                  style={{ animationDelay: `${Math.min(idx, 8) * 35}ms` }}
-                  className={`animate-fade-in-up group transition-colors even:bg-slate-50/70 hover:bg-amber-50/60 ${onRowClick ? 'cursor-pointer' : ''}`}
-                >
-                  {columns.map((col, colIdx) => (
-                    <td
-                      key={col.key}
-                      className={`px-4 py-3.5 align-middle text-slate-700 ${alignClass(col.align)} ${col.className ?? ''} ${
-                        colIdx === 0 ? 'border-l-2 border-transparent transition-colors group-hover:border-amber-500' : ''
-                      }`}
-                    >
-                      {col.render ? col.render(row) : (col.accessor?.(row) ?? null)}
-                    </td>
-                  ))}
-                </tr>
+                <Fragment key={rowKey(row)}>
+                  <tr
+                    onClick={() => onRowClick?.(row)}
+                    style={{ animationDelay: `${Math.min(idx, 8) * 35}ms` }}
+                    className={`animate-fade-in-up group transition-colors even:bg-slate-50/70 hover:bg-amber-50/60 ${onRowClick ? 'cursor-pointer' : ''}`}
+                  >
+                    {columns.map((col, colIdx) => (
+                      <td
+                        key={col.key}
+                        className={`px-4 py-3.5 align-middle text-slate-700 ${alignClass(col.align)} ${col.className ?? ''} ${
+                          colIdx === 0 ? 'border-l-2 border-transparent transition-colors group-hover:border-amber-500' : ''
+                        }`}
+                      >
+                        {col.render ? col.render(row) : (col.accessor?.(row) ?? null)}
+                      </td>
+                    ))}
+                  </tr>
+                  {renderDetail && isRowExpanded?.(row) && (
+                    <tr>
+                      <td colSpan={columns.length} className="bg-slate-50/60 px-4 py-3">
+                        {renderDetail(row)}
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               ))
             )}
           </tbody>

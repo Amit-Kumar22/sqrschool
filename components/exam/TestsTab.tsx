@@ -11,6 +11,7 @@ import { fromDateInput, toDateInput } from '@/lib/dateUtils';
 import Modal from '@/components/ui/Modal';
 import Button, { IconButton } from '@/components/ui/Button';
 import { SelectField, TextareaField, TextField } from '@/components/ui/FormField';
+import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 
 interface TestFormState {
   titleName: string;
@@ -200,123 +201,139 @@ export default function TestsTab() {
 
   const isEditing = editingId !== null;
 
+  const columns: DataTableColumn<Test>[] = [
+    {
+      key: 'titleName',
+      header: 'Title',
+      sortable: true,
+      accessor: (test) => test.titleName,
+      render: (test) => <p className="max-w-52 truncate font-semibold text-slate-900">{test.titleName}</p>,
+    },
+    {
+      key: 'subjectName',
+      header: 'Subject',
+      sortable: true,
+      accessor: (test) => test.subjectName,
+      render: (test) => (
+        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
+          {test.subjectName}
+        </span>
+      ),
+    },
+    {
+      key: 'schoolClassName',
+      header: 'Class',
+      sortable: true,
+      accessor: (test) => test.schoolClassName,
+      render: (test) => <span className="text-slate-700">{test.schoolClassName}</span>,
+    },
+    {
+      key: 'startDate',
+      header: 'Date',
+      sortable: true,
+      accessor: (test) => test.startDate,
+      render: (test) => <span className="text-slate-600">{new Date(test.startDate).toLocaleDateString()}</span>,
+    },
+    {
+      key: 'totalMarks',
+      header: 'Marks',
+      sortable: true,
+      accessor: (test) => test.totalMarks,
+      render: (test) => <span className="text-slate-600">{test.totalMarks}</span>,
+    },
+    {
+      key: 'durationMinutes',
+      header: 'Duration',
+      sortable: true,
+      accessor: (test) => test.durationMinutes,
+      render: (test) => <span className="text-slate-600">{test.durationMinutes} min</span>,
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (test) => <TestStatusPill upcoming={new Date(test.startDate) >= startOfToday()} />,
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      align: 'right',
+      widthClassName: 'w-20',
+      render: (test) => (
+        <div className="flex items-center justify-end gap-1">
+          <IconButton icon={Pencil} label="Edit" variant="primary" onClick={() => openEdit(test)} />
+          <IconButton
+            icon={Trash2}
+            label="Delete"
+            variant="danger"
+            loading={deletingId === test.id}
+            onClick={() => handleDelete(test.id)}
+          />
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-4">
       {error && <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
 
-      {/* ── List panel ── */}
-      <div className="card-premium overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-4">
-          <div className="flex items-center gap-2">
-            <ClipboardList size={16} className="text-amber-600" />
-            <h2 className="text-sm font-bold text-slate-900">All Tests</h2>
-            <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">{tests.length}</span>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <select
-              value={filterClassId}
-              onChange={(e) => setFilterClassId(e.target.value ? Number(e.target.value) : '')}
-              className="h-9 w-36 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
-            >
-              <option value="">All classes</option>
-              {classes.map((cls) => (
-                <option key={cls.id} value={cls.id}>
-                  {cls.className}
-                </option>
-              ))}
-            </select>
-            <select
-              value={filterSubjectId}
-              onChange={(e) => setFilterSubjectId(e.target.value ? Number(e.target.value) : '')}
-              className="h-9 w-36 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
-            >
-              <option value="">All subjects</option>
-              {subjects.map((subject) => (
-                <option key={subject.id} value={subject.id}>
-                  {subject.subjectName}
-                </option>
-              ))}
-            </select>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as ExamStatus | '')}
-              className="h-9 w-32 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
-            >
-              <option value="">All statuses</option>
-              {EXAM_STATUS_OPTIONS.map((status) => (
-                <option key={status} value={status}>
-                  {formatStatusLabel(status)}
-                </option>
-              ))}
-            </select>
-            <Button icon={Plus} size="sm" onClick={openCreate} disabled={metaLoading}>
-              Create Test
-            </Button>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <ClipboardList size={16} className="text-amber-600" />
+          <h2 className="text-sm font-bold text-slate-900">All Tests</h2>
+          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">{tests.length}</span>
         </div>
-
-        <div className="scrollbar-thin overflow-x-auto">
-          <table className="w-full min-w-[820px] text-left text-sm">
-            <thead>
-              <tr className="text-xs font-medium text-slate-500">
-                <th className="px-4 py-2.5">Title</th>
-                <th className="px-4 py-2.5">Subject</th>
-                <th className="px-4 py-2.5">Class</th>
-                <th className="px-4 py-2.5">Date</th>
-                <th className="px-4 py-2.5">Marks</th>
-                <th className="px-4 py-2.5">Duration</th>
-                <th className="px-4 py-2.5">Status</th>
-                <th className="px-4 py-2.5 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {loading || metaLoading ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-400">
-                    Loading…
-                  </td>
-                </tr>
-              ) : tests.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-400">
-                    No tests yet.
-                  </td>
-                </tr>
-              ) : (
-                tests.map((test) => (
-                  <tr key={test.id} className="text-slate-700">
-                    <td className="max-w-52 truncate px-4 py-3 font-semibold text-slate-900">{test.titleName}</td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
-                        {test.subjectName}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">{test.schoolClassName}</td>
-                    <td className="px-4 py-3">{new Date(test.startDate).toLocaleDateString()}</td>
-                    <td className="px-4 py-3">{test.totalMarks}</td>
-                    <td className="px-4 py-3">{test.durationMinutes} min</td>
-                    <td className="px-4 py-3">
-                      <TestStatusPill upcoming={new Date(test.startDate) >= startOfToday()} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-1">
-                        <IconButton icon={Pencil} label="Edit" variant="primary" onClick={() => openEdit(test)} />
-                        <IconButton
-                          icon={Trash2}
-                          label="Delete"
-                          variant="danger"
-                          loading={deletingId === test.id}
-                          onClick={() => handleDelete(test.id)}
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={filterClassId}
+            onChange={(e) => setFilterClassId(e.target.value ? Number(e.target.value) : '')}
+            className="h-9 w-36 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+          >
+            <option value="">All classes</option>
+            {classes.map((cls) => (
+              <option key={cls.id} value={cls.id}>
+                {cls.className}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterSubjectId}
+            onChange={(e) => setFilterSubjectId(e.target.value ? Number(e.target.value) : '')}
+            className="h-9 w-36 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+          >
+            <option value="">All subjects</option>
+            {subjects.map((subject) => (
+              <option key={subject.id} value={subject.id}>
+                {subject.subjectName}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as ExamStatus | '')}
+            className="h-9 w-32 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+          >
+            <option value="">All statuses</option>
+            {EXAM_STATUS_OPTIONS.map((status) => (
+              <option key={status} value={status}>
+                {formatStatusLabel(status)}
+              </option>
+            ))}
+          </select>
+          <Button icon={Plus} size="sm" onClick={openCreate} disabled={metaLoading}>
+            Create Test
+          </Button>
         </div>
       </div>
+
+      <DataTable
+        columns={columns}
+        data={tests}
+        rowKey={(test) => test.id}
+        loading={loading || metaLoading}
+        emptyTitle="No tests yet"
+        emptyDescription="Create the first test to get started."
+      />
 
       {formOpen && (
         <Modal

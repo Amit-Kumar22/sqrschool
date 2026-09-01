@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { BookOpen, CalendarCog, ChevronDown, ChevronRight, ClipboardList, HelpCircle, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
@@ -26,6 +26,7 @@ import Modal from '@/components/ui/Modal';
 import Button, { IconButton } from '@/components/ui/Button';
 import { ExamStatusBadge } from '@/components/ui/Badge';
 import { SelectField, TextareaField, TextField } from '@/components/ui/FormField';
+import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import ToggleCard from './ToggleCard';
 
 interface ScheduleRow {
@@ -313,6 +314,91 @@ export default function ExamsTab() {
   const isEditing = editingId !== null;
   const scheduledSubjects = subjects.filter((s) => selectedSubjectIds.includes(s.id));
 
+  const examColumns: DataTableColumn<Exam>[] = [
+    {
+      key: 'expand',
+      header: '',
+      widthClassName: 'w-8',
+      render: (exam) =>
+        exam.subjects.length > 0 && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleExpanded(exam.id);
+            }}
+            aria-label={expandedIds.has(exam.id) ? 'Collapse' : 'Expand'}
+            className="text-slate-400 hover:text-slate-600"
+          >
+            {expandedIds.has(exam.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          </button>
+        ),
+    },
+    {
+      key: 'title',
+      header: 'Title',
+      sortable: true,
+      accessor: (exam) => exam.title,
+      render: (exam) => <p className="max-w-52 truncate font-semibold text-slate-900">{exam.title}</p>,
+    },
+    {
+      key: 'className',
+      header: 'Class',
+      sortable: true,
+      accessor: (exam) => exam.className,
+      render: (exam) => <span className="text-slate-700">{exam.className}</span>,
+    },
+    {
+      key: 'examType',
+      header: 'Type',
+      sortable: true,
+      accessor: (exam) => exam.examType,
+      render: (exam) => (
+        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
+          {formatTypeLabel(exam.examType)}
+        </span>
+      ),
+    },
+    {
+      key: 'startDate',
+      header: 'Start',
+      sortable: true,
+      accessor: (exam) => exam.startDate,
+      render: (exam) => <span className="text-slate-600">{new Date(exam.startDate).toLocaleDateString()}</span>,
+    },
+    {
+      key: 'endDate',
+      header: 'End',
+      sortable: true,
+      accessor: (exam) => exam.endDate,
+      render: (exam) => <span className="text-slate-600">{new Date(exam.endDate).toLocaleDateString()}</span>,
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (exam) => <ExamStatusBadge status={exam.status} />,
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      align: 'right',
+      widthClassName: 'w-28',
+      render: (exam) => (
+        <div className="flex items-center justify-end gap-1">
+          <IconButton icon={CalendarCog} label="Manage Subjects" variant="primary" onClick={() => openSubjects(exam)} />
+          <IconButton icon={Pencil} label="Edit" variant="primary" onClick={() => openEdit(exam)} />
+          <IconButton
+            icon={Trash2}
+            label="Delete"
+            variant="danger"
+            loading={deletingId === exam.id}
+            onClick={() => handleDelete(exam.id)}
+          />
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-4">
       {error && <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
@@ -502,173 +588,91 @@ export default function ExamsTab() {
         </Modal>
       )}
 
-      {/* ── List panel ── */}
-      <div className="card-premium overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-4">
-          <div className="flex items-center gap-2">
-            <ClipboardList size={16} className="text-amber-600" />
-            <h2 className="text-sm font-bold text-slate-900">All Exams</h2>
-            <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">{exams.length}</span>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <form onSubmit={handleSearch}>
-              <input
-                type="search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search exams…"
-                className="h-9 w-40 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
-              />
-            </form>
-            <select
-              value={filterClassId}
-              onChange={(e) => setFilterClassId(e.target.value ? Number(e.target.value) : '')}
-              className="h-9 w-32 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
-            >
-              <option value="">All classes</option>
-              {classes.map((cls) => (
-                <option key={cls.id} value={cls.id}>
-                  {cls.className}
-                </option>
-              ))}
-            </select>
-            <select
-              value={filterExamType}
-              onChange={(e) => setFilterExamType(e.target.value as ExamType | '')}
-              className="h-9 w-36 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
-            >
-              <option value="">All types</option>
-              {EXAM_TYPE_OPTIONS.map((type) => (
-                <option key={type} value={type}>
-                  {formatTypeLabel(type)}
-                </option>
-              ))}
-            </select>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as ExamStatus | '')}
-              className="h-9 w-32 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
-            >
-              <option value="">All statuses</option>
-              {EXAM_STATUS_OPTIONS.map((status) => (
-                <option key={status} value={status}>
-                  {formatTypeLabel(status)}
-                </option>
-              ))}
-            </select>
-            <Button icon={Plus} size="sm" onClick={openCreate} disabled={metaLoading}>
-              Create Exam
-            </Button>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <ClipboardList size={16} className="text-amber-600" />
+          <h2 className="text-sm font-bold text-slate-900">All Exams</h2>
+          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">{exams.length}</span>
         </div>
-
-        <div className="scrollbar-thin overflow-x-auto">
-          <table className="w-full min-w-[900px] text-left text-sm">
-            <thead>
-              <tr className="text-xs font-medium text-slate-500">
-                <th className="w-8 px-4 py-2.5" />
-                <th className="px-4 py-2.5">Title</th>
-                <th className="px-4 py-2.5">Class</th>
-                <th className="px-4 py-2.5">Type</th>
-                <th className="px-4 py-2.5">Start</th>
-                <th className="px-4 py-2.5">End</th>
-                <th className="px-4 py-2.5">Status</th>
-                <th className="px-4 py-2.5 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {loading || metaLoading ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-400">
-                    Loading…
-                  </td>
-                </tr>
-              ) : exams.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-400">
-                    No exams yet.
-                  </td>
-                </tr>
-              ) : (
-                exams.map((exam) => {
-                  const expanded = expandedIds.has(exam.id);
-                  const hasSubjects = exam.subjects.length > 0;
-                  return (
-                    <Fragment key={exam.id}>
-                      <tr className="text-slate-700">
-                        <td className="px-4 py-3">
-                          {hasSubjects && (
-                            <button
-                              type="button"
-                              onClick={() => toggleExpanded(exam.id)}
-                              aria-label={expanded ? 'Collapse' : 'Expand'}
-                              className="text-slate-400 hover:text-slate-600"
-                            >
-                              {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                            </button>
-                          )}
-                        </td>
-                        <td className="max-w-52 truncate px-4 py-3 font-semibold text-slate-900">{exam.title}</td>
-                        <td className="px-4 py-3">{exam.className}</td>
-                        <td className="px-4 py-3">
-                          <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
-                            {formatTypeLabel(exam.examType)}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">{new Date(exam.startDate).toLocaleDateString()}</td>
-                        <td className="px-4 py-3">{new Date(exam.endDate).toLocaleDateString()}</td>
-                        <td className="px-4 py-3">
-                          <ExamStatusBadge status={exam.status} />
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center justify-end gap-1">
-                            <IconButton icon={CalendarCog} label="Manage Subjects" variant="primary" onClick={() => openSubjects(exam)} />
-                            {/* <IconButton
-                              icon={HelpCircle}
-                              label="Manage Questions"
-                              variant="primary"
-                              disabled={!hasSubjects}
-                              onClick={() => router.push(`${basePath}/exams/${exam.id}/questions`)}
-                            /> */}
-                            <IconButton icon={Pencil} label="Edit" variant="primary" onClick={() => openEdit(exam)} />
-                            <IconButton
-                              icon={Trash2}
-                              label="Delete"
-                              variant="danger"
-                              loading={deletingId === exam.id}
-                              onClick={() => handleDelete(exam.id)}
-                            />
-                          </div>
-                        </td>
-                      </tr>
-                      {expanded && hasSubjects && (
-                        <tr>
-                          <td colSpan={8} className="bg-slate-50/60 px-4 py-3">
-                            <p className="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase">Subject Schedule</p>
-                            <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-                              {exam.subjects.map((sub) => (
-                                <div key={sub.id} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5">
-                                  <BookOpen size={15} className="shrink-0 text-amber-500" />
-                                  <div className="min-w-0">
-                                    <p className="truncate text-sm font-semibold text-slate-900">{sub.subjectName}</p>
-                                    <p className="truncate text-xs text-slate-400">
-                                      {new Date(sub.examDate).toLocaleDateString()} · {sub.totalMarks} marks · {sub.durationMinutes} min
-                                    </p>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </Fragment>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+        <div className="flex flex-wrap items-center gap-2">
+          <form onSubmit={handleSearch}>
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search exams…"
+              className="h-9 w-40 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+            />
+          </form>
+          <select
+            value={filterClassId}
+            onChange={(e) => setFilterClassId(e.target.value ? Number(e.target.value) : '')}
+            className="h-9 w-32 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+          >
+            <option value="">All classes</option>
+            {classes.map((cls) => (
+              <option key={cls.id} value={cls.id}>
+                {cls.className}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterExamType}
+            onChange={(e) => setFilterExamType(e.target.value as ExamType | '')}
+            className="h-9 w-36 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+          >
+            <option value="">All types</option>
+            {EXAM_TYPE_OPTIONS.map((type) => (
+              <option key={type} value={type}>
+                {formatTypeLabel(type)}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as ExamStatus | '')}
+            className="h-9 w-32 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+          >
+            <option value="">All statuses</option>
+            {EXAM_STATUS_OPTIONS.map((status) => (
+              <option key={status} value={status}>
+                {formatTypeLabel(status)}
+              </option>
+            ))}
+          </select>
+          <Button icon={Plus} size="sm" onClick={openCreate} disabled={metaLoading}>
+            Create Exam
+          </Button>
         </div>
       </div>
+
+      <DataTable
+        columns={examColumns}
+        data={exams}
+        rowKey={(exam) => exam.id}
+        loading={loading || metaLoading}
+        emptyTitle="No exams yet"
+        emptyDescription="Create the first exam to get started."
+        isRowExpanded={(exam) => expandedIds.has(exam.id) && exam.subjects.length > 0}
+        renderDetail={(exam) => (
+          <>
+            <p className="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase">Subject Schedule</p>
+            <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+              {exam.subjects.map((sub) => (
+                <div key={sub.id} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5">
+                  <BookOpen size={15} className="shrink-0 text-amber-500" />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-900">{sub.subjectName}</p>
+                    <p className="truncate text-xs text-slate-400">
+                      {new Date(sub.examDate).toLocaleDateString()} · {sub.totalMarks} marks · {sub.durationMinutes} min
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      />
     </div>
   );
 }

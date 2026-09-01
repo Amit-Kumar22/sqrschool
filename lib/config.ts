@@ -150,6 +150,14 @@ export const API_ENDPOINTS = {
     UPDATE: (id: number) => `/v1/subject/update/${id}`,
     DELETE: (id: number) => `/v1/subject/delete/${id}`,
   },
+  CLASS_SUBJECT: {
+    LIST: '/v1/class-subjects',
+    CREATE: '/v1/class-subjects',
+    GET: (id: number) => `/v1/class-subjects/${id}`,
+    UPDATE: (id: number) => `/v1/class-subjects/${id}`,
+    DELETE: (id: number) => `/v1/class-subjects/${id}`,
+    BULK_UPDATE: '/v1/class-subjects/bulk-update',
+  },
   FEE_STRUCTURE: {
     LIST: '/v1/fee-structures',
     CREATE: '/v1/fee-structures',

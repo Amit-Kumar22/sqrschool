@@ -293,3 +293,78 @@ export function ConcessionStatusBadge({ status }: { status: string }) {
     </span>
   );
 }
+
+// Only "LOW" is confirmed by the notice-board API spec's example body —
+// MEDIUM/HIGH are the expected remaining levels for a 3-tier priority scale,
+// same approach as DifficultyBadge above.
+const NOTICE_PRIORITY_STYLES: Record<string, string> = {
+  LOW: 'bg-slate-100 text-slate-600 ring-slate-200',
+  MEDIUM: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  HIGH: 'bg-red-50 text-red-700 ring-red-600/20',
+};
+
+/** Pill for a notice's priority — tinted by known level, neutral for anything else. */
+export function NoticePriorityBadge({ priority }: { priority: string }) {
+  const style = NOTICE_PRIORITY_STYLES[priority] ?? 'bg-slate-100 text-slate-600 ring-slate-200';
+  const label = priority
+    ? priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase()
+    : 'Unknown';
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${style}`}
+    >
+      {label}
+    </span>
+  );
+}
+
+// All four values are confirmed by the notice-board API spec's "Available
+// values" list.
+const NOTICE_STATUS_STYLES: Record<string, string> = {
+  DRAFT: 'bg-slate-100 text-slate-600 ring-slate-200',
+  PUBLISHED: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  EXPIRED: 'bg-red-50 text-red-700 ring-red-600/20',
+  ARCHIVED: 'bg-violet-50 text-violet-700 ring-violet-600/20',
+};
+
+/** Pill for a notice's lifecycle status — tinted by known stage, neutral for anything else. */
+export function NoticeStatusBadge({ status }: { status: string }) {
+  const style = NOTICE_STATUS_STYLES[status] ?? 'bg-slate-100 text-slate-600 ring-slate-200';
+  const label = status
+    ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
+    : 'Unknown';
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${style}`}
+    >
+      {label}
+    </span>
+  );
+}
+
+// All four values are confirmed by the exam-result API spec's "Available
+// values" list.
+const EXAM_RESULT_STATUS_STYLES: Record<string, string> = {
+  DRAFT: 'bg-slate-100 text-slate-600 ring-slate-200',
+  PUBLISHED: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  WITHHELD: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  CANCELLED: 'bg-red-50 text-red-700 ring-red-600/20',
+};
+
+/** Pill for one exam result's publication status — tinted by known stage, neutral for anything else. */
+export function ExamResultStatusBadge({ status }: { status: string }) {
+  const style = EXAM_RESULT_STATUS_STYLES[status] ?? 'bg-slate-100 text-slate-600 ring-slate-200';
+  const label = status
+    ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
+    : 'Unknown';
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${style}`}
+    >
+      {label}
+    </span>
+  );
+}

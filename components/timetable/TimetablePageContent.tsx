@@ -136,23 +136,21 @@ export default function TimetablePageContent() {
         </div>
       </div>
 
-      <div className="scrollbar-thin flex flex-wrap gap-2 overflow-x-auto">
-        {subjects.map((subject) => {
-          const color = subjectColor(subject.id);
-          const active = activeSubjectId === subject.id;
-          return (
-            <button
-              key={subject.id}
-              type="button"
-              onClick={() => setActiveSubjectId((prev) => (prev === subject.id ? null : subject.id))}
-              className={`h-8 shrink-0 rounded-full px-3.5 text-sm font-medium transition-colors ${
-                active ? 'border-2 border-slate-900 bg-white text-slate-900' : `border border-transparent ${color.bg} ${color.text} hover:opacity-80`
-              }`}
-            >
+      <div className="relative w-full sm:w-56">
+        <select
+          value={activeSubjectId ?? ''}
+          disabled={subjects.length === 0}
+          onChange={(e) => setActiveSubjectId(e.target.value ? Number(e.target.value) : null)}
+          className="h-9 w-full appearance-none rounded-full border border-amber-300 bg-white pr-9 pl-4 text-sm font-semibold text-slate-800 shadow-premium-sm transition-colors hover:border-amber-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/25 focus:outline-none disabled:opacity-50"
+        >
+          <option value="">All subjects</option>
+          {subjects.map((subject) => (
+            <option key={subject.id} value={subject.id}>
               {subject.subjectName}
-            </button>
-          );
-        })}
+            </option>
+          ))}
+        </select>
+        <ChevronDown size={14} className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-amber-500" />
       </div>
 
       {error && <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
@@ -263,13 +261,14 @@ export default function TimetablePageContent() {
         />
       )}
 
-      {assignTarget && (
+      {assignTarget && classId && (
         <AssignmentFormModal
           period={assignTarget.period}
           dayOfWeek={assignTarget.day}
           item={assignTarget.entry}
           subjects={subjects}
           teachers={teachers}
+          classId={Number(classId)}
           onClose={() => setAssignTarget(null)}
           onSaved={() => {
             setAssignTarget(null);

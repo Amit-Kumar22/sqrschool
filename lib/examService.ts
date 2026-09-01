@@ -173,6 +173,86 @@ export const clearExamSubjects = async (examId: number): Promise<void> => {
   await api.delete(API_ENDPOINTS.EXAM.SUBJECTS(examId));
 };
 
+// ─── Exam Result service ────────────────────────────────────────────────────
+// Dedicated service for the exam-result-controller endpoints — one row per
+// student per exam-subject, entered/published from the Results tab. Every
+// endpoint here returns/accepts the raw entity — no {result} envelope.
+
+// All four values are confirmed by the exam-result API spec's "Available
+// values" list.
+export type ExamResultStatus = 'DRAFT' | 'PUBLISHED' | 'WITHHELD' | 'CANCELLED';
+
+export interface ExamResult {
+  id: number;
+  examId: number;
+  examTitle: string;
+  examSubjectId: number;
+  subjectId: number;
+  subjectName: string;
+  studentId: number;
+  studentName: string;
+  totalMarks: number;
+  passingMarks: number;
+  obtainedMarks: number;
+  percentage: number;
+  grade: string;
+  absent: boolean;
+  passed: boolean;
+  remarks: string;
+  status: ExamResultStatus;
+}
+
+export interface ExamResultPayload {
+  examId: number;
+  examSubjectId: number;
+  studentId: number;
+  obtainedMarks: number;
+  absent: boolean;
+  remarks: string;
+  status: ExamResultStatus;
+}
+
+export interface ExamResultListParams {
+  examId?: number;
+  examSubjectId?: number;
+  studentId?: number;
+  classId?: number;
+  status?: ExamResultStatus;
+  absent?: boolean;
+  passed?: boolean;
+}
+
+/** Exam results, optionally filtered by exam/subject/student/class/status. Returns the raw array — no pagination/envelope. */
+export const getExamResults = async (params: ExamResultListParams = {}): Promise<ExamResult[]> => {
+  const response = await api.get<ExamResult[]>(API_ENDPOINTS.EXAM_RESULT.LIST, { params });
+  return response.data;
+};
+
+export const getExamResult = async (id: number): Promise<ExamResult> => {
+  const response = await api.get<ExamResult>(API_ENDPOINTS.EXAM_RESULT.GET(id));
+  return response.data;
+};
+
+export const createExamResult = async (data: ExamResultPayload): Promise<ExamResult> => {
+  const response = await api.post<ExamResult>(API_ENDPOINTS.EXAM_RESULT.CREATE, data);
+  return response.data;
+};
+
+export const updateExamResult = async (id: number, data: ExamResultPayload): Promise<ExamResult> => {
+  const response = await api.put<ExamResult>(API_ENDPOINTS.EXAM_RESULT.UPDATE(id), data);
+  return response.data;
+};
+
+export const deleteExamResult = async (id: number): Promise<void> => {
+  await api.delete(API_ENDPOINTS.EXAM_RESULT.DELETE(id));
+};
+
+/** Flips one result's publication state (DRAFT/PUBLISHED/WITHHELD/CANCELLED) without touching its marks. */
+export const updateExamResultStatus = async (id: number, status: ExamResultStatus): Promise<ExamResult> => {
+  const response = await api.put<ExamResult>(API_ENDPOINTS.EXAM_RESULT.UPDATE_STATUS(id), null, { params: { status } });
+  return response.data;
+};
+
 // ─── Question service ────────────────────────────────────────────────────────
 // Dedicated section for the question-controller endpoints — the question
 // bank an exam draws from. Every endpoint here returns/accepts the raw

@@ -17,6 +17,7 @@ export interface SchoolClass {
 
 export interface ClassPayload {
   className: string;
+  description: string;
 }
 
 export interface ClassPage {

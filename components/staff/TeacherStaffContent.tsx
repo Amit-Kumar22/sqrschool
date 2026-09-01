@@ -1,16 +1,19 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
-import { Plus, Search, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Eye, Plus, Search, X } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { getAllTeacherStaff, type TeacherStaffMember } from '@/lib/schoolService';
 import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
-import Button from '@/components/ui/Button';
+import Button, { IconButton } from '@/components/ui/Button';
 import StaffFormModal from '@/components/staff/StaffFormModal';
 
 export default function TeacherStaffContent() {
+  const router = useRouter();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [activeSearch, setActiveSearch] = useState('');
 
@@ -116,6 +119,24 @@ export default function TeacherStaffContent() {
       sortable: true,
       accessor: (item) => (item.active ? 1 : 0),
       render: (item) => <StatusBadge active={item.active} />,
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      align: 'right',
+      widthClassName: 'w-16',
+      render: (item) => (
+        <div className="flex items-center justify-end gap-1">
+          <IconButton
+            icon={Eye}
+            label="View details"
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push(`/principal/staff/${item.id}`);
+            }}
+          />
+        </div>
+      ),
     },
   ];
 

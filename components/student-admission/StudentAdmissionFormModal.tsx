@@ -3,32 +3,24 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { CheckCircle2, UserPlus } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
-import { createStudentAdmission, type NewAdmissionPayload, type StudentAddress } from '@/lib/studentService';
+import { createStudentAdmission, type NewAdmissionPayload } from '@/lib/studentService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
-import { getSections, type Section } from '@/lib/classSectionService';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { SelectField, TextField } from '@/components/ui/FormField';
 
-const emptyAddress: StudentAddress = {
-  buildingName: '',
-  streetName: '',
-  landmark: '',
-  district: '',
-  city: '',
-  pin: '',
-  stateName: '',
-};
-
 function emptyForm(): NewAdmissionPayload {
   return {
     name: '',
-    phone: '',
     fatherName: '',
     motherName: '',
-    password: '',
-    sectionId: 0,
-    address: { ...emptyAddress },
+    parentEmail: '',
+    parentPhone: '',
+    classId: 0,
+    dob: '',
+    address: '',
+    pincode: '',
+    gender: '',
   };
 }
 
@@ -44,24 +36,18 @@ export default function StudentAdmissionFormModal({
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const setField = (key: keyof Omit<NewAdmissionPayload, 'address'>, value: string | number) =>
-    setForm((f) => ({ ...f, [key]: value }) as NewAdmissionPayload);
-  const setAddressField = (key: keyof StudentAddress, value: string) =>
-    setForm((f) => ({ ...f, address: { ...f.address, [key]: value } }));
+  const setField = <K extends keyof NewAdmissionPayload>(key: K, value: NewAdmissionPayload[K]) =>
+    setForm((f) => ({ ...f, [key]: value }));
 
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [classesLoading, setClassesLoading] = useState(false);
-  const [classId, setClassId] = useState<number | ''>('');
-
-  const [sections, setSections] = useState<Section[]>([]);
-  const [sectionsLoading, setSectionsLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     setClassesLoading(true);
     getClasses()
       .then((page) => {
-        if (!cancelled) setClasses(page.content);
+        if (!cancelled) setClasses(page.content ?? []);
       })
       .catch(() => {
         if (!cancelled) setClasses([]);
@@ -74,42 +60,14 @@ export default function StudentAdmissionFormModal({
     };
   }, []);
 
-  // Sections are scoped to whichever class is selected.
-  useEffect(() => {
-    setField('sectionId', 0);
-    if (!classId) {
-      setSections([]);
-      return;
-    }
-    let cancelled = false;
-    setSectionsLoading(true);
-    getSections({ classId })
-      .then((result) => {
-        if (!cancelled) setSections(result.sections);
-      })
-      .catch(() => {
-        if (!cancelled) setSections([]);
-      })
-      .finally(() => {
-        if (!cancelled) setSectionsLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [classId]);
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.phone.trim() || !form.fatherName.trim() || !form.motherName.trim()) {
+    if (!form.name.trim() || !form.fatherName.trim() || !form.motherName.trim()) {
       setError('Please fill in all required student details.');
       return;
     }
-    if (!form.password.trim()) {
-      setError('Password is required.');
-      return;
-    }
-    if (!classId || !form.sectionId) {
-      setError('Please select a class and section.');
+    if (!form.classId) {
+      setError('Please select a class.');
       return;
     }
 
@@ -148,7 +106,7 @@ export default function StudentAdmissionFormModal({
     <Modal
       icon={UserPlus}
       title="Add student admission"
-      subtitle="Create a login and enroll a student into a class."
+      subtitle="Enroll a new student into a class."
       size="lg"
       onClose={onClose}
       footer={
@@ -165,21 +123,12 @@ export default function StudentAdmissionFormModal({
       <form id="student-admission-form" onSubmit={handleSubmit} className="grid gap-2.5">
         <div className="grid gap-2.5 sm:grid-cols-2">
           <TextField label="Student name" required value={form.name} onChange={(e) => setField('name', e.target.value)} />
-          <TextField label="Phone" required value={form.phone} onChange={(e) => setField('phone', e.target.value)} />
-        </div>
-
-        <div className="grid gap-2.5 sm:grid-cols-2">
-          <TextField label="Father's name" required value={form.fatherName} onChange={(e) => setField('fatherName', e.target.value)} />
-          <TextField label="Mother's name" required value={form.motherName} onChange={(e) => setField('motherName', e.target.value)} />
-        </div>
-
-        <div className="grid gap-2.5 sm:grid-cols-2">
           <SelectField
             label="Class"
             required
-            value={classId}
+            value={form.classId || ''}
             disabled={classesLoading || classes.length === 0}
-            onChange={(e) => setClassId(e.target.value ? Number(e.target.value) : '')}
+            onChange={(e) => setField('classId', e.target.value ? Number(e.target.value) : 0)}
           >
             <option value="" disabled>
               {classesLoading ? 'Loading…' : 'Select a class'}
@@ -190,48 +139,38 @@ export default function StudentAdmissionFormModal({
               </option>
             ))}
           </SelectField>
-          <SelectField
-            label="Section"
-            required
-            value={form.sectionId || ''}
-            disabled={!classId || sectionsLoading || sections.length === 0}
-            onChange={(e) => setField('sectionId', e.target.value ? Number(e.target.value) : 0)}
-          >
+        </div>
+
+        <div className="grid gap-2.5 sm:grid-cols-2">
+          <TextField label="Father's name" required value={form.fatherName} onChange={(e) => setField('fatherName', e.target.value)} />
+          <TextField label="Mother's name" required value={form.motherName} onChange={(e) => setField('motherName', e.target.value)} />
+        </div>
+
+        <div className="grid gap-2.5 sm:grid-cols-2">
+          <TextField
+            label="Parent email"
+            type="email"
+            value={form.parentEmail}
+            onChange={(e) => setField('parentEmail', e.target.value)}
+          />
+          <TextField label="Parent phone" value={form.parentPhone} onChange={(e) => setField('parentPhone', e.target.value)} />
+        </div>
+
+        <div className="grid gap-2.5 sm:grid-cols-2">
+          <TextField label="Date of birth" type="date" value={form.dob} onChange={(e) => setField('dob', e.target.value)} />
+          <SelectField label="Gender" value={form.gender} onChange={(e) => setField('gender', e.target.value)}>
             <option value="" disabled>
-              {!classId ? 'Select a class first' : sectionsLoading ? 'Loading…' : 'Select a section'}
+              Select gender
             </option>
-            {sections.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.sectionName}
-              </option>
-            ))}
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+            <option value="OTHER">Other</option>
           </SelectField>
         </div>
 
-        <TextField
-          label="Password"
-          type="password"
-          required
-          value={form.password}
-          onChange={(e) => setField('password', e.target.value)}
-        />
-
-        <p className="mt-1.5 text-xs font-semibold tracking-wide text-slate-400 uppercase">Address</p>
-
-        <div className="grid gap-2.5 sm:grid-cols-2">
-          <TextField label="Building name" value={form.address.buildingName} onChange={(e) => setAddressField('buildingName', e.target.value)} />
-          <TextField label="Street name" value={form.address.streetName} onChange={(e) => setAddressField('streetName', e.target.value)} />
-        </div>
-        <div className="grid gap-2.5 sm:grid-cols-2">
-          <TextField label="Landmark" value={form.address.landmark} onChange={(e) => setAddressField('landmark', e.target.value)} />
-          <TextField label="District" value={form.address.district} onChange={(e) => setAddressField('district', e.target.value)} />
-        </div>
-        <div className="grid gap-2.5 sm:grid-cols-2">
-          <TextField label="City" value={form.address.city} onChange={(e) => setAddressField('city', e.target.value)} />
-          <TextField label="State" value={form.address.stateName} onChange={(e) => setAddressField('stateName', e.target.value)} />
-        </div>
-        <div className="grid gap-2.5 sm:grid-cols-2">
-          <TextField label="Pin code" value={form.address.pin} onChange={(e) => setAddressField('pin', e.target.value)} />
+        <div className="grid gap-2.5 sm:grid-cols-[1fr_auto]">
+          <TextField label="Address" value={form.address} onChange={(e) => setField('address', e.target.value)} />
+          <TextField label="Pin code" value={form.pincode} onChange={(e) => setField('pincode', e.target.value)} />
         </div>
 
         {error && <div className="animate-fade-in-up rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>}

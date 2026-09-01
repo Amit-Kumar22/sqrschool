@@ -7,26 +7,6 @@ import type { SchoolClass } from './classService';
 // Dedicated service for the student-admissions-controller endpoints. Every
 // endpoint here returns/accepts the raw entity — no {result} envelope.
 
-export interface StudentAddress {
-  buildingName: string;
-  streetName: string;
-  landmark: string;
-  district: string;
-  city: string;
-  pin: string;
-  stateName: string;
-}
-
-export interface NewAdmissionPayload {
-  name: string;
-  phone: string;
-  fatherName: string;
-  motherName: string;
-  password: string;
-  sectionId: number;
-  address: StudentAddress;
-}
-
 export interface StudentUser {
   id: number;
   fullName: string;
@@ -43,11 +23,12 @@ export interface StudentSection {
   schoolClass: SchoolClass;
 }
 
-/** Lighter shape than SchoolClass — the admission list's nested class has no created/updated/active. */
+/** Lighter shape than SchoolClass — the admission list's nested class has no created/updated. */
 export interface AdmissionSchoolClass {
   id: number;
   className: string;
   description: string | null;
+  active: boolean;
 }
 
 export interface StudentAdmission {
@@ -108,13 +89,10 @@ export const getStudentAdmissions = async ({
   return response.data;
 };
 
-// The create response shape isn't documented — this call is fire-and-forget
-// from the caller's point of view, which then reloads the list.
-export const createStudentAdmission = async (data: NewAdmissionPayload): Promise<void> => {
-  await api.post(API_ENDPOINTS.STUDENT_ADMISSION.CREATE, data);
-};
-
-export interface UpdateStudentPayload {
+// New admission and update now share one DTO on the backend — no password/
+// section at creation time; class-section assignment is its own flow (see
+// Student Class Section service below).
+export interface StudentPayload {
   name: string;
   fatherName: string;
   motherName: string;
@@ -127,12 +105,38 @@ export interface UpdateStudentPayload {
   gender: string;
 }
 
+export type NewAdmissionPayload = StudentPayload;
+export type UpdateStudentPayload = StudentPayload;
+
+// The create response shape isn't documented — this call is fire-and-forget
+// from the caller's point of view, which then reloads the list.
+export const createStudentAdmission = async (data: NewAdmissionPayload): Promise<void> => {
+  await api.post(API_ENDPOINTS.STUDENT_ADMISSION.CREATE, data);
+};
+
 export const updateStudent = async (studentId: number, data: UpdateStudentPayload): Promise<void> => {
   await api.put(API_ENDPOINTS.STUDENT_ADMISSION.UPDATE(studentId), data);
 };
 
 export const deleteStudent = async (studentId: number): Promise<void> => {
   await api.put(API_ENDPOINTS.STUDENT_ADMISSION.DELETE(studentId));
+};
+
+// Bulk-imports students from a raw file (multipart/form-data, single `file`
+// field). `api`'s instance default sets Content-Type: application/json —
+// axios's transformRequest checks that against the current header and, if
+// it matches, JSON.stringifies a FormData body instead of sending it as
+// multipart (see defaults/index.js's isFormData branch), silently breaking
+// the upload. Clearing Content-Type per-request avoids that; the browser
+// then sets the correct multipart boundary itself. Response shape isn't
+// documented by the API spec.
+export const uploadStudentRawFile = async (file: File): Promise<unknown> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await api.post(API_ENDPOINTS.STUDENT_ADMISSION.RAW_FILE_UPLOAD, formData, {
+    headers: { 'Content-Type': undefined },
+  });
+  return response.data;
 };
 
 // ─── Student Class Section service ──────────────────────────────────────────

@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
+import { Eye, Pencil, Plus, Search, Trash2, Upload, X } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteStudent, getStudentAdmissions, type FeeStatus, type StudentAdmission } from '@/lib/studentService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
@@ -13,6 +13,7 @@ import Button, { IconButton } from '@/components/ui/Button';
 import { SelectField } from '@/components/ui/FormField';
 import StudentAdmissionFormModal from '@/components/student-admission/StudentAdmissionFormModal';
 import StudentEditFormModal from '@/components/student-admission/StudentEditFormModal';
+import StudentImportModal from '@/components/student-admission/StudentImportModal';
 
 const FEE_STATUS_OPTIONS: { value: FeeStatus; label: string }[] = [
   { value: 'PENDING', label: 'Pending' },
@@ -35,6 +36,7 @@ export default function StaffStudentAdmissionPage() {
   const [activeSearch, setActiveSearch] = useState('');
 
   const [formModalOpen, setFormModalOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<StudentAdmission | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
@@ -257,9 +259,14 @@ export default function StaffStudentAdmissionPage() {
           </form>
         </div>
 
-        <Button icon={Plus} onClick={() => setFormModalOpen(true)}>
-          Add student
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button icon={Upload} variant="secondary" onClick={() => setImportModalOpen(true)}>
+            Import students
+          </Button>
+          <Button icon={Plus} onClick={() => setFormModalOpen(true)}>
+            Add student
+          </Button>
+        </div>
       </div>
 
       {error && (
@@ -279,6 +286,16 @@ export default function StaffStudentAdmissionPage() {
 
       {formModalOpen && (
         <StudentAdmissionFormModal onClose={() => setFormModalOpen(false)} onSaved={handleSaved} />
+      )}
+
+      {importModalOpen && (
+        <StudentImportModal
+          onClose={() => setImportModalOpen(false)}
+          onImported={async () => {
+            setImportModalOpen(false);
+            await loadStudents();
+          }}
+        />
       )}
 
       {editingStudent && (

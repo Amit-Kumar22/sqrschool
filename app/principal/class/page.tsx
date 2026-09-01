@@ -1,11 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { GraduationCap, Inbox, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteClass, getClasses, type SchoolClass } from '@/lib/classService';
 import SetPageTitle from '@/components/dashboard/SetPageTitle';
-import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
 import ClassFormModal from '@/components/class/ClassFormModal';
@@ -66,57 +65,6 @@ export default function StaffClassPage() {
     await loadItems();
   };
 
-  const columns: DataTableColumn<SchoolClass>[] = [
-    {
-      key: 'className',
-      header: 'Class',
-      sortable: true,
-      accessor: (item) => item.className,
-      render: (item) => <p className="font-semibold text-slate-900">{item.className}</p>,
-    },
-    {
-      key: 'description',
-      header: 'Description',
-      render: (item) => <span className="line-clamp-1 text-slate-600">{item.description || '—'}</span>,
-    },
-    {
-      key: 'status',
-      header: 'Status',
-      sortable: true,
-      accessor: (item) => (item.active ? 1 : 0),
-      render: (item) => <StatusBadge active={item.active} />,
-    },
-    {
-      key: 'actions',
-      header: 'Actions',
-      align: 'right',
-      widthClassName: 'w-20',
-      render: (item) => (
-        <div className="flex items-center justify-end gap-1">
-          <IconButton
-            icon={Pencil}
-            label="Edit"
-            variant="primary"
-            onClick={(e) => {
-              e.stopPropagation();
-              openEditModal(item);
-            }}
-          />
-          <IconButton
-            icon={Trash2}
-            label="Delete"
-            variant="danger"
-            loading={deletingId === item.id}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(item.id);
-            }}
-          />
-        </div>
-      ),
-    },
-  ];
-
   return (
     <div className="space-y-4">
       <SetPageTitle title="Class" />
@@ -133,14 +81,65 @@ export default function StaffClassPage() {
         </div>
       )}
 
-      <DataTable
-        columns={columns}
-        data={items}
-        rowKey={(item) => item.id}
-        loading={loading}
-        emptyTitle="No classes yet"
-        emptyDescription="Add the first class to get started."
-      />
+      {loading ? (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={`skeleton-${i}`} className="card-premium p-3">
+              <div className="flex items-center gap-2">
+                <div className="skeleton h-8 w-8 shrink-0 rounded-lg" />
+                <div className="skeleton h-4 w-2/3 rounded-md" />
+              </div>
+              <div className="skeleton mt-2 h-3 w-full rounded-md" />
+              <div className="skeleton mt-2.5 h-4 w-16 rounded-full" />
+            </div>
+          ))}
+        </div>
+      ) : items.length === 0 ? (
+        <div className="card-premium flex flex-col items-center gap-2 px-4 py-16 text-center">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-50 text-amber-700">
+            <Inbox size={20} />
+          </span>
+          <p className="text-sm font-semibold text-slate-900">No classes yet</p>
+          <p className="text-xs text-slate-500">Add the first class to get started.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {items.map((item) => (
+            <div
+              key={item.id}
+              className="card-premium group relative overflow-hidden p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-amber-lg"
+            >
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 to-amber-200 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-premium-sm transition-transform duration-300 group-hover:scale-110">
+                    <GraduationCap size={14} />
+                  </span>
+                  <p className="truncate text-sm font-semibold text-slate-900">{item.className}</p>
+                </div>
+                <div className="flex shrink-0 items-center gap-0.5">
+                  <IconButton icon={Pencil} label="Edit" variant="primary" size="sm" onClick={() => openEditModal(item)} />
+                  <IconButton
+                    icon={Trash2}
+                    label="Delete"
+                    variant="danger"
+                    size="sm"
+                    loading={deletingId === item.id}
+                    onClick={() => handleDelete(item.id)}
+                  />
+                </div>
+              </div>
+
+              <p className="mt-2 line-clamp-2 text-xs text-slate-500">{item.description || 'No description'}</p>
+
+              <div className="mt-2.5 border-t border-slate-100 pt-2">
+                <StatusBadge active={item.active} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {formModalOpen && (
         <ClassFormModal

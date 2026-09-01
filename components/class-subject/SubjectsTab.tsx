@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { BookOpen, Inbox, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteSubject, getSubjects, type Subject } from '@/lib/subjectService';
-import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import Button, { IconButton } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/FormField';
 import SubjectFormModal from '@/components/subject/SubjectFormModal';
@@ -67,52 +66,6 @@ export default function SubjectsTab() {
     await loadItems(nameFilter);
   };
 
-  const columns: DataTableColumn<Subject>[] = [
-    {
-      key: 'subjectName',
-      header: 'Subject',
-      sortable: true,
-      accessor: (item) => item.subjectName,
-      render: (item) => <p className="font-semibold text-slate-900">{item.subjectName}</p>,
-    },
-    {
-      key: 'subjectCode',
-      header: 'Code',
-      sortable: true,
-      accessor: (item) => item.subjectCode,
-      render: (item) => <span className="text-slate-600">{item.subjectCode}</span>,
-    },
-    {
-      key: 'actions',
-      header: 'Actions',
-      align: 'right',
-      widthClassName: 'w-20',
-      render: (item) => (
-        <div className="flex items-center justify-end gap-1">
-          <IconButton
-            icon={Pencil}
-            label="Edit"
-            variant="primary"
-            onClick={(e) => {
-              e.stopPropagation();
-              openEditModal(item);
-            }}
-          />
-          <IconButton
-            icon={Trash2}
-            label="Delete"
-            variant="danger"
-            loading={deletingId === item.id}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(item.id);
-            }}
-          />
-        </div>
-      ),
-    },
-  ];
-
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-end justify-between gap-2">
@@ -134,14 +87,64 @@ export default function SubjectsTab() {
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
       )}
 
-      <DataTable
-        columns={columns}
-        data={items}
-        rowKey={(item) => item.id}
-        loading={loading}
-        emptyTitle="No subjects yet"
-        emptyDescription="Add the first subject to get started."
-      />
+      {loading ? (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={`skeleton-${i}`} className="card-premium p-3">
+              <div className="flex items-center gap-2">
+                <div className="skeleton h-8 w-8 shrink-0 rounded-lg" />
+                <div className="skeleton h-4 w-2/3 rounded-md" />
+              </div>
+              <div className="skeleton mt-3 h-3 w-1/2 rounded-md" />
+            </div>
+          ))}
+        </div>
+      ) : items.length === 0 ? (
+        <div className="card-premium flex flex-col items-center gap-2 px-4 py-16 text-center">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-50 text-amber-700">
+            <Inbox size={20} />
+          </span>
+          <p className="text-sm font-semibold text-slate-900">No subjects yet</p>
+          <p className="text-xs text-slate-500">Add the first subject to get started.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {items.map((item) => (
+            <div
+              key={item.id}
+              className="card-premium group relative overflow-hidden p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-amber-lg"
+            >
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 to-amber-200 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-premium-sm transition-transform duration-300 group-hover:scale-110">
+                    <BookOpen size={14} />
+                  </span>
+                  <p className="truncate text-sm font-semibold text-slate-900">{item.subjectName}</p>
+                </div>
+                <div className="flex shrink-0 items-center gap-0.5">
+                  <IconButton icon={Pencil} label="Edit" variant="primary" size="sm" onClick={() => openEditModal(item)} />
+                  <IconButton
+                    icon={Trash2}
+                    label="Delete"
+                    variant="danger"
+                    size="sm"
+                    loading={deletingId === item.id}
+                    onClick={() => handleDelete(item.id)}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-2.5 border-t border-slate-100 pt-2">
+                <span className="rounded-md bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-slate-600">
+                  {item.subjectCode}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {formModalOpen && (
         <SubjectFormModal

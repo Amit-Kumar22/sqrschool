@@ -8,12 +8,12 @@ import { getClasses, type SchoolClass } from '@/lib/classService';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { FeeFrequencyBadge, FeeTypeBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
-import TabPill from '@/components/ui/TabPill';
+import { SelectField } from '@/components/ui/FormField';
 import FeeStructureFormModal from '@/components/fee/FeeStructureFormModal';
 
 const formatDate = (value: string) => (value ? new Date(value).toLocaleDateString() : '—');
 
-/** Fee structure management panel — one tab of the Fee Management page. Classes are browsed as pills rather than a dropdown since a school only has a handful. */
+/** Fee structure management panel — one tab of the Fee Management page. Classes are filtered via a dropdown. */
 export default function FeeStructurePageContent() {
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   // Starts true (not false) so the fee-structures effect below skips its
@@ -178,16 +178,26 @@ export default function FeeStructurePageContent() {
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="scrollbar-thin flex flex-wrap gap-1 overflow-x-auto">
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <SelectField
+          label="Class"
+          value={classFilter}
+          onChange={(e) => setClassFilter(e.target.value ? Number(e.target.value) : '')}
+          disabled={classesLoading || classes.length === 0}
+          wrapperClassName="w-44"
+        >
           {classesLoading && classes.length === 0 ? (
-            <span className="px-1 text-xs text-slate-400">Loading classes…</span>
+            <option value="">Loading classes…</option>
+          ) : classes.length === 0 ? (
+            <option value="">No classes</option>
           ) : (
             classes.map((cls) => (
-              <TabPill key={cls.id} label={cls.className} active={classFilter === cls.id} onClick={() => setClassFilter(cls.id)} />
+              <option key={cls.id} value={cls.id}>
+                {cls.className}
+              </option>
             ))
           )}
-        </div>
+        </SelectField>
         <Button icon={Plus} size="sm" onClick={openCreateModal} disabled={classesLoading || classes.length === 0}>
           Add Fee Structure
         </Button>

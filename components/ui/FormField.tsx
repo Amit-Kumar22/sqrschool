@@ -53,19 +53,35 @@ interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
   hint?: string;
   wrapperClassName?: string;
   children: ReactNode;
+  /** 'sm' shrinks height/padding/font for dense filter rows — defaults to the standard 'md' size used everywhere else. Named uiSize since the native <select> element already has its own `size` attribute (visible row count). */
+  uiSize?: 'sm' | 'md';
 }
 
-export function SelectField({ label, hint, required, wrapperClassName, className, children, ...rest }: SelectFieldProps) {
+const SELECT_SIZE_CLASSES: Record<'sm' | 'md', string> = {
+  sm: 'h-8 text-xs px-2.5 pr-7',
+  md: 'h-10 text-sm px-3 pr-9',
+};
+
+const SELECT_CHEVRON_CLASSES: Record<'sm' | 'md', string> = {
+  sm: 'right-2.5',
+  md: 'right-3',
+};
+
+export function SelectField({ label, hint, required, wrapperClassName, className, children, uiSize = 'md', ...rest }: SelectFieldProps) {
   return (
     <label className={`group block text-sm ${wrapperClassName ?? ''}`}>
       <FieldLabel label={label} required={required} />
       <div className="relative">
-        <select required={required} {...rest} className={`${inputBase} appearance-none px-3 pr-9 ${className ?? ''}`}>
+        <select
+          required={required}
+          {...rest}
+          className={`w-full appearance-none rounded-lg border border-slate-200 bg-white text-slate-700 shadow-premium-sm transition-all duration-200 hover:border-slate-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 disabled:shadow-none ${SELECT_SIZE_CLASSES[uiSize]} ${className ?? ''}`}
+        >
           {children}
         </select>
         <ChevronDown
-          size={15}
-          className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-amber-600"
+          size={uiSize === 'sm' ? 13 : 15}
+          className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-amber-600 ${SELECT_CHEVRON_CLASSES[uiSize]}`}
         />
       </div>
       <FieldHint hint={hint} />

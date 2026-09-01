@@ -35,6 +35,7 @@ export default function AssignmentFormModal({
   item,
   subjects = [],
   teachers = [],
+  classId,
   onClose,
   onSaved,
   onDeleted,
@@ -44,6 +45,8 @@ export default function AssignmentFormModal({
   item: WeeklyTimetableEntry | null;
   subjects: Subject[];
   teachers: TeacherStaffMember[];
+  /** Only teachers assigned to this class are offered — an unassigned teacher can't be scheduled for it. */
+  classId: number;
   onClose: () => void;
   onSaved: (item: WeeklyTimetableEntry) => void;
   onDeleted: (id: number) => void;
@@ -54,8 +57,16 @@ export default function AssignmentFormModal({
   const [error, setError] = useState('');
 
   const isEditing = !!item;
+  const classTeachers = teachers.filter((teacher) => teacher.assignedClasses.some((cls) => cls.id === classId));
+  // Narrowed to the chosen subject — a teacher assigned to this class but
+  // teaching a different subject can't be scheduled for this period.
+  const availableTeachers = form.subjectId ? classTeachers.filter((teacher) => teacher.subject?.id === form.subjectId) : [];
   const setField = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
+
+  // Changing the subject can invalidate the previously picked teacher (they
+  // may not teach the new subject), so the teacher selection resets with it.
+  const handleSubjectChange = (subjectId: number) => setForm((f) => ({ ...f, subjectId, teacherId: 0 }));
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -136,7 +147,7 @@ export default function AssignmentFormModal({
           required
           disabled={subjects.length === 0}
           value={form.subjectId || ''}
-          onChange={(e) => setField('subjectId', Number(e.target.value))}
+          onChange={(e) => handleSubjectChange(Number(e.target.value))}
         >
           <option value="" disabled>
             {subjects.length === 0 ? 'No subjects available' : 'Select a subject'}
@@ -151,16 +162,20 @@ export default function AssignmentFormModal({
         <SelectField
           label="Teacher"
           required
-          disabled={teachers.length === 0}
+          disabled={availableTeachers.length === 0}
           value={form.teacherId || ''}
           onChange={(e) => setField('teacherId', Number(e.target.value))}
         >
           <option value="" disabled>
-            {teachers.length === 0 ? 'No teachers available' : 'Select a teacher'}
+            {!form.subjectId
+              ? 'Select a subject first'
+              : availableTeachers.length === 0
+                ? 'No teachers for this subject in this class'
+                : 'Select a teacher'}
           </option>
-          {teachers.map((teacher) => (
+          {availableTeachers.map((teacher) => (
             <option key={teacher.id} value={teacher.id}>
-              {teacher.teacherUser.fullName}
+              {teacher.subject ? `${teacher.teacherUser.fullName} (${teacher.subject.subjectName})` : teacher.teacherUser.fullName}
             </option>
           ))}
         </SelectField>

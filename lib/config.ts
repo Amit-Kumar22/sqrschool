@@ -58,6 +58,7 @@ export const API_ENDPOINTS = {
     LIST: '/v1/student/all-student',
     UPDATE: (studentId: number) => `/v1/student/update-student/${studentId}`,
     DELETE: (studentId: number) => `/v1/student/delete-student/${studentId}`,
+    RAW_FILE_UPLOAD: '/v1/student/student-raw-file-upload',
   },
   STUDENT_CLASS_SECTION: {
     CREATE: '/v1/student-class-sections',
@@ -119,6 +120,19 @@ export const API_ENDPOINTS = {
     UPDATE: (id: number) => `/v1/exams/${id}`,
     DELETE: (id: number) => `/v1/exams/${id}`,
     SUBJECTS: (examId: number) => `/v1/exams/${examId}/subjects`,
+  },
+  // Unlike every other controller, this one isn't versioned under /v1 on the
+  // backend — its path is /api/exam-results, and BACKEND_API_BASE_URL above
+  // already ends in /api, so the route here is bare. This 404s until the
+  // controller is deployed on a given environment — that's a backend/deploy
+  // state issue, not a wrong path (confirmed: /v1/exam-results 404s too).
+  EXAM_RESULT: {
+    LIST: '/v1/exam-results',
+    CREATE: '/v1/exam-results',
+    GET: (id: number) => `/v1/exam-results/${id}`,
+    UPDATE: (id: number) => `/v1/exam-results/${id}`,
+    DELETE: (id: number) => `/v1/exam-results/${id}`,
+    UPDATE_STATUS: (id: number) => `/v1/exam-results/${id}/status`,
   },
   TEST_EXAM: {
     LIST: '/v1/test-exam',
@@ -193,6 +207,26 @@ export const API_ENDPOINTS = {
     CREATE: '/v1/weekly-timetables',
     UPDATE: (id: number) => `/v1/weekly-timetables/${id}`,
     DELETE: (id: number) => `/v1/weekly-timetables/${id}`,
+  },
+  NOTICE_BOARD: {
+    LIST: '/v1/notice-boards',
+    CREATE: '/v1/notice-boards',
+    GET: (id: number) => `/v1/notice-boards/${id}`,
+    UPDATE: (id: number) => `/v1/notice-boards/${id}`,
+    DELETE: (id: number) => `/v1/notice-boards/${id}`,
+  },
+  STAFF_PERMISSION: {
+    LIST: '/v1/staff-permissions',
+    ADD: '/v1/staff-permissions/add',
+    GET: (id: number) => `/v1/staff-permissions/${id}`,
+    UPDATE: '/v1/staff-permissions/update',
+  },
+  ACCESS_ATTRIBUTE: {
+    LIST: '/v1/access-attribute',
+    ADD: '/v1/access-attribute/add',
+    GET: (attributeId: number) => `/v1/access-attribute/${attributeId}`,
+    UPDATE: (attributeId: number) => `/v1/access-attribute/update/${attributeId}`,
+    DELETE: (attributeId: number) => `/v1/access-attribute/delete/${attributeId}`,
   },
   // Public/unauthenticated endpoints consumed by the marketing home page —
   // no session required, see lib/freeService.ts.

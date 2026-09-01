@@ -92,14 +92,21 @@ export const deleteSchool = async (id: number): Promise<void> => {
 // only create + list are exposed by the backend today, no update/delete.
 
 /** Roles assignable when adding a staff member from the school's Staff panel. */
-export type StaffRole = 'TEACHER' | 'STAFF';
+export type StaffRole = 'TEACHER' | 'STAFF' | 'ADMIN';
 
+// No longer takes a password — the backend generates one and returns it in
+// the create response (see AddStaffResponse below). classIds/subjectId are
+// teacher-specific (what TeacherStaffMember.assignedClasses/subject reflect
+// back) — sent as [] / 0 for non-TEACHER roles.
 export interface AddStaffPayload {
   name: string;
-  password: string;
-  role: StaffRole;
   email: string;
   phoneNumber: string;
+  qualification: string;
+  experienceYears: number;
+  role: StaffRole;
+  classIds: number[];
+  subjectId: number;
 }
 
 // Wrapped in {statusCode, success, message, result} — result is the plain

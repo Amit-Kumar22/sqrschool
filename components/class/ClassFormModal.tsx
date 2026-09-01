@@ -6,10 +6,10 @@ import { createClass, updateClass, type ClassPayload, type SchoolClass } from '@
 import { apiErrorMessage } from '@/lib/api';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import { TextField } from '@/components/ui/FormField';
+import { TextareaField, TextField } from '@/components/ui/FormField';
 
 function toFormState(item: SchoolClass | null): ClassPayload {
-  return { className: item?.className ?? '' };
+  return { className: item?.className ?? '', description: item?.description ?? '' };
 }
 
 export default function ClassFormModal({
@@ -72,6 +72,14 @@ export default function ClassFormModal({
           value={form.className}
           placeholder="e.g. Class 5"
           onChange={(e) => setField('className', e.target.value)}
+        />
+
+        <TextareaField
+          label="Description"
+          value={form.description}
+          placeholder="Optional notes about this class"
+          rows={2}
+          onChange={(e) => setField('description', e.target.value)}
         />
 
         {error && <div className="animate-fade-in-up rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>}

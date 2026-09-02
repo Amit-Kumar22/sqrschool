@@ -17,9 +17,13 @@ const TOP_TABS: { key: TopTab; label: string }[] = [
   { key: 'concessions', label: 'Concessions' },
 ];
 
+const isTopTab = (value?: string): value is TopTab => TOP_TABS.some((t) => t.key === value);
+
 /** Fee Management — class-wise fee structure, collection, reports & concessions. Dashboard is shown as a disabled tab until its API exists. */
-export default function FeeManagementPageContent() {
-  const [tab, setTab] = useState<TopTab>('structure');
+export default function FeeManagementPageContent({ initialTab }: { initialTab?: string }) {
+  // Lets the Collect Fee detail page's "Back" link (?tab=collect) land back
+  // on the tab it was opened from instead of always resetting to Fee Structure.
+  const [tab, setTab] = useState<TopTab>(isTopTab(initialTab) ? initialTab : 'structure');
 
   return (
     <div className="space-y-4">

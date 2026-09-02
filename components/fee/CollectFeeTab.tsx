@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { CircleDollarSign, History, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteStudentFee, getStudentFees, type StudentFee } from '@/lib/feeService';
@@ -8,7 +9,6 @@ import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { FeeTypeBadge, StudentFeeStatusBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
 import StudentPicker from './shared/StudentPicker';
-import RecordPaymentModal from './RecordPaymentModal';
 import GenerateFeeModal from './GenerateFeeModal';
 import FeePaymentsModal from './FeePaymentsModal';
 
@@ -16,6 +16,13 @@ const formatDate = (value: string) => (value ? new Date(value).toLocaleDateStrin
 const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
 export default function CollectFeeTab() {
+  const router = useRouter();
+  const pathname = usePathname();
+  // fee-structure lives under both /principal and /principal-2 — derive the
+  // active base path so the collect detail page opens under whichever role
+  // this tab is currently mounted in.
+  const basePath = pathname?.startsWith('/principal-2') ? '/principal-2' : '/principal';
+
   const [classId, setClassId] = useState<number | ''>('');
   const [studentId, setStudentId] = useState<number | ''>('');
   const [studentName, setStudentName] = useState('');
@@ -25,7 +32,6 @@ export default function CollectFeeTab() {
   const [error, setError] = useState('');
 
   const [generateModalOpen, setGenerateModalOpen] = useState(false);
-  const [payingItem, setPayingItem] = useState<StudentFee | null>(null);
   const [viewingItem, setViewingItem] = useState<StudentFee | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
@@ -117,16 +123,17 @@ export default function CollectFeeTab() {
       widthClassName: 'w-28',
       render: (item) => (
         <div className="flex items-center justify-end gap-1">
-          <IconButton
+          <Button
             icon={CircleDollarSign}
-            label="Collect payment"
-            variant="primary"
+            size="sm"
             disabled={item.status === 'PAID'}
             onClick={(e) => {
               e.stopPropagation();
-              setPayingItem(item);
+              router.push(`${basePath}/fee-structure/collect/${item.id}`);
             }}
-          />
+          >
+            Collect
+          </Button>
           <IconButton
             icon={History}
             label="Payment history"
@@ -198,17 +205,6 @@ export default function CollectFeeTab() {
           onClose={() => setGenerateModalOpen(false)}
           onSaved={async () => {
             setGenerateModalOpen(false);
-            await loadFees();
-          }}
-        />
-      )}
-
-      {payingItem && (
-        <RecordPaymentModal
-          fee={payingItem}
-          onClose={() => setPayingItem(null)}
-          onSaved={async () => {
-            setPayingItem(null);
             await loadFees();
           }}
         />

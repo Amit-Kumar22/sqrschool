@@ -228,6 +228,15 @@ export const API_ENDPOINTS = {
     UPDATE: (attributeId: number) => `/v1/access-attribute/update/${attributeId}`,
     DELETE: (attributeId: number) => `/v1/access-attribute/delete/${attributeId}`,
   },
+  CONVERSATION: {
+    LIST: '/v1/conversations',
+    GET: (id: number) => `/v1/conversations/${id}`,
+    CREATE_DIRECT: '/v1/conversations/direct',
+    CREATE_GROUP: '/v1/conversations/group',
+    MESSAGES: (id: number) => `/v1/conversations/${id}/messages`,
+    READ: (id: number) => `/v1/conversations/${id}/read`,
+    SEND_MESSAGE: '/v1/conversations/send-message',
+  },
   // Public/unauthenticated endpoints consumed by the marketing home page —
   // no session required, see lib/freeService.ts.
   FREE: {

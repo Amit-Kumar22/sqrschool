@@ -64,7 +64,7 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Time Table', href: '/principal/time-table', icon: CalendarClock });
     items.push({ label: 'Notice', href: '/principal/notice', icon: Megaphone });
     items.push({ label: 'Homework', href: '/principal/homework', icon: NotebookPen });
-    items.push({ label: 'Communication', href: '/principal/Communication', icon: MessageSquare });
+    items.push({ label: 'Communication', href: '/principal/communication', icon: MessageSquare });
     items.push({ label: 'Report', href: '/principal/report', icon: BarChart3 });
     items.push({ label: 'Role & Permission', href: '/principal/role-permission', icon: ShieldCheck });
     items.push({ label: 'Subject & Class', href: '/principal/subject-class', icon: Layers });
@@ -83,6 +83,11 @@ export function getNavItems(role: Role): NavItem[] {
   if (role === 'TEACHER') {
     items.push({ label: 'Homework', href: '/teacher/homework', icon: NotebookPen });
     items.push({ label: 'Holidays', href: '/teacher/holiday', icon: CalendarDays });
+    items.push({ label: 'Communication', href: '/teacher/communication', icon: MessageSquare });
+  }
+
+  if (role === 'STUDENT') {
+    items.push({ label: 'Communication', href: '/student/communication', icon: MessageSquare });
   }
 
   items.push({ label: 'My Profile', href: `/${base}/profile`, icon: UserCircle });

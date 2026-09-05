@@ -30,15 +30,25 @@ async function getConnectedClient(): Promise<StompClient> {
     const token = getAuthToken();
     const c = new Client({
       webSocketFactory: () => new SockJS(SOCKET_ENDPOINT) as unknown as WebSocket,
-      reconnectDelay: 5000,
+      // 0 = no auto-reconnect loop. SOCKET_ENDPOINT is an unconfirmed guess
+      // (see note above) — until it's verified against the real backend,
+      // auto-retrying would just hammer a 404'ing /info endpoint every few
+      // seconds forever. Bump this back up once the endpoint is confirmed.
+      reconnectDelay: 0,
       connectHeaders: token ? { Authorization: `Bearer ${token}` } : {},
     });
 
-    await new Promise<void>((resolve, reject) => {
-      c.onConnect = () => resolve();
-      c.onStompError = (frame) => reject(new Error(frame.headers?.message || 'STOMP connection error'));
-      c.activate();
-    });
+    try {
+      await new Promise<void>((resolve, reject) => {
+        c.onConnect = () => resolve();
+        c.onStompError = (frame) => reject(new Error(frame.headers?.message || 'STOMP connection error'));
+        c.onWebSocketError = () => reject(new Error('WebSocket connection failed'));
+        c.activate();
+      });
+    } catch (err) {
+      c.deactivate();
+      throw err;
+    }
 
     client = c;
     return c;

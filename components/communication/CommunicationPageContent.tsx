@@ -18,7 +18,6 @@ import {
 import { getStaffMembers, type StaffMember } from '@/lib/schoolService';
 import { disconnectSocket, subscribeToConversation } from '@/lib/socket';
 import SetPageTitle from '@/components/dashboard/SetPageTitle';
-import PageHeader from '@/components/ui/PageHeader';
 
 const formatRoleLabel = (role: string) =>
   role
@@ -50,6 +49,37 @@ function conversationSubtitle(conversation: Conversation, currentUserId?: number
   return other ? formatRoleLabel(other.role) : '';
 }
 
+// GET /v1/conversations doesn't expose a per-user unread count, so "read" is
+// tracked client-side: the timestamp of the newest message seen in each
+// conversation, per logged-in user, persisted to localStorage so it survives
+// a reload (but is local to this browser/device only — the PUT .../read
+// call still tells the backend too, for whenever it does track this).
+const LAST_READ_STORAGE_KEY = 'sqr.communication.lastRead';
+
+function loadLastReadMap(userId: number): Record<number, string> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(`${LAST_READ_STORAGE_KEY}.${userId}`);
+    return raw ? (JSON.parse(raw) as Record<number, string>) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveLastReadMap(userId: number, map: Record<number, string>): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(`${LAST_READ_STORAGE_KEY}.${userId}`, JSON.stringify(map));
+  } catch {
+    // Storage can throw (private mode, quota) — unread badges just won't persist across reloads.
+  }
+}
+
+function countUnread(messages: ChatMessage[], currentUserId?: number | null, lastRead?: string): number {
+  const lastReadTime = lastRead ? new Date(lastRead).getTime() : 0;
+  return messages.filter((m) => m.senderId !== currentUserId && new Date(m.createdAt).getTime() > lastReadTime).length;
+}
+
 /** Communication — conversation list + message thread, two-pane chat UI. */
 export default function CommunicationPageContent() {
   const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
@@ -60,6 +90,7 @@ export default function CommunicationPageContent() {
   const [conversationsError, setConversationsError] = useState('');
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [lastReadMap, setLastReadMap] = useState<Record<number, string>>({});
 
   const [searchQuery, setSearchQuery] = useState('');
   const [directoryResults, setDirectoryResults] = useState<StaffMember[]>([]);
@@ -79,8 +110,30 @@ export default function CommunicationPageContent() {
   }, []);
 
   useEffect(() => {
+    if (currentUser) setLastReadMap(loadLastReadMap(currentUser.id));
+  }, [currentUser]);
+
+  useEffect(() => {
     selectedIdRef.current = selectedId;
   }, [selectedId]);
+
+  // Marks a conversation read both locally (drives the unread badge,
+  // persisted per-user so it survives a reload) and on the backend.
+  const markRead = (conversationId: number, upToTimestamp?: string) => {
+    if (!currentUser) return;
+    const timestamp = upToTimestamp ?? new Date().toISOString();
+    setLastReadMap((prev) => {
+      if (prev[conversationId] && new Date(prev[conversationId]).getTime() >= new Date(timestamp).getTime()) {
+        return prev;
+      }
+      const next = { ...prev, [conversationId]: timestamp };
+      saveLastReadMap(currentUser.id, next);
+      return next;
+    });
+    markConversationRead(conversationId).catch(() => {
+      // Non-critical — read state failing to sync shouldn't block viewing the thread.
+    });
+  };
 
   // GET /v1/conversations doesn't return a last-message preview or unread
   // count, so each conversation's messages are fetched once here to derive
@@ -121,9 +174,9 @@ export default function CommunicationPageContent() {
 
   useEffect(() => {
     if (selectedId == null) return;
-    markConversationRead(selectedId).catch(() => {
-      // Non-critical — read state failing to sync shouldn't block viewing the thread.
-    });
+    const msgs = messagesByConversation[selectedId];
+    markRead(selectedId, msgs?.[msgs.length - 1]?.createdAt);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
 
   useEffect(() => {
@@ -158,9 +211,7 @@ export default function CommunicationPageContent() {
         });
 
         if (message.conversationId === selectedIdRef.current) {
-          markConversationRead(message.conversationId).catch(() => {
-            // Non-critical, same as the open-on-select read call above.
-          });
+          markRead(message.conversationId, message.createdAt);
         }
       })
         .then((unsubscribe) => {
@@ -180,6 +231,12 @@ export default function CommunicationPageContent() {
     return () => {
       cancelled = true;
     };
+    // Deliberately keyed only on `conversations` — subscribing again on every
+    // markRead/currentUser identity change would tear down and reopen every
+    // conversation's socket for no reason; the handler always reads the
+    // latest markRead via closure since this effect reruns whenever the
+    // conversation list itself changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations]);
 
   useEffect(() => {
@@ -378,6 +435,7 @@ export default function CommunicationPageContent() {
                   const msgs = messagesByConversation[conversation.id] ?? [];
                   const last = msgs[msgs.length - 1];
                   const isSelected = conversation.id === selectedId;
+                  const unread = isSelected ? 0 : countUnread(msgs, currentUser?.id, lastReadMap[conversation.id]);
                   return (
                     <button
                       key={conversation.id}
@@ -396,9 +454,18 @@ export default function CommunicationPageContent() {
                           <p className="truncate text-sm font-semibold text-slate-900">{conversation.name}</p>
                           {last && <span className="shrink-0 text-[11px] text-slate-400">{formatTime(last.createdAt)}</span>}
                         </div>
-                        <p className="truncate text-xs text-slate-500">
-                          {last ? last.content : conversationSubtitle(conversation, currentUser?.id)}
-                        </p>
+                        <div className="flex items-center justify-between gap-2">
+                          <p
+                            className={`truncate text-xs ${unread > 0 ? 'font-medium text-slate-700' : 'text-slate-500'}`}
+                          >
+                            {last ? last.content : conversationSubtitle(conversation, currentUser?.id)}
+                          </p>
+                          {unread > 0 && (
+                            <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-amber-600 px-1.5 text-[10px] font-semibold text-white">
+                              {unread > 99 ? '99+' : unread}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </button>
                   );
@@ -472,7 +539,7 @@ export default function CommunicationPageContent() {
                 {selectedMessages.map((message) => {
                   const isMine = message.senderId === currentUser?.id;
                   return (
-                    <div key={message.clientMessageId} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+                    <div key={message.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                       <div
                         className={`max-w-[70%] rounded-2xl px-3.5 py-2 text-sm shadow-premium-sm ${
                           isMine

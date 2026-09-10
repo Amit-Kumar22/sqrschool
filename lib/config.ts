@@ -36,6 +36,10 @@ export const API_ENDPOINTS = {
     UPDATE: (id: number) => `/v1/school/${id}`,
     DELETE: (id: number) => `/v1/school/${id}`,
     DETAIL: (schoolId: number) => `/v1/school/detail/${schoolId}`,
+    // Sets the school's GPS geofence (center point + allowed radius) used to
+    // gate attendance check-in/out — a separate endpoint from the main
+    // school record update above.
+    COORDINATE: (id: number) => `/v1/school/${id}/cordinate`,
   },
   ADMIN: {
     ADD_STAFF: '/v1/admin/add-staff',
@@ -80,6 +84,7 @@ export const API_ENDPOINTS = {
     // Same path serves both GET (fetch current values) and POST (update).
     UPDATE: (id: number) => `/v1/class/update/${id}`,
     DELETE: (id: number) => `/v1/class/delete/${id}`,
+    ASSIGN_TEACHER: (classId: number) => `/v1/class/assign-teacher/${classId}`,
   },
   CLASS_SECTION: {
     SAVE: '/v1/class/section/save',
@@ -329,5 +334,15 @@ export const API_ENDPOINTS = {
     GET: (id: number) => `/v1/website-floating-setting/${id}`,
     UPDATE: (id: number) => `/v1/website-floating-setting/${id}`,
     DELETE: (id: number) => `/v1/website-floating-setting/${id}`,
+  },
+  // Unlike every other controller, these paths literally start with
+  // /v1/api/... on top of BACKEND_API_BASE_URL already ending in /api
+  // (same kind of backend quirk as EXAM_RESULT above) — confirmed against
+  // the API spec, kept as given rather than "corrected".
+  ATTENDANCE: {
+    ALL_STUDENTS_BY_CLASS_TEACHER: '/v1/api/attendance/all-student-by-class-teacher',
+    STUDENT_CHECK_IN: '/v1/api/attendance/student-check-in',
+    TEACHER_CHECK_IN: '/v1/api/attendance/teacher-check-in',
+    CHECK_OUT: '/v1/api/attendance/check-out',
   },
 } as const;

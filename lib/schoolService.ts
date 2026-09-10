@@ -38,6 +38,12 @@ export interface School {
   totalTeachers: number;
   address: SchoolAddress;
   active: boolean;
+  // Not part of the create/update payload — only ever set through
+  // updateSchoolCoordinates below. Optional since most detail responses
+  // won't include them until a geofence has actually been saved.
+  latitude?: number;
+  longitude?: number;
+  allowedRadiusMeters?: number;
 }
 
 export type SchoolPayload = Omit<School, 'id' | 'created' | 'updated' | 'active'>;
@@ -85,6 +91,18 @@ export const updateSchool = async (id: number, data: SchoolPayload): Promise<Sch
 
 export const deleteSchool = async (id: number): Promise<void> => {
   await api.delete(API_ENDPOINTS.SCHOOL.DELETE(id));
+};
+
+export interface SchoolCoordinatePayload {
+  latitude: number;
+  longitude: number;
+  allowedRadiusMeters: number;
+}
+
+/** Sets the school's attendance geofence (center point + allowed radius). Returns the raw updated entity — no envelope. */
+export const updateSchoolCoordinates = async (id: number, data: SchoolCoordinatePayload): Promise<School> => {
+  const response = await api.put<School>(API_ENDPOINTS.SCHOOL.COORDINATE(id), data);
+  return response.data;
 };
 
 // ─── Staff (Super Admin User APIs) ──────────────────────────────────────────

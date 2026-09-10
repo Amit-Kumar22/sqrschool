@@ -7,6 +7,7 @@ import { apiErrorMessage } from '@/lib/api';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { TextField } from '@/components/ui/FormField';
+import SchoolLocationSection from '@/components/school/SchoolLocationSection';
 
 const EMPTY_ADDRESS: SchoolAddress = {
   buildingName: '',
@@ -148,7 +149,7 @@ export default function SchoolFormModal({
           />
         </FieldGroup>
 
-        <FieldGroup title="Address" last>
+        <FieldGroup title="Address" last={!isEditing}>
           <TextField
             label="Building name"
             value={form.address.buildingName}
@@ -164,6 +165,14 @@ export default function SchoolFormModal({
 
         {error && <div className="mt-4 animate-fade-in-up rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>}
       </form>
+
+      {/* Coordinates are set through their own PUT /v1/school/{id}/cordinate call — kept
+          outside the form above so it can save independently of "Save changes". */}
+      {isEditing && (
+        <div className="mt-5 border-t border-slate-100 pt-4">
+          <SchoolLocationSection school={school!} />
+        </div>
+      )}
     </Modal>
   );
 }

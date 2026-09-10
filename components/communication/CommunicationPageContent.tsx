@@ -335,7 +335,10 @@ export default function CommunicationPageContent() {
 
     // Optimistic bubble so the send feels instant; reconciled with the
     // server's copy (or rolled back) once the request settles.
-    const clientMessageId = crypto.randomUUID();
+    // crypto.randomUUID() is only defined in secure contexts (HTTPS or
+    // localhost) — this app is also served over plain HTTP in production, so
+    // a manual id is used instead of a Web Crypto call that would throw there.
+    const clientMessageId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const optimisticMessage: ChatMessage = {
       id: -Date.now(),
       clientMessageId,

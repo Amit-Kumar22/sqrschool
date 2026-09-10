@@ -68,3 +68,14 @@ export const updateClass = async (id: number, data: ClassPayload): Promise<Schoo
 export const deleteClass = async (id: number): Promise<void> => {
   await api.delete(API_ENDPOINTS.CLASS.DELETE(id));
 };
+
+/**
+ * Assigns a class teacher. classId is embedded in the URL (as the spec's
+ * `{classId}` denotes) but is also sent as a query param alongside
+ * teacherId, matching the endpoint's documented parameter list exactly.
+ * teacherId is the teacher-record id (TeacherStaffMember.id), same
+ * convention as every other teacher assignment in this app.
+ */
+export const assignClassTeacher = async (classId: number, teacherId: number): Promise<void> => {
+  await api.put(API_ENDPOINTS.CLASS.ASSIGN_TEACHER(classId), null, { params: { classId, teacherId } });
+};

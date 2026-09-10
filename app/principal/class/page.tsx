@@ -1,13 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { GraduationCap, Inbox, Pencil, Plus, Trash2 } from 'lucide-react';
+import { GraduationCap, Inbox, Pencil, Plus, Trash2, UserCog } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteClass, getClasses, type SchoolClass } from '@/lib/classService';
+import { getAllTeacherStaff, type TeacherStaffMember } from '@/lib/schoolService';
 import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import { StatusBadge } from '@/components/ui/Badge';
 import Button, { IconButton } from '@/components/ui/Button';
 import ClassFormModal from '@/components/class/ClassFormModal';
+import AssignTeacherModal from '@/components/class/AssignTeacherModal';
 
 export default function StaffClassPage() {
   const [items, setItems] = useState<SchoolClass[]>([]);
@@ -17,6 +19,9 @@ export default function StaffClassPage() {
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<SchoolClass | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  const [teachers, setTeachers] = useState<TeacherStaffMember[]>([]);
+  const [assigningItem, setAssigningItem] = useState<SchoolClass | null>(null);
 
   const loadItems = async () => {
     setLoading(true);
@@ -31,9 +36,24 @@ export default function StaffClassPage() {
     }
   };
 
+  // Which class each teacher is the class teacher for isn't returned by the
+  // class list itself — it's only visible from the teacher side via
+  // assignedClasses, so it's fetched separately and looked up per card below.
+  const loadTeachers = async () => {
+    try {
+      const content = (await getAllTeacherStaff()).content;
+      setTeachers(content);
+    } catch {
+      // Non-fatal — the page still works without the "Class teacher" badges.
+    }
+  };
+
   useEffect(() => {
     loadItems();
+    loadTeachers();
   }, []);
+
+  const classTeacherFor = (classId: number) => teachers.find((t) => t.assignedClasses.some((c) => c.id === classId));
 
   const openCreateModal = () => {
     setEditingItem(null);
@@ -104,41 +124,60 @@ export default function StaffClassPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className="card-premium group relative overflow-hidden p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-amber-lg"
-            >
-              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 to-amber-200 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          {items.map((item) => {
+            const teacher = classTeacherFor(item.id);
+            return (
+              <div
+                key={item.id}
+                className="card-premium group relative overflow-hidden p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-amber-lg"
+              >
+                <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 to-amber-200 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex min-w-0 items-center gap-2">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-premium-sm transition-transform duration-300 group-hover:scale-110">
-                    <GraduationCap size={14} />
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-premium-sm transition-transform duration-300 group-hover:scale-110">
+                      <GraduationCap size={14} />
+                    </span>
+                    <p className="truncate text-sm font-semibold text-slate-900">{item.className}</p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-0.5">
+                    <IconButton icon={UserCog} label="Assign teacher" size="sm" onClick={() => setAssigningItem(item)} />
+                    <IconButton icon={Pencil} label="Edit" variant="primary" size="sm" onClick={() => openEditModal(item)} />
+                    <IconButton
+                      icon={Trash2}
+                      label="Delete"
+                      variant="danger"
+                      size="sm"
+                      loading={deletingId === item.id}
+                      onClick={() => handleDelete(item.id)}
+                    />
+                  </div>
+                </div>
+
+                <p className="mt-2 line-clamp-2 text-xs text-slate-500">{item.description || 'No description'}</p>
+
+                <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-slate-100 pt-2">
+                  <StatusBadge active={item.active} />
+                  <span className={`truncate text-xs ${teacher ? 'text-slate-600' : 'text-slate-400'}`}>
+                    {teacher ? teacher.teacherUser.fullName : 'No class teacher'}
                   </span>
-                  <p className="truncate text-sm font-semibold text-slate-900">{item.className}</p>
-                </div>
-                <div className="flex shrink-0 items-center gap-0.5">
-                  <IconButton icon={Pencil} label="Edit" variant="primary" size="sm" onClick={() => openEditModal(item)} />
-                  <IconButton
-                    icon={Trash2}
-                    label="Delete"
-                    variant="danger"
-                    size="sm"
-                    loading={deletingId === item.id}
-                    onClick={() => handleDelete(item.id)}
-                  />
                 </div>
               </div>
-
-              <p className="mt-2 line-clamp-2 text-xs text-slate-500">{item.description || 'No description'}</p>
-
-              <div className="mt-2.5 border-t border-slate-100 pt-2">
-                <StatusBadge active={item.active} />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
+      )}
+
+      {assigningItem && (
+        <AssignTeacherModal
+          schoolClass={assigningItem}
+          teachers={teachers}
+          onClose={() => setAssigningItem(null)}
+          onAssigned={() => {
+            setAssigningItem(null);
+            loadTeachers();
+          }}
+        />
       )}
 
       {formModalOpen && (

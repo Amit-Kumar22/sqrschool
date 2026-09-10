@@ -81,6 +81,7 @@ export function getNavItems(role: Role): NavItem[] {
   }
 
   if (role === 'TEACHER') {
+    items.push({ label: 'Attedance', href: '/teacher/attedance', icon: ClipboardCheck });
     items.push({ label: 'Homework', href: '/teacher/homework', icon: NotebookPen });
     items.push({ label: 'Holidays', href: '/teacher/holiday', icon: CalendarDays });
     items.push({ label: 'Communication', href: '/teacher/communication', icon: MessageSquare });

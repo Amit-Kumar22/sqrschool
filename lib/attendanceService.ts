@@ -31,14 +31,14 @@ export interface ClassTeacherStudentPage {
 }
 
 export interface ClassTeacherStudentParams {
-  /** The class teacher's email — whose class roster to fetch. */
-  reqEmail: string;
+  /** The class teacher's email — whose class roster to fetch. Omit to fetch every student across all classes. */
+  reqEmail?: string;
   page?: number;
   size?: number;
   sort?: string[];
 }
 
-/** Every student in the class taught by the class teacher matching reqEmail. Returns the raw Page shape — no envelope. */
+/** Students in the class taught by the class teacher matching reqEmail, or every student when reqEmail is omitted. Returns the raw Page shape — no envelope. */
 export const getStudentsByClassTeacher = async ({
   reqEmail,
   page = 0,
@@ -46,7 +46,7 @@ export const getStudentsByClassTeacher = async ({
   sort,
 }: ClassTeacherStudentParams): Promise<ClassTeacherStudentPage> => {
   const response = await api.get<ClassTeacherStudentPage>(API_ENDPOINTS.ATTENDANCE.ALL_STUDENTS_BY_CLASS_TEACHER, {
-    params: { reqEmail, page, size, sort },
+    params: { reqEmail: reqEmail || undefined, page, size, sort },
   });
   return response.data;
 };
@@ -75,4 +75,39 @@ export const checkInTeacher = async (coords: Coordinates): Promise<void> => {
 export const checkOut = async (coords: Coordinates): Promise<void> => {
   const body: AttendanceBody = { attendanceSource: 'GPS', ...coords };
   await api.post(API_ENDPOINTS.ATTENDANCE.CHECK_OUT, body);
+};
+
+export type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'HALF_DAY' | 'LATE' | 'HOLIDAY' | 'LOGOUT' | 'WEEKEND';
+
+/** A single day's attendance record. Carries `name` (not a user id) as the only link back to the person it belongs to. */
+export interface Attendance {
+  id: number;
+  name: string;
+  attendanceDate: string;
+  loginTime: string | null;
+  logoutTime: string | null;
+  totalWorkingMinutes: number | null;
+  minutesLate: number | null;
+  status: AttendanceStatus;
+  attendanceSource: AttendanceSource;
+  remarks: string | null;
+}
+
+interface AttendanceListResponse {
+  statusCode: number;
+  message: string;
+  result: Attendance[];
+}
+
+/**
+ * Every attendance record (teachers and students) for one calendar date
+ * (`YYYY-MM-DD`), admin-wide. There's no per-teacher filter on this
+ * endpoint or a user-id field on the record, so to build one teacher's
+ * history, call this per date and match rows where `name` equals that
+ * teacher's fullName. Wrapped in {statusCode, message, result} — confirmed
+ * against the live API, unlike the rest of this file's endpoints.
+ */
+export const getAttendanceByDate = async (date: string): Promise<Attendance[]> => {
+  const response = await api.get<AttendanceListResponse>(API_ENDPOINTS.ATTENDANCE.BY_DATE(date));
+  return response.data.result;
 };

@@ -344,5 +344,9 @@ export const API_ENDPOINTS = {
     STUDENT_CHECK_IN: '/v1/api/attendance/student-check-in',
     TEACHER_CHECK_IN: '/v1/api/attendance/teacher-check-in',
     CHECK_OUT: '/v1/api/attendance/check-out',
+    // Admin-wide — every attendance record (teachers and students) for one
+    // calendar date. No per-teacher filter, so callers match rows to a
+    // teacher by comparing `name` against the teacher's fullName.
+    BY_DATE: (date: string) => `/v1/api/attendance/date/${date}`,
   },
 } as const;

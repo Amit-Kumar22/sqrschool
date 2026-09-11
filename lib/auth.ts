@@ -4,7 +4,7 @@
 // proxy.ts (Next's server-side request hook) can read them and enforce
 // role-based routing before a page ever renders.
 
-export type Role = 'SUPERADMIN' | 'PRINCIPAL' | 'TEACHER' | 'STAFF' | 'STUDENT' | 'ADMIN';
+export type Role = 'SUPERADMIN' | 'PRINCIPAL' | 'TEACHER' | 'STAFF' | 'STUDENT' | 'ADMIN' | 'PARENT';
 
 // Backend quirk: principal accounts carry role "ADMIN" over the wire (both
 // /auth/login and /profile), not "PRINCIPAL". Routing, nav and ProtectedRoute
@@ -104,6 +104,7 @@ export function getDashboardByRole(role: string): string {
     case 'TEACHER'   : return '/teacher/dashboard';
     case 'STAFF'     : return '/staff/dashboard';
     case 'STUDENT'   : return '/student/dashboard';
+    case 'PARENT'    : return '/parent/dashboard';
     default          : return '/login';
   }
 }

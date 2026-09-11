@@ -349,4 +349,15 @@ export const API_ENDPOINTS = {
     // teacher by comparing `name` against the teacher's fullName.
     BY_DATE: (date: string) => `/v1/api/attendance/date/${date}`,
   },
+  DASHBOARD: {
+    ADMIN_ATTENDANCE_OVERVIEW: '/v1/admin/dashboard/attendance-overview',
+    ADMIN_CLASS_STATS: '/v1/admin/dashboard/class-stats',
+    ADMIN_FEE_OVERVIEW: '/v1/admin/dashboard/fee-overview',
+    ADMIN_RECENT_NOTICES: '/v1/admin/dashboard/recent-notices',
+    ADMIN_REVENUE_TREND: '/v1/admin/dashboard/revenue-trend',
+    ADMIN_SUMMARY: '/v1/admin/dashboard/summary',
+    TEACHER: '/v1/teacher/dashboard',
+    PARENT: '/v1/parent/dashboard',
+    STUDENT: '/v1/student/dashboard',
+  },
 } as const;

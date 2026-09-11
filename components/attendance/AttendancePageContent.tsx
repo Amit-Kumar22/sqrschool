@@ -273,7 +273,7 @@ export default function AttendancePageContent({ role }: { role: Role }) {
                         <p>{teacher.teacherUser.phone || '—'}</p>
                       </td>
                       <td className="px-4 py-2.5 text-right">
-                        <Button size="sm" variant="secondary" icon={History} onClick={() => router.push(`/principal/attedance/${teacher.id}`)}>
+                        <Button size="sm" variant="secondary" icon={History} onClick={() => router.push(`/principal/staff/${teacher.id}?tab=attendance`)}>
                           Attendance history
                         </Button>
                       </td>

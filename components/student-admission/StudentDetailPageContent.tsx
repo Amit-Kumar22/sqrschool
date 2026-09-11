@@ -3,17 +3,26 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, GraduationCap, Loader2, Pencil, Phone, Trash2, User, Users } from 'lucide-react';
+import { ArrowLeft, CalendarCheck, GraduationCap, IdCard, Loader2, Pencil, Phone, Trash2, User, Users } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteStudent, getStudentAdmissions, type StudentAdmission } from '@/lib/studentService';
 import { StatusBadge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import SegmentedTabs, { type SegmentedTabItem } from '@/components/ui/SegmentedTabs';
+import PersonAttendanceCalendar from '@/components/attendance/PersonAttendanceCalendar';
 import StudentEditFormModal from './StudentEditFormModal';
 
 const formatDate = (value?: string | null) => (value ? new Date(value).toLocaleDateString() : '—');
 
-export default function StudentDetailPageContent({ studentId }: { studentId: number }) {
+type DetailTab = 'details' | 'attendance';
+
+const TABS: SegmentedTabItem[] = [
+  { key: 'details', label: 'Details', icon: IdCard },
+  { key: 'attendance', label: 'Attendance', icon: CalendarCheck },
+];
+
+export default function StudentDetailPageContent({ studentId, initialTab }: { studentId: number; initialTab?: DetailTab }) {
   const router = useRouter();
   const backToList = () => router.push('/principal/student-admission');
 
@@ -22,6 +31,7 @@ export default function StudentDetailPageContent({ studentId }: { studentId: num
   const [error, setError] = useState('');
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [activeTab, setActiveTab] = useState<DetailTab>(initialTab ?? 'details');
 
   const load = async () => {
     setLoading(true);
@@ -119,33 +129,39 @@ export default function StudentDetailPageContent({ studentId }: { studentId: num
 
       {error && <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <DetailCard title="Admission" icon={GraduationCap} accent="from-sky-500 via-blue-400 to-sky-500" iconBg="bg-sky-50 text-sky-600">
-          <DetailRow label="Admission date" value={formatDate(student.admissionDate)} />
-          <DetailRow label="Class" value={student.schoolClass?.className} />
-          <DetailRow label="Roll number" value={student.rollNumber} />
-        </DetailCard>
+      <SegmentedTabs tabs={TABS} active={activeTab} onChange={(key) => setActiveTab(key as DetailTab)} />
 
-        <DetailCard title="Personal" icon={User} accent="from-amber-400 via-orange-400 to-amber-400" iconBg="bg-amber-50 text-amber-600">
-          <DetailRow label="Date of birth" value={formatDate(student.dob)} />
-          <DetailRow label="Gender" value={student.gender} />
-          <DetailRow label="Blood group" value={student.bloodGroup} />
-        </DetailCard>
+      {activeTab === 'details' && (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <DetailCard title="Admission" icon={GraduationCap} accent="from-sky-500 via-blue-400 to-sky-500" iconBg="bg-sky-50 text-sky-600">
+            <DetailRow label="Admission date" value={formatDate(student.admissionDate)} />
+            <DetailRow label="Class" value={student.schoolClass?.className} />
+            <DetailRow label="Roll number" value={student.rollNumber} />
+          </DetailCard>
 
-        <DetailCard title="Contact" icon={Phone} accent="from-emerald-500 via-teal-400 to-emerald-500" iconBg="bg-emerald-50 text-emerald-600">
-          <DetailRow label="Phone" value={student.studentUser?.phone} />
-          <DetailRow label="Email" value={student.studentUser?.email} full />
-          <DetailRow label="Address" value={student.address} full />
-          <DetailRow label="Pin code" value={student.pincode} />
-        </DetailCard>
+          <DetailCard title="Personal" icon={User} accent="from-amber-400 via-orange-400 to-amber-400" iconBg="bg-amber-50 text-amber-600">
+            <DetailRow label="Date of birth" value={formatDate(student.dob)} />
+            <DetailRow label="Gender" value={student.gender} />
+            <DetailRow label="Blood group" value={student.bloodGroup} />
+          </DetailCard>
 
-        <DetailCard title="Parents" icon={Users} accent="from-rose-500 via-red-400 to-rose-500" iconBg="bg-rose-50 text-rose-600">
-          <DetailRow label="Father's name" value={student.fatherName} />
-          <DetailRow label="Mother's name" value={student.motherName} />
-          <DetailRow label="Parent phone" value={student.parentUser?.phone} />
-          <DetailRow label="Parent email" value={student.parentUser?.email} full />
-        </DetailCard>
-      </div>
+          <DetailCard title="Contact" icon={Phone} accent="from-emerald-500 via-teal-400 to-emerald-500" iconBg="bg-emerald-50 text-emerald-600">
+            <DetailRow label="Phone" value={student.studentUser?.phone} />
+            <DetailRow label="Email" value={student.studentUser?.email} full />
+            <DetailRow label="Address" value={student.address} full />
+            <DetailRow label="Pin code" value={student.pincode} />
+          </DetailCard>
+
+          <DetailCard title="Parents" icon={Users} accent="from-rose-500 via-red-400 to-rose-500" iconBg="bg-rose-50 text-rose-600">
+            <DetailRow label="Father's name" value={student.fatherName} />
+            <DetailRow label="Mother's name" value={student.motherName} />
+            <DetailRow label="Parent phone" value={student.parentUser?.phone} />
+            <DetailRow label="Parent email" value={student.parentUser?.email} full />
+          </DetailCard>
+        </div>
+      )}
+
+      {activeTab === 'attendance' && <PersonAttendanceCalendar personName={student.studentUser?.fullName ?? ''} />}
 
       {editModalOpen && (
         <StudentEditFormModal

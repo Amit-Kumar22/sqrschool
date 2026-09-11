@@ -3,21 +3,31 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, BadgeCheck, GraduationCap, Layers, Loader2, Phone } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, CalendarCheck, GraduationCap, IdCard, Layers, Loader2, Phone } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { getAllTeacherStaff, type TeacherStaffMember } from '@/lib/schoolService';
 import { StatusBadge } from '@/components/ui/Badge';
+import SegmentedTabs, { type SegmentedTabItem } from '@/components/ui/SegmentedTabs';
+import PersonAttendanceCalendar from '@/components/attendance/PersonAttendanceCalendar';
 
 const formatDate = (value?: string | null) => (value ? new Date(value).toLocaleDateString() : '—');
 
-export default function TeacherDetailPageContent({ teacherId }: { teacherId: number }) {
+type DetailTab = 'details' | 'attendance';
+
+const TABS: SegmentedTabItem[] = [
+  { key: 'details', label: 'Details', icon: IdCard },
+  { key: 'attendance', label: 'Attendance', icon: CalendarCheck },
+];
+
+export default function TeacherDetailPageContent({ teacherId, initialTab }: { teacherId: number; initialTab?: DetailTab }) {
   const router = useRouter();
   const backToList = () => router.push('/principal/staff');
 
   const [teacher, setTeacher] = useState<TeacherStaffMember | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState<DetailTab>(initialTab ?? 'details');
 
   const load = async () => {
     setLoading(true);
@@ -93,42 +103,48 @@ export default function TeacherDetailPageContent({ teacherId }: { teacherId: num
 
       {error && <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <DetailCard title="Contact" icon={Phone} accent="from-emerald-500 via-teal-400 to-emerald-500" iconBg="bg-emerald-50 text-emerald-600">
-          <DetailRow label="Phone" value={teacher.teacherUser?.phone} />
-          <DetailRow label="Email" value={teacher.teacherUser?.email} full />
-        </DetailCard>
+      <SegmentedTabs tabs={TABS} active={activeTab} onChange={(key) => setActiveTab(key as DetailTab)} />
 
-        <DetailCard title="Teaching details" icon={GraduationCap} accent="from-sky-500 via-blue-400 to-sky-500" iconBg="bg-sky-50 text-sky-600">
-          <DetailRow label="Subject" value={teacher.subject?.subjectName} />
-          <DetailRow label="Employee code" value={teacher.employeeCode} />
-          <DetailRow label="Qualification" value={teacher.qualification} />
-          <DetailRow label="Experience" value={teacher.experienceYears != null ? `${teacher.experienceYears} yrs` : undefined} />
-        </DetailCard>
+      {activeTab === 'details' && (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <DetailCard title="Contact" icon={Phone} accent="from-emerald-500 via-teal-400 to-emerald-500" iconBg="bg-emerald-50 text-emerald-600">
+            <DetailRow label="Phone" value={teacher.teacherUser?.phone} />
+            <DetailRow label="Email" value={teacher.teacherUser?.email} full />
+          </DetailCard>
 
-        <DetailCard title="Account" icon={BadgeCheck} accent="from-violet-500 via-purple-400 to-violet-500" iconBg="bg-violet-50 text-violet-600">
-          <DetailRow label="Role" value={teacher.teacherUser?.role} />
-          <DetailRow label="Account status" value={teacher.teacherUser?.status} />
-          <DetailRow label="Joined" value={formatDate(teacher.teacherUser?.createdAt)} />
-        </DetailCard>
+          <DetailCard title="Teaching details" icon={GraduationCap} accent="from-sky-500 via-blue-400 to-sky-500" iconBg="bg-sky-50 text-sky-600">
+            <DetailRow label="Subject" value={teacher.subject?.subjectName} />
+            <DetailRow label="Employee code" value={teacher.employeeCode} />
+            <DetailRow label="Qualification" value={teacher.qualification} />
+            <DetailRow label="Experience" value={teacher.experienceYears != null ? `${teacher.experienceYears} yrs` : undefined} />
+          </DetailCard>
 
-        <DetailCard title="Assigned classes" icon={Layers} accent="from-rose-500 via-red-400 to-rose-500" iconBg="bg-rose-50 text-rose-600">
-          {teacher.assignedClasses?.length ? (
-            <div className="flex flex-wrap gap-1.5 sm:col-span-2">
-              {teacher.assignedClasses.map((cls) => (
-                <span
-                  key={cls.id}
-                  className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20"
-                >
-                  {cls.className}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-slate-400 sm:col-span-2">No classes assigned yet.</p>
-          )}
-        </DetailCard>
-      </div>
+          <DetailCard title="Account" icon={BadgeCheck} accent="from-violet-500 via-purple-400 to-violet-500" iconBg="bg-violet-50 text-violet-600">
+            <DetailRow label="Role" value={teacher.teacherUser?.role} />
+            <DetailRow label="Account status" value={teacher.teacherUser?.status} />
+            <DetailRow label="Joined" value={formatDate(teacher.teacherUser?.createdAt)} />
+          </DetailCard>
+
+          <DetailCard title="Assigned classes" icon={Layers} accent="from-rose-500 via-red-400 to-rose-500" iconBg="bg-rose-50 text-rose-600">
+            {teacher.assignedClasses?.length ? (
+              <div className="flex flex-wrap gap-1.5 sm:col-span-2">
+                {teacher.assignedClasses.map((cls) => (
+                  <span
+                    key={cls.id}
+                    className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20"
+                  >
+                    {cls.className}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400 sm:col-span-2">No classes assigned yet.</p>
+            )}
+          </DetailCard>
+        </div>
+      )}
+
+      {activeTab === 'attendance' && <PersonAttendanceCalendar personName={teacher.teacherUser?.fullName ?? ''} />}
     </div>
   );
 }

@@ -1,21 +1,53 @@
-import { CalendarCheck, FileText, ListTodo, Wallet } from 'lucide-react';
-import SetPageTitle from '@/components/dashboard/SetPageTitle';
-import StatCard from '@/components/dashboard/StatCard';
-import ComingSoonPanel from '@/components/dashboard/ComingSoonPanel';
+'use client';
 
-export default function StudentDashboard() {
+import { useEffect, useState } from 'react';
+import { Loader2 } from 'lucide-react';
+import SetPageTitle from '@/components/dashboard/SetPageTitle';
+import NoticeListPanel from '@/components/dashboard/NoticeListPanel';
+import StudentDashboardBody from '@/components/dashboard/StudentDashboardBody';
+import { getUser, type SessionUser } from '@/lib/auth';
+import { apiErrorMessage } from '@/lib/api';
+import { getStudentDashboard, type StudentDashboard } from '@/lib/dashboardService';
+
+export default function StudentDashboardPage() {
+  const [user, setUser] = useState<SessionUser | null>(null);
+  const [dashboard, setDashboard] = useState<StudentDashboard | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    setUser(getUser());
+    getStudentDashboard()
+      .then(setDashboard)
+      .catch((err) => setError(apiErrorMessage(err, 'Could not load your dashboard.')))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 size={28} className="animate-spin text-amber-700" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <SetPageTitle title="Student Dashboard" />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard index={0} icon={CalendarCheck} label="Attendance" value="—" />
-        <StatCard index={1} icon={FileText} label="Upcoming Exams" value="—" />
-        <StatCard index={2} icon={ListTodo} label="Assignments Due" value="—" />
-        <StatCard index={3} icon={Wallet} label="Fee Status" value="—" />
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+        <p className="text-sm text-slate-500">Welcome back{user?.fullName ? `, ${user.fullName}` : ''}! Here&apos;s what&apos;s happening today.</p>
       </div>
 
-      <ComingSoonPanel items={['Class timetable', 'Exam results', 'Homework & assignments', 'Fee payment']} />
+      {error && <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
+
+      {dashboard && (
+        <>
+          <StudentDashboardBody bundle={dashboard} />
+          <NoticeListPanel notices={dashboard.recentNotices ?? []} />
+        </>
+      )}
     </div>
   );
 }

@@ -1,12 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
-import { getAllTeacherStaff, type TeacherStaffMember } from '@/lib/schoolService';
 import { getAttendanceByDate, type Attendance, type AttendanceStatus } from '@/lib/attendanceService';
-import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import Modal from '@/components/ui/Modal';
 import { IconButton } from '@/components/ui/Button';
 
@@ -59,39 +56,18 @@ const todayInput = () => {
 };
 
 /**
- * One teacher's attendance as a month calendar — a dedicated page rather than
- * a modal since a month grid plus a day-detail popup doesn't fit comfortably
- * inside one dialog.
+ * Read-only month calendar of one person's attendance, embedded as a tab on
+ * that person's detail page (teacher or student) rather than a standalone
+ * route — both share this since the backend has no per-person filter.
  *
- * There's no backend endpoint that filters attendance by teacher — the only
+ * There's no backend endpoint that filters attendance by person — the only
  * reliable one (GET /attendance/date/{date}) returns every record for a
- * single day, school-wide, keyed by a plain `name` string rather than a
- * user id. So this fetches that endpoint once per day of the visible month
- * (in parallel) and keeps only the row whose name matches this teacher,
- * client-side. (The bulk /attendance/user-wise-all endpoint looked like a
- * better fit but returns an empty page even for dates with confirmed
- * records — not usable against the live backend.)
+ * single day, school-wide, keyed by a plain `name` string rather than a user
+ * id. So this fetches that endpoint once per day of the visible month (in
+ * parallel) and keeps only the row whose name matches this person,
+ * client-side.
  */
-export default function TeacherAttendanceCalendarPageContent({ teacherId }: { teacherId: number }) {
-  const router = useRouter();
-  const backToAttendance = () => router.push('/principal/attedance');
-
-  const [teacher, setTeacher] = useState<TeacherStaffMember | null>(null);
-  const [teacherLoading, setTeacherLoading] = useState(true);
-  const [teacherError, setTeacherError] = useState('');
-
-  useEffect(() => {
-    setTeacherLoading(true);
-    getAllTeacherStaff()
-      .then((page) => {
-        const found = (page.content ?? []).find((t) => t.id === teacherId);
-        setTeacher(found ?? null);
-        if (!found) setTeacherError('Teacher not found.');
-      })
-      .catch((err) => setTeacherError(apiErrorMessage(err, 'Could not load this teacher.')))
-      .finally(() => setTeacherLoading(false));
-  }, [teacherId]);
-
+export default function PersonAttendanceCalendar({ personName }: { personName: string }) {
   const now = new Date();
   const [viewYear, setViewYear] = useState(now.getFullYear());
   const [viewMonth, setViewMonth] = useState(now.getMonth());
@@ -101,7 +77,7 @@ export default function TeacherAttendanceCalendarPageContent({ teacherId }: { te
   const [error, setError] = useState('');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const teacherName = teacher?.teacherUser.fullName.trim().toLowerCase() ?? '';
+  const normalizedName = personName.trim().toLowerCase();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
   const monthDates = Array.from({ length: daysInMonth }, (_, i) => toDateInput(viewYear, viewMonth, i + 1));
@@ -109,7 +85,7 @@ export default function TeacherAttendanceCalendarPageContent({ teacherId }: { te
   const canGoNext = !(viewYear === now.getFullYear() && viewMonth === now.getMonth());
 
   useEffect(() => {
-    if (!teacher) return;
+    if (!normalizedName) return;
     let cancelled = false;
     setLoading(true);
     setError('');
@@ -118,7 +94,7 @@ export default function TeacherAttendanceCalendarPageContent({ teacherId }: { te
         if (cancelled) return;
         const byDate: Record<string, Attendance | null> = {};
         for (const [date, list] of results) {
-          byDate[date] = list.find((r) => r.name.trim().toLowerCase() === teacherName) ?? null;
+          byDate[date] = list.find((r) => r.name.trim().toLowerCase() === normalizedName) ?? null;
         }
         setRecords(byDate);
       })
@@ -132,7 +108,7 @@ export default function TeacherAttendanceCalendarPageContent({ teacherId }: { te
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teacher, viewYear, viewMonth]);
+  }, [normalizedName, viewYear, viewMonth]);
 
   const goPrevMonth = () => {
     if (viewMonth === 0) {
@@ -153,35 +129,10 @@ export default function TeacherAttendanceCalendarPageContent({ teacherId }: { te
     }
   };
 
-  if (teacherLoading) {
-    return (
-      <div className="flex items-center gap-2 text-sm text-slate-500">
-        <Loader2 size={16} className="animate-spin" /> Loading teacher…
-      </div>
-    );
-  }
-
-  if (!teacher) {
-    return (
-      <div className="space-y-4">
-        <BackButton onClick={backToAttendance} />
-        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{teacherError || 'Teacher not found.'}</div>
-      </div>
-    );
-  }
-
   const selectedRecord = selectedDate ? (records[selectedDate] ?? null) : null;
 
   return (
     <div className="space-y-4">
-      <SetPageTitle title="Attendance History" />
-      <BackButton onClick={backToAttendance} />
-
-      <div className="card-premium p-4">
-        <p className="text-sm font-semibold text-slate-900">{teacher.teacherUser.fullName}</p>
-        <p className="text-xs text-slate-500">{teacher.teacherUser.email}</p>
-      </div>
-
       <div className="card-premium overflow-hidden">
         <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-4 py-3">
           <p className="text-sm font-semibold text-slate-900">
@@ -292,13 +243,5 @@ export default function TeacherAttendanceCalendarPageContent({ teacherId }: { te
         </Modal>
       )}
     </div>
-  );
-}
-
-function BackButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button type="button" onClick={onClick} className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-amber-700">
-      <ArrowLeft size={15} /> Back to attendance
-    </button>
   );
 }

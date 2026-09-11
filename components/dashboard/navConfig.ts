@@ -59,7 +59,7 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Students', href: '/principal/student-admission', icon: UserPlus });
     items.push({ label: 'Teachers', href: '/principal/staff', icon: Users });
     items.push({ label: 'Classes', href: '/principal/class', icon: BookOpen });
-    items.push({ label: 'Attedance', href: '/principal/attedance', icon: ClipboardCheck });
+    // items.push({ label: 'Attedance', href: '/principal/attedance', icon: ClipboardCheck });
     items.push({ label: 'Fees', href: '/principal/fee-structure', icon: IndianRupee });
     items.push({ label: 'Time Table', href: '/principal/time-table', icon: CalendarClock });
     items.push({ label: 'Notice', href: '/principal/notice', icon: Megaphone });
@@ -103,4 +103,5 @@ export const ROLE_LABELS: Record<Role, string> = {
   STAFF: 'Staff',
   STUDENT: 'Student',
   ADMIN: "Admin",
+  PARENT: 'Parent',
 };

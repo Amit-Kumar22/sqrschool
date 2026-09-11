@@ -43,24 +43,19 @@ export default function StaffStudentAdmissionPage() {
   useEffect(() => {
     setClassesLoading(true);
     getClasses()
-      .then((page) => {
-        const content = page.content ?? [];
-        setClasses(content);
-        setClassFilter((prev) => prev || (content[0]?.id ?? ''));
-      })
+      .then((page) => setClasses(page.content ?? []))
       .catch(() => setClasses([]))
       .finally(() => setClassesLoading(false));
   }, []);
 
-  // classId is required by the backend — nothing loads until a class is selected.
+  // classFilter === '' means "All classes" — classId is omitted from the request entirely.
   const loadStudents = async () => {
-    if (!classFilter) return;
     setLoading(true);
     setError('');
     try {
       const content = (
         await getStudentAdmissions({
-          classId: classFilter,
+          classId: classFilter || undefined,
           feeStatus: feeStatusFilter || undefined,
           search: activeSearch || undefined,
         })
@@ -74,9 +69,12 @@ export default function StaffStudentAdmissionPage() {
   };
 
   useEffect(() => {
+    // Wait for the class list to resolve first, purely so the "All classes"
+    // dropdown isn't still showing "Loading…" while results are already in.
+    if (classesLoading) return;
     loadStudents();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [classFilter, feeStatusFilter, activeSearch]);
+  }, [classFilter, feeStatusFilter, activeSearch, classesLoading]);
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -198,15 +196,12 @@ export default function StaffStudentAdmissionPage() {
         <div className="flex flex-wrap items-end gap-2">
           <SelectField
             label="Class"
-            required
             wrapperClassName="w-40"
             value={classFilter}
-            disabled={classesLoading || classes.length === 0}
+            disabled={classesLoading}
             onChange={(e) => setClassFilter(e.target.value ? Number(e.target.value) : '')}
           >
-            <option value="" disabled>
-              {classesLoading ? 'Loading…' : 'Select a class'}
-            </option>
+            <option value="">{classesLoading ? 'Loading…' : 'All classes'}</option>
             {classes.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.className}

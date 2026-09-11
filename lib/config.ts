@@ -147,10 +147,14 @@ export const API_ENDPOINTS = {
     DELETE: (id: number) => `/v1/test-exam/${id}`,
   },
   HOME_WORK: {
-    LIST: '/v1/home-work',
     CREATE: '/v1/home-work',
     ADD_DAILY: '/v1/home-work/add-daily',
-    GET: (id: number) => `/v1/home-work/${id}`,
+    // Caller-scoped list for the Teacher panel — teacherId is still a query
+    // param here (unlike WEEKLY_TIMETABLE.TEACHER_LIST above), fetched from
+    // the profile endpoint by the caller.
+    TEACHER_LIST: '/v1/home-work/teacher',
+    // Cross-teacher list for the Principal/Admin panel, read-only.
+    ADMIN_LIST: '/v1/home-work/admin',
     DELETE: (id: number) => `/v1/home-work/${id}`,
   },
   QUESTION: {
@@ -212,6 +216,9 @@ export const API_ENDPOINTS = {
     CREATE: '/v1/weekly-timetables',
     UPDATE: (id: number) => `/v1/weekly-timetables/${id}`,
     DELETE: (id: number) => `/v1/weekly-timetables/${id}`,
+    // A teacher's own scoped schedule — teacherId isn't a param because the
+    // backend resolves it from the caller's auth token, not the query string.
+    TEACHER_LIST: '/v1/weekly-timetables/teacher',
   },
   NOTICE_BOARD: {
     LIST: '/v1/notice-boards',
@@ -344,10 +351,14 @@ export const API_ENDPOINTS = {
     STUDENT_CHECK_IN: '/v1/api/attendance/student-check-in',
     TEACHER_CHECK_IN: '/v1/api/attendance/teacher-check-in',
     CHECK_OUT: '/v1/api/attendance/check-out',
-    // Admin-wide — every attendance record (teachers and students) for one
-    // calendar date. No per-teacher filter, so callers match rows to a
-    // teacher by comparing `name` against the teacher's fullName.
-    BY_DATE: (date: string) => `/v1/api/attendance/date/${date}`,
+    // Paginated attendance history for one user (teacher or student),
+    // optionally bounded by a startDate/endDate range — the per-user
+    // replacement for the old admin-wide by-date lookup.
+    USER_ALL: (userId: number) => `/v1/api/attendance/user-all/${userId}`,
+    // Today's attendance record for one user, if any — drives the "already
+    // checked in" state for both a teacher's self check-in and a student's
+    // roster row.
+    USER_TODAY: (userId: number) => `/v1/api/attendance/user-today/user/${userId}`,
   },
   DASHBOARD: {
     ADMIN_ATTENDANCE_OVERVIEW: '/v1/admin/dashboard/attendance-overview',

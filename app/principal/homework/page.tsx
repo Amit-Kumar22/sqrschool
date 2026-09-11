@@ -1,5 +1,5 @@
-import HomeworkContent from '@/components/homework/HomeworkContent';
+import AdminHomeworkContent from '@/components/homework/AdminHomeworkContent';
 
-export default function StaffWebsiteSettingPage() {
-  return <HomeworkContent />;
+export default function PrincipalHomeworkPage() {
+  return <AdminHomeworkContent />;
 }

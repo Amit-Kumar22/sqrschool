@@ -1,4 +1,4 @@
-import { api } from './api';
+import { api, type ApiEnvelope } from './api';
 import { API_ENDPOINTS } from './config';
 
 // ─── Period service ──────────────────────────────────────────────────────────
@@ -153,4 +153,31 @@ export const updateWeeklyTimetableEntry = async (id: number, data: WeeklyTimetab
 
 export const deleteWeeklyTimetableEntry = async (id: number): Promise<void> => {
   await api.delete(API_ENDPOINTS.WEEKLY_TIMETABLE.DELETE(id));
+};
+
+// ─── Teacher-scoped weekly timetable ─────────────────────────────────────────
+// A read-only view of one teacher's own schedule — the backend resolves the
+// teacher from the auth token, so there's no teacherId param, only optional
+// narrowing by class/subject/day. Unlike the plain LIST above, this is
+// wrapped in the {statusCode, message, result} envelope.
+
+export interface TeacherWeeklyTimetableEntry extends WeeklyTimetableEntry {
+  /** Set when another teacher is also attached to this period (e.g. a co-taught or substituted slot); empty otherwise. */
+  otherTeacherName: string;
+}
+
+export interface TeacherWeeklyTimetableParams {
+  classId?: number;
+  subjectId?: number;
+  dayOfWeek?: DayOfWeek;
+}
+
+/** The logged-in teacher's own timetable entries, optionally narrowed. Unwraps the {result} envelope. */
+export const getTeacherWeeklyTimetable = async (
+  params: TeacherWeeklyTimetableParams = {},
+): Promise<TeacherWeeklyTimetableEntry[]> => {
+  const response = await api.get<ApiEnvelope<TeacherWeeklyTimetableEntry[]>>(API_ENDPOINTS.WEEKLY_TIMETABLE.TEACHER_LIST, {
+    params,
+  });
+  return response.data.result ?? [];
 };

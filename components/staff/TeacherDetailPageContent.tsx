@@ -144,7 +144,7 @@ export default function TeacherDetailPageContent({ teacherId, initialTab }: { te
         </div>
       )}
 
-      {activeTab === 'attendance' && <PersonAttendanceCalendar personName={teacher.teacherUser?.fullName ?? ''} />}
+      {activeTab === 'attendance' && <PersonAttendanceCalendar userId={teacher.teacherUser.id} />}
     </div>
   );
 }

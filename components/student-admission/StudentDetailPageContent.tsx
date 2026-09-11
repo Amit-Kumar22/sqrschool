@@ -161,7 +161,7 @@ export default function StudentDetailPageContent({ studentId, initialTab }: { st
         </div>
       )}
 
-      {activeTab === 'attendance' && <PersonAttendanceCalendar personName={student.studentUser?.fullName ?? ''} />}
+      {activeTab === 'attendance' && <PersonAttendanceCalendar userId={student.studentUser.id} />}
 
       {editModalOpen && (
         <StudentEditFormModal

@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
-import { getAttendanceByDate, type Attendance, type AttendanceStatus } from '@/lib/attendanceService';
+import { getUserAttendance, type Attendance } from '@/lib/attendanceService';
 import Modal from '@/components/ui/Modal';
 import { IconButton } from '@/components/ui/Button';
+import { STATUS_DOT, STATUS_STYLES, formatClockTime, formatEnumLabel } from './attendanceDisplay';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -13,40 +14,6 @@ const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
-
-const STATUS_DOT: Record<AttendanceStatus, string> = {
-  PRESENT: 'bg-emerald-500',
-  LATE: 'bg-amber-500',
-  HALF_DAY: 'bg-amber-500',
-  LOGOUT: 'bg-sky-500',
-  ABSENT: 'bg-red-500',
-  HOLIDAY: 'bg-slate-400',
-  WEEKEND: 'bg-slate-300',
-};
-
-const STATUS_STYLES: Record<AttendanceStatus, string> = {
-  PRESENT: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
-  LATE: 'bg-amber-50 text-amber-700 ring-amber-600/20',
-  HALF_DAY: 'bg-amber-50 text-amber-700 ring-amber-600/20',
-  LOGOUT: 'bg-sky-50 text-sky-700 ring-sky-600/20',
-  ABSENT: 'bg-red-50 text-red-700 ring-red-600/20',
-  HOLIDAY: 'bg-slate-100 text-slate-600 ring-slate-500/20',
-  WEEKEND: 'bg-slate-100 text-slate-600 ring-slate-500/20',
-};
-
-const formatEnumLabel = (value: string) =>
-  value
-    .toLowerCase()
-    .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-
-/** Backend sends a display-ready string like "10 September 2026 03:03 PM" — pull just the trailing time. */
-const formatTime = (value: string | null) => {
-  if (!value) return '—';
-  const match = value.match(/\d{1,2}:\d{2}\s*[AP]M$/i);
-  return match ? match[0] : value;
-};
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 const toDateInput = (y: number, m: number, d: number) => `${y}-${pad2(m + 1)}-${pad2(d)}`;
@@ -58,16 +25,9 @@ const todayInput = () => {
 /**
  * Read-only month calendar of one person's attendance, embedded as a tab on
  * that person's detail page (teacher or student) rather than a standalone
- * route — both share this since the backend has no per-person filter.
- *
- * There's no backend endpoint that filters attendance by person — the only
- * reliable one (GET /attendance/date/{date}) returns every record for a
- * single day, school-wide, keyed by a plain `name` string rather than a user
- * id. So this fetches that endpoint once per day of the visible month (in
- * parallel) and keeps only the row whose name matches this person,
- * client-side.
+ * route — both share this component, keyed by that person's own user id.
  */
-export default function PersonAttendanceCalendar({ personName }: { personName: string }) {
+export default function PersonAttendanceCalendar({ userId }: { userId: number }) {
   const now = new Date();
   const [viewYear, setViewYear] = useState(now.getFullYear());
   const [viewMonth, setViewMonth] = useState(now.getMonth());
@@ -77,7 +37,6 @@ export default function PersonAttendanceCalendar({ personName }: { personName: s
   const [error, setError] = useState('');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const normalizedName = personName.trim().toLowerCase();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
   const monthDates = Array.from({ length: daysInMonth }, (_, i) => toDateInput(viewYear, viewMonth, i + 1));
@@ -85,16 +44,21 @@ export default function PersonAttendanceCalendar({ personName }: { personName: s
   const canGoNext = !(viewYear === now.getFullYear() && viewMonth === now.getMonth());
 
   useEffect(() => {
-    if (!normalizedName) return;
+    if (!userId) return;
     let cancelled = false;
     setLoading(true);
     setError('');
-    Promise.all(monthDates.map((date) => getAttendanceByDate(date).then((list) => [date, list] as const)))
-      .then((results) => {
+    getUserAttendance({
+      userId,
+      startDate: monthDates[0],
+      endDate: monthDates[monthDates.length - 1],
+      size: daysInMonth,
+    })
+      .then((res) => {
         if (cancelled) return;
         const byDate: Record<string, Attendance | null> = {};
-        for (const [date, list] of results) {
-          byDate[date] = list.find((r) => r.name.trim().toLowerCase() === normalizedName) ?? null;
+        for (const record of res.content ?? []) {
+          byDate[record.attendanceDate] = record;
         }
         setRecords(byDate);
       })
@@ -108,7 +72,7 @@ export default function PersonAttendanceCalendar({ personName }: { personName: s
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [normalizedName, viewYear, viewMonth]);
+  }, [userId, viewYear, viewMonth]);
 
   const goPrevMonth = () => {
     if (viewMonth === 0) {
@@ -216,11 +180,11 @@ export default function PersonAttendanceCalendar({ personName }: { personName: s
               <dl className="grid grid-cols-2 gap-x-3 gap-y-2.5">
                 <div>
                   <dt className="text-xs text-slate-400">Login time</dt>
-                  <dd className="font-medium text-slate-800">{formatTime(selectedRecord.loginTime)}</dd>
+                  <dd className="font-medium text-slate-800">{formatClockTime(selectedRecord.loginTime)}</dd>
                 </div>
                 <div>
                   <dt className="text-xs text-slate-400">Logout time</dt>
-                  <dd className="font-medium text-slate-800">{formatTime(selectedRecord.logoutTime)}</dd>
+                  <dd className="font-medium text-slate-800">{formatClockTime(selectedRecord.logoutTime)}</dd>
                 </div>
                 <div>
                   <dt className="text-xs text-slate-400">Working minutes</dt>
@@ -232,7 +196,7 @@ export default function PersonAttendanceCalendar({ personName }: { personName: s
                 </div>
                 <div>
                   <dt className="text-xs text-slate-400">Source</dt>
-                  <dd className="font-medium text-slate-800">{selectedRecord.attendanceSource}</dd>
+                  <dd className="font-medium text-slate-800">{formatEnumLabel(selectedRecord.attendanceSource)}</dd>
                 </div>
               </dl>
               {selectedRecord.remarks && <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">{selectedRecord.remarks}</p>}

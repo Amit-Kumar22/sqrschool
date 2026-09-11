@@ -3,7 +3,7 @@
 import { FormEvent, useState } from 'react';
 import { CalendarDays, NotebookPen, Plus, Trash2 } from 'lucide-react';
 import { createHomework, type Homework, type HomeworkPayload } from '@/lib/homeworkService';
-import type { TeacherSubjectMapping } from '@/lib/teacherSubjectService';
+import { formatTime, type TeacherWeeklyTimetableEntry } from '@/lib/timetableService';
 import { apiErrorMessage } from '@/lib/api';
 import Modal from '@/components/ui/Modal';
 import Button, { IconButton } from '@/components/ui/Button';
@@ -16,37 +16,45 @@ interface NoteFormState {
 
 const todayIso = () => new Date().toISOString().slice(0, 10);
 
-const blankNote = (): NoteFormState => ({ homeworkDate: todayIso(), questionsText: '' });
+const blankNote = (date: string): NoteFormState => ({ homeworkDate: date, questionsText: '' });
+
+const dayLabel = (day: string) => (day ? day.charAt(0) + day.slice(1).toLowerCase() : '');
 
 export default function HomeworkFormModal({
-  assignments,
-  defaultTeacherClassId,
+  slots,
+  defaultWeeklyTimetableId,
   onClose,
   onSaved,
 }: {
-  assignments: TeacherSubjectMapping[];
-  defaultTeacherClassId: number | '';
+  slots: TeacherWeeklyTimetableEntry[];
+  defaultWeeklyTimetableId: number | '';
   onClose: () => void;
   onSaved: (item: Homework) => void;
 }) {
-  const [teacherClassId, setTeacherClassId] = useState<number | ''>(defaultTeacherClassId);
-  const [notes, setNotes] = useState<NoteFormState[]>([blankNote()]);
+  const [weeklyTimetableId, setWeeklyTimetableId] = useState<number | ''>(defaultWeeklyTimetableId);
+  const [homeworkDate, setHomeworkDate] = useState(todayIso());
+  const [dueDate, setDueDate] = useState(todayIso());
+  const [notes, setNotes] = useState<NoteFormState[]>([blankNote(todayIso())]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   const updateNote = (idx: number, patch: Partial<NoteFormState>) =>
     setNotes((prev) => prev.map((n, i) => (i === idx ? { ...n, ...patch } : n)));
-  const addNote = () => setNotes((prev) => [...prev, blankNote()]);
+  const addNote = () => setNotes((prev) => [...prev, blankNote(homeworkDate)]);
   const removeNote = (idx: number) => setNotes((prev) => prev.filter((_, i) => i !== idx));
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!teacherClassId) {
-      setError('Please select a class.');
+    if (!weeklyTimetableId) {
+      setError('Please select a class period.');
+      return;
+    }
+    if (!homeworkDate || !dueDate) {
+      setError('Please set both the homework date and the due date.');
       return;
     }
     if (notes.length === 0) {
-      setError('Add at least one homework date.');
+      setError('Add at least one homework entry.');
       return;
     }
     for (const note of notes) {
@@ -61,7 +69,9 @@ export default function HomeworkFormModal({
     }
 
     const payload: HomeworkPayload = {
-      teacherClassId: Number(teacherClassId),
+      weeklyTimetableId: Number(weeklyTimetableId),
+      homeworkDate,
+      dueDate,
       notes: notes.map((n) => ({
         homeworkDate: n.homeworkDate,
         questions: n.questionsText
@@ -87,7 +97,7 @@ export default function HomeworkFormModal({
     <Modal
       icon={NotebookPen}
       title="Add homework"
-      subtitle="Set homework for one of your assigned classes."
+      subtitle="Set homework for one of your scheduled class periods."
       size="lg"
       onClose={onClose}
       footer={
@@ -102,16 +112,42 @@ export default function HomeworkFormModal({
       }
     >
       <form id="homework-form" onSubmit={handleSubmit} className="grid gap-3.5">
-        <SelectField label="Class" required value={teacherClassId} onChange={(e) => setTeacherClassId(e.target.value ? Number(e.target.value) : '')}>
+        <SelectField
+          label="Class period"
+          required
+          disabled={slots.length === 0}
+          value={weeklyTimetableId}
+          onChange={(e) => setWeeklyTimetableId(e.target.value ? Number(e.target.value) : '')}
+        >
           <option value="" disabled>
-            Select a class
+            {slots.length === 0 ? 'No scheduled periods found' : 'Select a class period'}
           </option>
-          {assignments.map((assignment) => (
-            <option key={assignment.id} value={assignment.id}>
-              {assignment.subject.subjectName} — {assignment.section.schoolClass.className} {assignment.section.sectionName}
+          {slots.map((slot) => (
+            <option key={slot.id} value={slot.id}>
+              {slot.className} · {slot.subjectName} — {dayLabel(slot.dayOfWeek)}, {slot.periodName} (
+              {formatTime(slot.startTime)})
             </option>
           ))}
         </SelectField>
+
+        <div className="grid grid-cols-2 gap-3">
+          <TextField
+            label="Homework date"
+            icon={CalendarDays}
+            type="date"
+            required
+            value={homeworkDate}
+            onChange={(e) => setHomeworkDate(e.target.value)}
+          />
+          <TextField
+            label="Due date"
+            icon={CalendarDays}
+            type="date"
+            required
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+          />
+        </div>
 
         <div>
           <div className="mb-1.5 flex items-center justify-between">

@@ -24,8 +24,6 @@ export default function AddDailyNoteModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const { subject, section } = homework.teacherSubjectSection;
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const questions = questionsText
@@ -57,7 +55,7 @@ export default function AddDailyNoteModal({
     <Modal
       icon={CalendarPlus}
       title="Add daily note"
-      subtitle={`${subject.subjectName} — ${section.schoolClass.className} ${section.sectionName}`}
+      subtitle={`${homework.subjectName} — ${homework.className}`}
       size="sm"
       onClose={onClose}
       footer={

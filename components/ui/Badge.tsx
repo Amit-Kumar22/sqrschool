@@ -368,3 +368,25 @@ export function ExamResultStatusBadge({ status }: { status: string }) {
     </span>
   );
 }
+
+// Only "ACTIVE" is confirmed by the home-work API spec — unrecognized values
+// fall back to a neutral slate pill instead of breaking, same approach as
+// the other badges in this file.
+const HOMEWORK_NOTE_STATUS_STYLES: Record<string, string> = {
+  ACTIVE: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  INACTIVE: 'bg-slate-100 text-slate-600 ring-slate-200',
+};
+
+/** Pill for one homework note's lifecycle status — tinted by known state, neutral for anything else. */
+export function HomeworkNoteStatusBadge({ status }: { status: string }) {
+  const style = HOMEWORK_NOTE_STATUS_STYLES[status] ?? 'bg-slate-100 text-slate-600 ring-slate-200';
+  const label = status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : 'Unknown';
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${style}`}
+    >
+      {label}
+    </span>
+  );
+}

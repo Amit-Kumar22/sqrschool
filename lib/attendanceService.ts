@@ -5,12 +5,13 @@ import type { Coordinates } from './geo';
 
 // ─── Attendance service ──────────────────────────────────────────────────────
 // Dedicated service for the attendance-controller endpoints — the class
-// teacher's roster lookup plus GPS-based check-in/check-out for both
-// teachers and students. Every endpoint here returns/accepts the raw shape —
-// no {result} envelope.
+// teacher's roster lookup, GPS-based check-in/check-out for both teachers
+// and students, and per-user attendance history/today-status lookups. Most
+// endpoints return/accept the raw shape (no envelope); getUserTodayAttendance
+// is the one exception, wrapped in {statusCode, message, result}.
 
-/** Only "GPS" is documented today; kept as a union with a string fallback in case another source is added later. */
-export type AttendanceSource = 'GPS' | (string & {});
+/** "GPS" and "QR_CODE" are documented today; kept as a union with a string fallback in case another source is added later. */
+export type AttendanceSource = 'GPS' | 'QR_CODE' | (string & {});
 
 /** Same shape as RosterStudent (lib/studentService.ts) — the class-teacher roster reuses it verbatim. */
 export interface ClassTeacherStudent {
@@ -79,35 +80,78 @@ export const checkOut = async (coords: Coordinates): Promise<void> => {
 
 export type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'HALF_DAY' | 'LATE' | 'HOLIDAY' | 'LOGOUT' | 'WEEKEND';
 
-/** A single day's attendance record. Carries `name` (not a user id) as the only link back to the person it belongs to. */
+/** One day's attendance record for one user. */
 export interface Attendance {
   id: number;
+  created: string;
+  updated: string;
   name: string;
   attendanceDate: string;
   loginTime: string | null;
   logoutTime: string | null;
+  checkinScanLatitude: number | null;
+  checkinScanLongitude: number | null;
+  checkoutScanLatitude: number | null;
+  checkoutScanLongitude: number | null;
+  attendanceQRCode: string | null;
+  checkIndistanceFromOffice: string | null;
+  checkOutdistanceFromOffice: string | null;
   totalWorkingMinutes: number | null;
   minutesLate: number | null;
   status: AttendanceStatus;
   attendanceSource: AttendanceSource;
   remarks: string | null;
+  updateBy: string | null;
+  active: boolean;
 }
 
-interface AttendanceListResponse {
+export interface AttendancePage {
+  content: Attendance[];
+  totalElements: number;
+  totalPages: number;
+  pageNumber: number;
+  pageSize: number;
+  last: boolean;
+}
+
+export interface UserAttendanceParams {
+  userId: number;
+  /** Inclusive range bounds, `YYYY-MM-DD`. Omit either to leave that side open. */
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  size?: number;
+  sort?: string[];
+}
+
+/** One user's (teacher or student) attendance history, optionally bounded by a date range. Returns the raw Page shape — no envelope. */
+export const getUserAttendance = async ({
+  userId,
+  startDate,
+  endDate,
+  page = 0,
+  size = 31,
+  sort,
+}: UserAttendanceParams): Promise<AttendancePage> => {
+  const response = await api.get<AttendancePage>(API_ENDPOINTS.ATTENDANCE.USER_ALL(userId), {
+    params: { startDate, endDate, page, size, sort },
+  });
+  return response.data;
+};
+
+interface AttendanceResultResponse {
   statusCode: number;
   message: string;
-  result: Attendance[];
+  result: Attendance | null;
 }
 
-/**
- * Every attendance record (teachers and students) for one calendar date
- * (`YYYY-MM-DD`), admin-wide. There's no per-teacher filter on this
- * endpoint or a user-id field on the record, so to build one teacher's
- * history, call this per date and match rows where `name` equals that
- * teacher's fullName. Wrapped in {statusCode, message, result} — confirmed
- * against the live API, unlike the rest of this file's endpoints.
- */
-export const getAttendanceByDate = async (date: string): Promise<Attendance[]> => {
-  const response = await api.get<AttendanceListResponse>(API_ENDPOINTS.ATTENDANCE.BY_DATE(date));
-  return response.data.result;
+/** Today's attendance record for one user, or null if they haven't checked in yet today. */
+export const getUserTodayAttendance = async (userId: number): Promise<Attendance | null> => {
+  try {
+    const response = await api.get<AttendanceResultResponse>(API_ENDPOINTS.ATTENDANCE.USER_TODAY(userId));
+    return response.data.result ?? null;
+  } catch (err) {
+    if ((err as { response?: { status?: number } })?.response?.status === 404) return null;
+    throw err;
+  }
 };

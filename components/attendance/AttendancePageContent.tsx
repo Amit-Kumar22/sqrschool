@@ -10,6 +10,8 @@ import {
   checkInTeacher,
   checkOut,
   getStudentsByClassTeacher,
+  getUserTodayAttendance,
+  type Attendance,
   type ClassTeacherStudent,
 } from '@/lib/attendanceService';
 import { getCurrentPosition, type Coordinates } from '@/lib/geo';
@@ -18,6 +20,9 @@ import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import Button, { IconButton } from '@/components/ui/Button';
 import { SelectField } from '@/components/ui/FormField';
 import SegmentedTabs, { type SegmentedTabItem } from '@/components/ui/SegmentedTabs';
+import Modal from '@/components/ui/Modal';
+import PersonAttendanceCalendar from '@/components/attendance/PersonAttendanceCalendar';
+import { formatClockTime } from '@/components/attendance/attendanceDisplay';
 
 const PAGE_SIZE = 10;
 
@@ -79,15 +84,43 @@ export default function AttendancePageContent({ role }: { role: Role }) {
 
   const [checkedInIds, setCheckedInIds] = useState<Set<number>>(new Set());
   const [checkingInId, setCheckingInId] = useState<number | null>(null);
+  const [rosterStatusLoading, setRosterStatusLoading] = useState(false);
+  const [historyStudent, setHistoryStudent] = useState<ClassTeacherStudent | null>(null);
 
+  const [selfUserId, setSelfUserId] = useState<number | null>(null);
   const [selfStatus, setSelfStatus] = useState<'idle' | 'checked-in' | 'checked-out'>('idle');
   const [selfTime, setSelfTime] = useState('');
+  const [selfStatusLoading, setSelfStatusLoading] = useState(false);
   const [selfBusy, setSelfBusy] = useState<'in' | 'out' | null>(null);
   const [selfError, setSelfError] = useState('');
+  const [showSelfHistory, setShowSelfHistory] = useState(false);
+
+  /** Derives idle/checked-in/checked-out from a user-today attendance record (or its absence). */
+  const applySelfStatus = (record: Attendance | null) => {
+    if (record?.logoutTime) {
+      setSelfStatus('checked-out');
+      setSelfTime(formatClockTime(record.logoutTime));
+    } else if (record?.loginTime) {
+      setSelfStatus('checked-in');
+      setSelfTime(formatClockTime(record.loginTime));
+    } else {
+      setSelfStatus('idle');
+      setSelfTime('');
+    }
+  };
 
   useEffect(() => {
     if (isTeacher) {
-      setReqEmail(getUser()?.email ?? '');
+      const user = getUser();
+      setReqEmail(user?.email ?? '');
+      setSelfUserId(user?.id ?? null);
+      if (user?.id) {
+        setSelfStatusLoading(true);
+        getUserTodayAttendance(user.id)
+          .then(applySelfStatus)
+          .catch(() => {})
+          .finally(() => setSelfStatusLoading(false));
+      }
       return;
     }
     setTeachersLoading(true);
@@ -97,6 +130,32 @@ export default function AttendancePageContent({ role }: { role: Role }) {
       .finally(() => setTeachersLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTeacher]);
+
+  // Once the roster loads, resolve each student's real "checked in today"
+  // state from the backend rather than relying only on local state, which
+  // would otherwise forget prior check-ins across a page reload.
+  useEffect(() => {
+    if (!isTeacher || students.length === 0) return;
+    let cancelled = false;
+    setRosterStatusLoading(true);
+    Promise.all(students.map((student) => getUserTodayAttendance(student.id).catch(() => null)))
+      .then((records) => {
+        if (cancelled) return;
+        setCheckedInIds((prev) => {
+          const next = new Set(prev);
+          records.forEach((record, i) => {
+            if (record?.loginTime) next.add(students[i].id);
+          });
+          return next;
+        });
+      })
+      .finally(() => {
+        if (!cancelled) setRosterStatusLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isTeacher, students]);
 
   useEffect(() => {
     if (isTeacher && !reqEmail) {
@@ -146,8 +205,13 @@ export default function AttendancePageContent({ role }: { role: Role }) {
     }
     try {
       await checkInTeacher(coords);
-      setSelfStatus('checked-in');
-      setSelfTime(formatNow());
+      const userId = getUser()?.id;
+      if (userId) {
+        applySelfStatus(await getUserTodayAttendance(userId));
+      } else {
+        setSelfStatus('checked-in');
+        setSelfTime(formatNow());
+      }
     } catch (err) {
       setSelfError(apiErrorMessage(err, 'Check-in failed.'));
     } finally {
@@ -165,8 +229,13 @@ export default function AttendancePageContent({ role }: { role: Role }) {
     }
     try {
       await checkOut(coords);
-      setSelfStatus('checked-out');
-      setSelfTime(formatNow());
+      const userId = getUser()?.id;
+      if (userId) {
+        applySelfStatus(await getUserTodayAttendance(userId));
+      } else {
+        setSelfStatus('checked-out');
+        setSelfTime(formatNow());
+      }
     } catch (err) {
       setSelfError(apiErrorMessage(err, 'Check-out failed.'));
     } finally {
@@ -206,9 +275,10 @@ export default function AttendancePageContent({ role }: { role: Role }) {
               <div>
                 <p className="text-sm font-semibold text-slate-900">My attendance</p>
                 <p className="text-xs text-slate-500">
-                  {selfStatus === 'idle' && 'Not checked in yet today.'}
-                  {selfStatus === 'checked-in' && `Checked in at ${selfTime}`}
-                  {selfStatus === 'checked-out' && `Checked out at ${selfTime}`}
+                  {selfStatusLoading && 'Checking today’s status…'}
+                  {!selfStatusLoading && selfStatus === 'idle' && 'Not checked in yet today.'}
+                  {!selfStatusLoading && selfStatus === 'checked-in' && `Checked in at ${selfTime}`}
+                  {!selfStatusLoading && selfStatus === 'checked-out' && `Checked out at ${selfTime}`}
                 </p>
               </div>
             </div>
@@ -217,7 +287,7 @@ export default function AttendancePageContent({ role }: { role: Role }) {
                 icon={LogIn}
                 size="sm"
                 loading={selfBusy === 'in'}
-                disabled={selfBusy !== null || selfStatus === 'checked-in'}
+                disabled={selfBusy !== null || selfStatusLoading || selfStatus === 'checked-in'}
                 onClick={handleSelfCheckIn}
               >
                 Check In
@@ -227,10 +297,13 @@ export default function AttendancePageContent({ role }: { role: Role }) {
                 variant="secondary"
                 size="sm"
                 loading={selfBusy === 'out'}
-                disabled={selfBusy !== null || selfStatus !== 'checked-in'}
+                disabled={selfBusy !== null || selfStatusLoading || selfStatus !== 'checked-in'}
                 onClick={handleSelfCheckOut}
               >
                 Check Out
+              </Button>
+              <Button icon={History} variant="secondary" size="sm" disabled={!selfUserId} onClick={() => setShowSelfHistory(true)}>
+                History
               </Button>
             </div>
           </div>
@@ -352,23 +425,33 @@ export default function AttendancePageContent({ role }: { role: Role }) {
                         </td>
                         {isTeacher && (
                           <td className="px-4 py-2.5 text-right">
-                            {checkedIn ? (
-                              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-600/20 ring-inset">
-                                <CheckCircle2 size={12} />
-                                Checked in
-                              </span>
-                            ) : (
-                              <Button
+                            <div className="flex items-center justify-end gap-2">
+                              {rosterStatusLoading ? (
+                                <span className="skeleton inline-block h-6 w-24 rounded-full" />
+                              ) : checkedIn ? (
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-600/20 ring-inset">
+                                  <CheckCircle2 size={12} />
+                                  Checked in
+                                </span>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
+                                  icon={Circle}
+                                  loading={checkingInId === student.id}
+                                  disabled={checkingInId !== null}
+                                  onClick={() => handleStudentCheckIn(student)}
+                                >
+                                  Check in
+                                </Button>
+                              )}
+                              <IconButton
+                                icon={History}
+                                label={`View ${student.fullName}'s attendance history`}
                                 size="sm"
-                                variant="secondary"
-                                icon={Circle}
-                                loading={checkingInId === student.id}
-                                disabled={checkingInId !== null}
-                                onClick={() => handleStudentCheckIn(student)}
-                              >
-                                Check in
-                              </Button>
-                            )}
+                                onClick={() => setHistoryStudent(student)}
+                              />
+                            </div>
                           </td>
                         )}
                       </tr>
@@ -398,6 +481,18 @@ export default function AttendancePageContent({ role }: { role: Role }) {
             </div>
           )}
         </div>
+      )}
+
+      {historyStudent && (
+        <Modal title="Attendance history" subtitle={historyStudent.fullName} icon={History} size="lg" onClose={() => setHistoryStudent(null)}>
+          <PersonAttendanceCalendar userId={historyStudent.id} />
+        </Modal>
+      )}
+
+      {showSelfHistory && selfUserId && (
+        <Modal title="My attendance history" icon={History} size="lg" onClose={() => setShowSelfHistory(false)}>
+          <PersonAttendanceCalendar userId={selfUserId} />
+        </Modal>
       )}
     </div>
   );

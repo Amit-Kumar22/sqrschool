@@ -127,7 +127,10 @@ export default function ThemeFormModal({
             label="Theme type"
             value={form.themeType}
             onChange={(e) => setForm((f) => ({ ...f, themeType: e.target.value }))}
-            placeholder="e.g. LIGHT"
+            placeholder="e.g. PREMIUM"
+            // Not just a label: lib/siteContent.ts reads the trailing number off
+            // this value to pick the public home page's layout.
+            hint="Picks the public home layout — PREMIUM (full-width hero) or PREMIUM-2 (split hero)."
           />
           <TextField
             label="Company name"

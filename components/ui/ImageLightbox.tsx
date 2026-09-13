@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect } from 'react';
-import Image from 'next/image';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 export interface LightboxImage {
@@ -97,7 +96,11 @@ export default function ImageLightbox({ images, index, onClose, onIndexChange }:
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative h-[65vh] w-full overflow-hidden rounded-2xl bg-black shadow-glow-primary-lg">
-          <Image src={active.src} alt={active.alt} fill className="object-contain" sizes="100vw" priority />
+          {/* A plain <img>, not next/image: these are CMS-supplied URLs whose host
+              is whatever the school pasted into Website Settings, and next/image
+              refuses any host that isn't allow-listed in next.config. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={active.src} alt={active.alt} className="absolute inset-0 h-full w-full object-contain" />
         </div>
         {active.caption && <p className="mt-4 text-center text-sm font-medium text-white/90">{active.caption}</p>}
       </div>

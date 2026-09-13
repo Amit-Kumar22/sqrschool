@@ -3,7 +3,20 @@
 import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, GraduationCap, Loader2, Lock, Mail, ShieldCheck, Sparkles } from 'lucide-react';
+import {
+  ArrowLeft,
+  Briefcase,
+  Eye,
+  EyeOff,
+  GraduationCap,
+  Loader2,
+  Lock,
+  Mail,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  UserCog,
+} from 'lucide-react';
 import { apiErrorMessage, loginUser, getProfile } from '@/lib/api';
 import { setAuthToken, setUser, getDashboardByRole, getUserRole, isAuthenticated } from '@/lib/auth';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -12,6 +25,19 @@ const HIGHLIGHTS = [
   'One login for every role — admin, principal, teacher, staff and student',
   'Real-time dashboards built for each panel',
   'Bank-grade session security, always encrypted',
+];
+
+// Demo accounts for the shared evaluation environment — one per panel, all on
+// the same password. Picking one fills the form rather than signing in, so the
+// sign-in button still confirms the choice.
+const DEMO_PASSWORD = '12345';
+
+const DEMO_ACCOUNTS = [
+  { role: 'Super Admin', email: 'super-admin@gmail.com', icon: ShieldCheck },
+  { role: 'Principal', email: 'admin@gmail.com', icon: Briefcase },
+  { role: 'Teacher', email: 'kavita.joshi@yopmail.com', icon: UserCog },
+  { role: 'Student', email: 'aarav@gvs.edu', icon: GraduationCap },
+  { role: 'Parent', email: 'rajesh@gmail.com', icon: Users },
 ];
 
 export default function LoginPage() {
@@ -30,6 +56,12 @@ export default function LoginPage() {
       if (role) router.replace(getDashboardByRole(role));
     }
   }, [router]);
+
+  const fillDemoAccount = (demoEmail: string) => {
+    setEmail(demoEmail);
+    setPassword(DEMO_PASSWORD);
+    setError('');
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -122,83 +154,134 @@ export default function LoginPage() {
 
       {/* ── Login form — fixed panel chrome, same reasoning as the branding panel above. ── */}
       <div className="flex w-full flex-1 items-center justify-center px-4 py-12 lg:w-1/2">
-        <div className="animate-scale-in relative w-full max-w-sm overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-8 shadow-glow-amber-lg">
-          <span className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-amber-500 via-orange-400 to-amber-500" />
+        <div className="w-full max-w-md">
+          <Link
+            href="/"
+            className="mb-4 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-premium-sm transition-all hover:-translate-x-0.5 hover:text-slate-900 hover:shadow-premium"
+          >
+            <ArrowLeft size={15} /> Back to home
+          </Link>
 
-          <div className="mb-8 flex flex-col items-center lg:items-start">
-            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-glow-amber lg:hidden">
-              <GraduationCap size={22} />
-            </span>
-            <h2 className="text-2xl font-bold text-slate-900">Welcome back</h2>
-            <p className="mt-1.5 text-sm text-slate-500">Sign in to your portal to continue.</p>
+          <div className="animate-scale-in relative w-full overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-8 shadow-glow-amber-lg">
+            <span className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-amber-500 via-orange-400 to-amber-500" />
+
+            <div className="mb-8 flex flex-col items-center lg:items-start">
+              <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-glow-amber lg:hidden">
+                <GraduationCap size={22} />
+              </span>
+              <h2 className="text-2xl font-bold text-slate-900">Welcome back</h2>
+              <p className="mt-1.5 text-sm text-slate-500">Sign in to your portal to continue.</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-900">
+                  Email address
+                </label>
+                <div className="relative">
+                  <Mail size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@sqrschool.edu"
+                    className="h-11 w-full rounded-lg border border-slate-200 bg-white pr-3 pl-10 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-900">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    className="h-11 w-full rounded-lg border border-slate-200 bg-white pr-10 pl-10 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              {error && (
+                <div className="animate-fade-in-up rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-amber-700 text-sm font-semibold text-white shadow-glow-amber transition-all hover:-translate-y-0.5 hover:bg-amber-800 hover:shadow-glow-amber-lg disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+              >
+                {loading && <Loader2 size={16} className="animate-spin" />}
+                {loading ? 'Signing in…' : 'Sign In'}
+              </button>
+            </form>
+
+            <div className="mt-7 border-t border-slate-200 pt-5">
+              <div className="flex items-center justify-between gap-2">
+                <p className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
+                  <Sparkles size={14} className="text-amber-600" /> Demo accounts
+                </p>
+                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-500">
+                  Password: {DEMO_PASSWORD}
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-slate-500">Pick a role to fill the form, then sign in.</p>
+
+              <div className="mt-3 grid gap-2">
+                {DEMO_ACCOUNTS.map(({ role, email: demoEmail, icon: Icon }) => {
+                  const selected = email === demoEmail && password === DEMO_PASSWORD;
+                  return (
+                    <button
+                      key={demoEmail}
+                      type="button"
+                      onClick={() => fillDemoAccount(demoEmail)}
+                      className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-left transition-all hover:-translate-y-0.5 ${
+                        selected
+                          ? 'border-amber-500 bg-amber-50 shadow-glow-amber'
+                          : 'border-slate-200 bg-white hover:border-amber-300 hover:shadow-premium-sm'
+                      }`}
+                    >
+                      <span
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors ${
+                          selected ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-500'
+                        }`}
+                      >
+                        <Icon size={15} />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-xs font-semibold text-slate-900">{role}</span>
+                        <span className="block truncate text-[11px] text-slate-500">{demoEmail}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <p className="mt-6 text-center text-xs text-slate-400 lg:text-left">
+              Having trouble signing in? Contact your school administrator.
+            </p>
           </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-900">
-                Email address
-              </label>
-              <div className="relative">
-                <Mail size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@sqrschool.edu"
-                  className="h-11 w-full rounded-lg border border-slate-200 bg-white pr-3 pl-10 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-900">
-                Password
-              </label>
-              <div className="relative">
-                <Lock size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="h-11 w-full rounded-lg border border-slate-200 bg-white pr-10 pl-10 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-
-            {error && (
-              <div className="animate-fade-in-up rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-amber-700 text-sm font-semibold text-white shadow-glow-amber transition-all hover:-translate-y-0.5 hover:bg-amber-800 hover:shadow-glow-amber-lg disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
-            >
-              {loading && <Loader2 size={16} className="animate-spin" />}
-              {loading ? 'Signing in…' : 'Sign In'}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-xs text-slate-400 lg:text-left">
-            Having trouble signing in? Contact your school administrator.
-          </p>
         </div>
       </div>
     </div>

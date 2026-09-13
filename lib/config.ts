@@ -249,12 +249,13 @@ export const API_ENDPOINTS = {
     READ: (id: number) => `/v1/conversations/${id}/read`,
     SEND_MESSAGE: '/v1/conversations/send-message',
   },
-  // Public/unauthenticated endpoints consumed by the marketing home page —
-  // no session required, see lib/freeService.ts.
+  // Public/unauthenticated endpoint consumed by the marketing home page — one
+  // aggregate payload carrying the school setting, contact, header, section
+  // copy and every content list, so the page needs a single request instead of
+  // one per resource. Unlike the theme's PUBLIC_ACTIVE above it isn't under
+  // /v1/free/, but it's public all the same. See lib/freeService.ts.
   FREE: {
-    INFRASTRUCTURE: '/v1/free/infrastructure',
-    ANNOUNCEMENTS_ACTIVE: '/v1/free/announcements/active',
-    ABOUT_US: '/v1/free/about-us',
+    WEBSITE_CONTENT: '/v1/website-content',
   },
   // Website Settings — CMS-style endpoints behind the marketing site, all
   // sharing the same LIST/CREATE/GET/UPDATE/DELETE shape. See lib/websiteSettingService.ts.

@@ -3,8 +3,8 @@
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import type { WebsiteWhyChoosePoint } from '@/lib/websiteSettingService';
 import type { SectionCopy } from '@/lib/siteContent';
-import SectionHeading from './SectionHeading';
-import SiteImage from './SiteImage';
+import SectionHeading from '@/components/site/primitives/SectionHeading';
+import SiteImage from '@/components/site/primitives/SiteImage';
 
 interface WhyChooseSectionProps {
   points: WebsiteWhyChoosePoint[];

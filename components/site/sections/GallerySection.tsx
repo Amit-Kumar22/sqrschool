@@ -5,8 +5,8 @@ import { ArrowRight, Expand, Play } from 'lucide-react';
 import type { WebsiteGalleryItem } from '@/lib/websiteSettingService';
 import type { SectionCopy } from '@/lib/siteContent';
 import ImageLightbox from '@/components/ui/ImageLightbox';
-import SectionHeading from './SectionHeading';
-import SiteImage from './SiteImage';
+import SectionHeading from '@/components/site/primitives/SectionHeading';
+import SiteImage from '@/components/site/primitives/SiteImage';
 
 interface GallerySectionProps {
   items: WebsiteGalleryItem[];

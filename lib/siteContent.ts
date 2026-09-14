@@ -29,35 +29,10 @@ import type { WebsiteSection } from './websiteSettingService';
 import type { WebsiteNavigationItem } from './freeService';
 
 // ─── Public site presentation helpers ────────────────────────────────────────
-// Pure data helpers shared by the home page and its section components: which
-// layout the active theme asks for, which sections the CMS enabled and in what
-// order, and how to turn the CMS's free-text icon/platform keywords into
-// something renderable.
-
-// ─── Layout variant ───────────────────────────────────────────────────────────
-
-/**
- * `classic` — full-bleed photographic hero, full-width gallery strip, and the
- *   "why choose us" panel sitting beside the testimonials.
- * `split` — light split hero (copy beside a framed photo), a statistics band,
- *   and the gallery sharing a row with "why choose us" above full-width
- *   testimonials.
- */
-export type SiteVariant = 'classic' | 'split';
-
-const SITE_VARIANTS: SiteVariant[] = ['classic', 'split'];
-
-/**
- * The active colour theme's `themeType` doubles as the layout selector for the
- * public site: "PREMIUM" renders the classic layout, "PREMIUM-2" the split one.
- * Any further numbered type (PREMIUM-3, …) cycles back through the list, so an
- * unrecognized value still renders a complete page instead of nothing.
- */
-export function resolveSiteVariant(themeType?: string | null): SiteVariant {
-  const suffix = Number(themeType?.match(/(\d+)\s*$/)?.[1] ?? 1);
-  const index = Number.isFinite(suffix) && suffix > 0 ? (suffix - 1) % SITE_VARIANTS.length : 0;
-  return SITE_VARIANTS[index];
-}
+// Pure data helpers shared by every home-page template: which sections the CMS
+// enabled and in what order, and how to turn its free-text icon/platform
+// keywords into something renderable. Which template renders the page is the
+// registry's job (components/site/templates/registry.ts), not this file's.
 
 // ─── Sections ─────────────────────────────────────────────────────────────────
 

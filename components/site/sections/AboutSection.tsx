@@ -2,23 +2,34 @@
 
 import { ArrowRight, Play } from 'lucide-react';
 import type { WebsiteFeature } from '@/lib/websiteSettingService';
-import { resolveIcon, type SectionCopy, type SiteVariant } from '@/lib/siteContent';
-import SectionHeading from './SectionHeading';
-import SiteImage from './SiteImage';
+import { resolveIcon, type SectionCopy } from '@/lib/siteContent';
+import SectionHeading from '@/components/site/primitives/SectionHeading';
+import SiteImage from '@/components/site/primitives/SiteImage';
 
 interface AboutSectionProps {
   copy: SectionCopy;
   /** Icon-led highlights beside the about copy — the features the pillar strip didn't take. */
   highlights: WebsiteFeature[];
   media: { src: string; alt: string; videoUrl?: string } | null;
-  variant: SiteVariant;
+  /** `panel` sets the copy inside a primary-filled card; `plain` leaves it on the page ground. */
+  tone?: 'panel' | 'plain';
+  mediaSide?: 'left' | 'right';
   ctaLabel: string;
   ctaUrl: string;
 }
 
-/** About block: section copy plus highlights beside the campus photo. `classic` sets the copy in a filled panel, `split` on the page ground. */
-export default function AboutSection({ copy, highlights, media, variant, ctaLabel, ctaUrl }: AboutSectionProps) {
-  const onDark = variant === 'classic';
+/** About block: section copy plus highlights beside the campus photo. `classic` sets the copy in a filled panel, `split` on the page ground, `showcase` moves the photo to the left. */
+export default function AboutSection({
+  copy,
+  highlights,
+  media,
+  tone = 'plain',
+  mediaSide = 'right',
+  ctaLabel,
+  ctaUrl,
+}: AboutSectionProps) {
+  const onDark = tone === 'panel';
+  const mediaFirst = mediaSide === 'left';
 
   return (
     <section id="about" className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
@@ -76,7 +87,11 @@ export default function AboutSection({ copy, highlights, media, variant, ctaLabe
         </div>
 
         {media && (
-          <div className="relative overflow-hidden rounded-2xl shadow-glow-primary">
+          <div
+            className={`relative overflow-hidden rounded-2xl shadow-glow-primary ${
+              mediaFirst ? 'lg:order-first' : ''
+            }`}
+          >
             <SiteImage src={media.src} alt={media.alt} className="h-64 w-full object-cover sm:h-80 lg:h-[24rem]" />
             {media.videoUrl && (
               <a

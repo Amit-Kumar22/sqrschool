@@ -5,17 +5,19 @@ import Link from 'next/link';
 import { ArrowRight, GraduationCap, Menu, X } from 'lucide-react';
 import type { WebsiteHeader } from '@/lib/websiteSettingService';
 import type { WebsiteNavigationItem } from '@/lib/freeService';
-import SiteImage from './SiteImage';
+import SiteImage from '@/components/site/primitives/SiteImage';
 
 interface SiteHeaderProps {
   header: WebsiteHeader | null;
   navItems: WebsiteNavigationItem[];
   schoolName: string;
   tagline: string;
+  /** `center` puts the nav between the lockup and the CTA. */
+  navAlign?: 'start' | 'center';
 }
 
 /** Sticky masthead — logo lockup, CMS navigation and the enquiry call-to-action. Condenses once the page scrolls. */
-export default function SiteHeader({ header, navItems, schoolName, tagline }: SiteHeaderProps) {
+export default function SiteHeader({ header, navItems, schoolName, tagline, navAlign = 'start' }: SiteHeaderProps) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -28,6 +30,7 @@ export default function SiteHeader({ header, navItems, schoolName, tagline }: Si
 
   // Only the phone menu is CMS-toggleable; the desktop nav always renders.
   const mobileMenuEnabled = header?.mobileMenuEnabled !== false;
+  const centerNav = navAlign === 'center';
 
   return (
     <header
@@ -36,9 +39,9 @@ export default function SiteHeader({ header, navItems, schoolName, tagline }: Si
       }`}
     >
       <div
-        className={`mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 transition-all duration-300 sm:px-6 ${
+        className={`mx-auto flex max-w-7xl items-center gap-4 px-4 transition-all duration-300 sm:px-6 ${
           scrolled ? 'h-16' : 'h-20'
-        }`}
+        } ${centerNav ? 'justify-between xl:grid xl:grid-cols-[1fr_auto_1fr]' : 'justify-between'}`}
       >
         <Link href="/" className="group flex min-w-0 items-center gap-3">
           {header?.logoUrl ? (
@@ -65,7 +68,7 @@ export default function SiteHeader({ header, navItems, schoolName, tagline }: Si
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-7 xl:flex">
+        <nav className={`hidden items-center gap-7 xl:flex ${centerNav ? 'justify-center' : ''}`}>
           {navItems.map((item) => (
             <a
               key={item.id}
@@ -78,7 +81,7 @@ export default function SiteHeader({ header, navItems, schoolName, tagline }: Si
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${centerNav ? 'xl:justify-end' : ''}`}>
           {/* The portal sign-in, not the CMS enquiry CTA — that one still runs
               the announcement/about/why-choose buttons further down the page. */}
           <Link

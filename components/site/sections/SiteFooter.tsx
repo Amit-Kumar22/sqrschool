@@ -5,7 +5,7 @@ import { Clock, GraduationCap, Mail, MapPin, Phone } from 'lucide-react';
 import type { WebsiteContact, WebsiteSocialLink } from '@/lib/websiteSettingService';
 import type { WebsiteNavigationItem, WebsiteSetting } from '@/lib/freeService';
 import { socialIconPath } from '@/lib/siteContent';
-import SiteImage from './SiteImage';
+import SiteImage from '@/components/site/primitives/SiteImage';
 
 interface SiteFooterProps {
   setting: WebsiteSetting | null;

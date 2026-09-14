@@ -3,9 +3,9 @@
 import { Quote, Star } from 'lucide-react';
 import type { WebsiteTestimonial } from '@/lib/freeService';
 import { initials, type SectionCopy } from '@/lib/siteContent';
-import SectionHeading from './SectionHeading';
-import SiteImage from './SiteImage';
-import { useCarousel } from './useCarousel';
+import SectionHeading from '@/components/site/primitives/SectionHeading';
+import SiteImage from '@/components/site/primitives/SiteImage';
+import { useCarousel } from '@/components/site/primitives/useCarousel';
 
 interface TestimonialsSectionProps {
   testimonials: WebsiteTestimonial[];

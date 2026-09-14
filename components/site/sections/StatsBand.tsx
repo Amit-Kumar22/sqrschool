@@ -1,10 +1,16 @@
 'use client';
 
 import type { WebsiteStatistic } from '@/lib/websiteSettingService';
-import { resolveIcon, type SiteVariant } from '@/lib/siteContent';
+import { resolveIcon } from '@/lib/siteContent';
 
-/** Counter band. `split` frames it as a card inside the page grid; `classic` runs it edge to edge. */
-export default function StatsBand({ stats, variant }: { stats: WebsiteStatistic[]; variant: SiteVariant }) {
+/** Counter band — framed as a card inside the page grid, or run edge to edge. */
+export default function StatsBand({
+  stats,
+  layout = 'full',
+}: {
+  stats: WebsiteStatistic[];
+  layout?: 'full' | 'card';
+}) {
   if (stats.length === 0) return null;
 
   const rows = (
@@ -24,7 +30,7 @@ export default function StatsBand({ stats, variant }: { stats: WebsiteStatistic[
     </div>
   );
 
-  if (variant === 'split') {
+  if (layout === 'card') {
     return (
       <section className="mx-auto max-w-7xl px-4 pb-4 sm:px-6">
         <div className="overflow-hidden rounded-2xl bg-primary text-white shadow-glow-primary">

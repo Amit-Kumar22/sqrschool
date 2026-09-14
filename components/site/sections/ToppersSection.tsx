@@ -3,9 +3,9 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { WebsiteTopper } from '@/lib/websiteSettingService';
 import { initials, type SectionCopy } from '@/lib/siteContent';
-import SectionHeading from './SectionHeading';
-import SiteImage from './SiteImage';
-import { useCarousel } from './useCarousel';
+import SectionHeading from '@/components/site/primitives/SectionHeading';
+import SiteImage from '@/components/site/primitives/SiteImage';
+import { useCarousel } from '@/components/site/primitives/useCarousel';
 
 // Medal colors are conventional rather than themed — a silver 2nd place reads
 // wrong in any brand palette. Ranks past the podium fall back to the theme.

@@ -8,7 +8,8 @@ import type { ThemePreset } from '@/lib/themePresets';
 import { COLOR_FIELD_GROUPS, HEX_COLOR_REGEX, type ColorFieldKey } from './themeFields';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import { TextField } from '@/components/ui/FormField';
+import { SelectField, TextField } from '@/components/ui/FormField';
+import { TEMPLATE_MANIFEST } from '@/components/site/templates/registry';
 
 type FormState = Omit<ThemePayload, 'id'>;
 
@@ -123,15 +124,25 @@ export default function ThemeFormModal({
             onChange={(e) => setForm((f) => ({ ...f, themeName: e.target.value }))}
             placeholder="e.g. Spring Term"
           />
-          <TextField
-            label="Theme type"
+          {/* Not a label: this value selects the public home page's template
+              (components/site/templates/registry.ts), so it's picked from the
+              registered list rather than typed. A theme saved with some older
+              value keeps it as an option so editing can't silently change it. */}
+          <SelectField
+            label="Home page template"
             value={form.themeType}
             onChange={(e) => setForm((f) => ({ ...f, themeType: e.target.value }))}
-            placeholder="e.g. PREMIUM"
-            // Not just a label: lib/siteContent.ts reads the trailing number off
-            // this value to pick the public home page's layout.
-            hint="Picks the public home layout — PREMIUM (full-width hero) or PREMIUM-2 (split hero)."
-          />
+            hint={TEMPLATE_MANIFEST.find((entry) => entry.key === form.themeType)?.description ?? 'Layout used by the public home page.'}
+          >
+            {!TEMPLATE_MANIFEST.some((entry) => entry.key === form.themeType) && (
+              <option value={form.themeType}>{form.themeType || '— none —'}</option>
+            )}
+            {TEMPLATE_MANIFEST.map((entry) => (
+              <option key={entry.key} value={entry.key}>
+                {entry.name}
+              </option>
+            ))}
+          </SelectField>
           <TextField
             label="Company name"
             value={form.companyName}

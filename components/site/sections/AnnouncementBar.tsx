@@ -10,6 +10,8 @@ interface AnnouncementBarProps {
   holiday: Holiday | null;
   ctaLabel: string;
   ctaUrl: string;
+  /** `bar` runs edge to edge under the hero; `card` insets it into the page grid. */
+  layout?: 'bar' | 'card';
 }
 
 const formatHolidayDate = (value: string) => {
@@ -19,8 +21,8 @@ const formatHolidayDate = (value: string) => {
     : date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
-/** Ticker strip under the hero carrying the announcement section's copy and any active holiday. */
-export default function AnnouncementBar({ copy, holiday, ctaLabel, ctaUrl }: AnnouncementBarProps) {
+/** Ticker under the hero carrying the announcement section's copy and any active holiday — a full-bleed strip, or an inset card in the showcase layout. */
+export default function AnnouncementBar({ copy, holiday, ctaLabel, ctaUrl, layout = 'bar' }: AnnouncementBarProps) {
   const holidayDate = holiday?.holidayDate ? formatHolidayDate(holiday.holidayDate) : '';
   const messages = [
     copy.description || copy.title,
@@ -32,10 +34,14 @@ export default function AnnouncementBar({ copy, holiday, ctaLabel, ctaUrl }: Ann
   if (messages.length === 0) return null;
 
   const text = messages.join('   •   ');
+  const inset = layout === 'card';
 
-  return (
-    <section id="announcements" className="border-y border-white/10 bg-primary text-white">
-      <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-2.5 sm:px-6">
+  const row = (
+    <div
+      className={`mx-auto flex max-w-7xl items-center gap-4 ${
+        inset ? 'rounded-xl bg-primary px-5 py-3 shadow-glow-primary' : 'px-4 py-2.5 sm:px-6'
+      }`}
+    >
         <span className="flex shrink-0 items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-button-bg sm:text-xs">
           <Megaphone size={16} className="shrink-0" />
           <span className="hidden sm:inline">{copy.eyebrow}</span>
@@ -61,7 +67,20 @@ export default function AnnouncementBar({ copy, holiday, ctaLabel, ctaUrl }: Ann
         >
           {ctaLabel}
         </a>
-      </div>
+    </div>
+  );
+
+  if (inset) {
+    return (
+      <section id="announcements" className="px-4 pt-6 text-white sm:px-6">
+        {row}
+      </section>
+    );
+  }
+
+  return (
+    <section id="announcements" className="border-y border-white/10 bg-primary text-white">
+      {row}
     </section>
   );
 }

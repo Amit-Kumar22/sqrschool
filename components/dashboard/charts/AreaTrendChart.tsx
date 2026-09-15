@@ -43,7 +43,7 @@ function smoothPath(points: { x: number; y: number }[]): string {
 }
 
 /** Smooth gradient-fill area/line chart for a single trend series — revenue, attendance counts, etc. Scales via viewBox, no fixed pixel width. */
-export default function AreaTrendChart({ data, color = '#4f63e5', valueFormatter = (v) => `${v}`, height = 220 }: AreaTrendChartProps) {
+export default function AreaTrendChart({ data, color = '#1faa62', valueFormatter = (v) => `${v}`, height = 220 }: AreaTrendChartProps) {
   const gradientId = useId();
   const wrapRef = useRef<HTMLDivElement>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);

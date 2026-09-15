@@ -8,17 +8,17 @@ interface PageHeaderProps {
   actions?: ReactNode;
 }
 
-/** Shared header for dashboard/admin pages — icon badge, title, description and action slot. Fixed indigo chrome, not theme-bound (see Sidebar.tsx). */
+/** Shared header for dashboard/admin pages — icon badge, title, description and action slot. Fixed brand-green chrome, not theme-bound (see Sidebar.tsx). */
 export default function PageHeader({ icon: Icon, title, description, actions }: PageHeaderProps) {
   return (
-    <div className="card-premium animate-fade-in-up relative flex flex-wrap items-center justify-between gap-3 overflow-hidden px-4 py-3">
-      <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-500 via-orange-400 to-amber-400" />
-      <span className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-gradient-to-br from-amber-400/15 to-amber-400/10 blur-2xl" />
+    <div className="card-premium animate-fade-in-up relative flex flex-wrap items-center justify-between gap-3 overflow-hidden px-4 py-3.5">
+      <span className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-brand-400 to-brand-600" />
+      <span className="pointer-events-none absolute -top-12 -right-10 h-32 w-32 rounded-full bg-brand-400/10 blur-2xl" />
 
-      <div className="relative flex items-center gap-2.5">
+      <div className="relative flex items-center gap-3">
         {Icon && (
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-glow-amber">
-            <Icon size={17} />
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-glow-brand">
+            <Icon size={18} />
           </span>
         )}
         <div>

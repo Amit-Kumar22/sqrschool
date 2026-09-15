@@ -149,7 +149,7 @@ export default function NoticePageContent() {
         </div>
       ) : items.length === 0 ? (
         <div className="card-premium flex flex-col items-center gap-2 px-4 py-16 text-center">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-50 text-amber-700">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-brand-700">
             <Inbox size={20} />
           </span>
           <p className="text-sm font-semibold text-slate-900">No notices yet</p>

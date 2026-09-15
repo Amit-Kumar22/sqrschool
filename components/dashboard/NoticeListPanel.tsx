@@ -18,7 +18,7 @@ export default function NoticeListPanel({ notices }: { notices: DashboardNotice[
             <li
               key={notice.id}
               style={{ animationDelay: `${idx * 50}ms` }}
-              className="animate-fade-in-up rounded-lg border border-slate-100 bg-slate-50/60 p-3 transition-colors hover:border-indigo-100 hover:bg-indigo-50/40"
+              className="animate-fade-in-up rounded-lg border border-slate-100 bg-slate-50/60 p-3 transition-colors hover:border-brand-100 hover:bg-brand-50/40"
             >
               <div className="flex items-start justify-between gap-2">
                 <p className="text-sm font-medium text-slate-900">{notice.title}</p>

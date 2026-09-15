@@ -269,7 +269,7 @@ export default function AttendancePageContent({ role }: { role: Role }) {
         <div className="card-premium p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-premium-sm">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-premium-sm">
                 <MapPin size={15} />
               </span>
               <div>
@@ -331,10 +331,10 @@ export default function AttendancePageContent({ role }: { role: Role }) {
             <div className="scrollbar-thin overflow-x-auto">
               <table className="w-full min-w-full border-collapse text-left text-sm">
                 <thead>
-                  <tr className="bg-gradient-to-r from-amber-950 via-amber-800 to-amber-950">
-                    <th className="px-4 py-2.5 text-xs font-semibold tracking-wider text-white/90 uppercase">Teacher</th>
-                    <th className="px-4 py-2.5 text-xs font-semibold tracking-wider text-white/90 uppercase">Contact</th>
-                    <th className="px-4 py-2.5 text-right text-xs font-semibold tracking-wider text-white/90 uppercase">Action</th>
+                  <tr className="border-b border-slate-200/80 bg-slate-50/80">
+                    <th className="px-4 py-2.5 text-[11px] font-semibold tracking-wider text-slate-500 uppercase">Teacher</th>
+                    <th className="px-4 py-2.5 text-[11px] font-semibold tracking-wider text-slate-500 uppercase">Contact</th>
+                    <th className="px-4 py-2.5 text-right text-[11px] font-semibold tracking-wider text-slate-500 uppercase">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -407,10 +407,10 @@ export default function AttendancePageContent({ role }: { role: Role }) {
             <div className="scrollbar-thin overflow-x-auto">
               <table className="w-full min-w-full border-collapse text-left text-sm">
                 <thead>
-                  <tr className="bg-gradient-to-r from-amber-950 via-amber-800 to-amber-950">
-                    <th className="px-4 py-2.5 text-xs font-semibold tracking-wider text-white/90 uppercase">Student</th>
-                    <th className="px-4 py-2.5 text-xs font-semibold tracking-wider text-white/90 uppercase">Contact</th>
-                    {isTeacher && <th className="px-4 py-2.5 text-right text-xs font-semibold tracking-wider text-white/90 uppercase">Attendance</th>}
+                  <tr className="border-b border-slate-200/80 bg-slate-50/80">
+                    <th className="px-4 py-2.5 text-[11px] font-semibold tracking-wider text-slate-500 uppercase">Student</th>
+                    <th className="px-4 py-2.5 text-[11px] font-semibold tracking-wider text-slate-500 uppercase">Contact</th>
+                    {isTeacher && <th className="px-4 py-2.5 text-right text-[11px] font-semibold tracking-wider text-slate-500 uppercase">Attendance</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -501,7 +501,7 @@ export default function AttendancePageContent({ role }: { role: Role }) {
 function EmptyState({ title, description }: { title: string; description: string }) {
   return (
     <div className="flex flex-col items-center gap-2 px-4 py-12 text-center">
-      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-50 text-amber-700">
+      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-brand-700">
         <Inbox size={20} />
       </span>
       <p className="text-sm font-semibold text-slate-900">{title}</p>

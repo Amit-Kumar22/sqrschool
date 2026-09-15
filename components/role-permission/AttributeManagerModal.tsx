@@ -125,7 +125,7 @@ export default function AttributeManagerModal({
                     if (e.key === 'Enter') saveEdit(attr);
                     if (e.key === 'Escape') setEditingId(null);
                   }}
-                  className="h-8 flex-1 rounded-md border border-amber-300 px-2 text-sm focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                  className="h-8 flex-1 rounded-md border border-brand-300 px-2 text-sm focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
                 />
               ) : (
                 <span className="flex-1 truncate text-sm font-medium text-slate-800">{attr.attributeName}</span>

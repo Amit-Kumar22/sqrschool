@@ -231,13 +231,13 @@ export default function StaffStudentAdmissionPage() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search students"
-                className="h-10 w-52 rounded-lg border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 shadow-premium-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                className="h-10 w-52 rounded-lg border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 shadow-premium-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
               />
             </div>
             <button
               type="submit"
               title="Search"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-700 text-white transition-colors hover:bg-amber-800"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white transition-colors hover:bg-brand-700"
             >
               <Search size={15} />
             </button>

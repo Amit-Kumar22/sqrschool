@@ -17,13 +17,13 @@ export default function SectionCard({ title, subtitle, icon: Icon, right, childr
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="flex items-start gap-2.5">
           {Icon && (
-            <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-700 text-white shadow-premium-sm">
-              <Icon size={15} />
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+              <Icon size={16} />
             </span>
           )}
           <div>
-            <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
-            {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
+            <h3 className="text-base font-semibold text-slate-900">{title}</h3>
+            {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
           </div>
         </div>
         {right && <div className="shrink-0">{right}</div>}

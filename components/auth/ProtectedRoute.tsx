@@ -38,9 +38,9 @@ export default function ProtectedRoute({
 
   if (!allowed) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 shadow-premium">
-          <Loader2 size={24} className="animate-spin text-amber-700" />
+      <div className="flex min-h-screen items-center justify-center bg-canvas">
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 shadow-premium">
+          <Loader2 size={24} className="animate-spin text-brand-600" />
         </span>
       </div>
     );

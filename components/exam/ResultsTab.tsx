@@ -41,7 +41,7 @@ const formatShortDate = (value: string) =>
   value ? new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
 
 const inputClass =
-  'h-8 rounded-md border border-slate-200 px-2 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400';
+  'h-8 rounded-md border border-slate-200 px-2 text-sm text-slate-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400';
 
 /** Result Entry — per-student mark entry for one class's exam, one subject at a time. Save is per-row: POST/PUT /exam-results each take a single result, not a list. */
 export default function ResultsTab() {
@@ -327,7 +327,7 @@ export default function ResultsTab() {
     <div className="space-y-3">
       <div className="card-premium p-4">
         <div className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-premium-sm">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-premium-sm">
             <BarChart3 size={15} />
           </span>
           <div>
@@ -553,7 +553,7 @@ export default function ResultsTab() {
                               type="checkbox"
                               checked={row.absent}
                               onChange={(e) => setRow(student.id, 'absent', e.target.checked)}
-                              className="h-4 w-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500/30"
+                              className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500/30"
                             />
                           ) : (
                             <span
@@ -575,7 +575,7 @@ export default function ResultsTab() {
                               className={`w-full min-w-[140px] ${inputClass}`}
                             />
                           ) : existing.remarks ? (
-                            <span className="font-medium text-indigo-600">{existing.remarks}</span>
+                            <span className="font-medium text-brand-700">{existing.remarks}</span>
                           ) : (
                             <span className="text-slate-300">—</span>
                           )}
@@ -607,7 +607,7 @@ export default function ResultsTab() {
                                 onChange={(e) =>
                                   setStatusDrafts((prev) => ({ ...prev, [student.id]: e.target.value as ExamResultStatus }))
                                 }
-                                className={`h-7 rounded-full border px-2 text-[11px] font-semibold focus:ring-2 focus:ring-amber-500/25 focus:outline-none disabled:opacity-50 ${
+                                className={`h-7 rounded-full border px-2 text-[11px] font-semibold focus:ring-2 focus:ring-brand-500/25 focus:outline-none disabled:opacity-50 ${
                                   STATUS_SELECT_CLASSES[statusDrafts[student.id] ?? existing.status]
                                 }`}
                               >

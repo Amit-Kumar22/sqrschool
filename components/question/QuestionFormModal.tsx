@@ -276,7 +276,7 @@ export default function QuestionFormModal({
                     checked={option.correct}
                     onChange={() => setCorrectOption(idx)}
                     title="Mark as correct"
-                    className="h-4 w-4 shrink-0 border-slate-300 text-amber-600 focus:ring-amber-500/30"
+                    className="h-4 w-4 shrink-0 border-slate-300 text-brand-600 focus:ring-brand-500/30"
                   />
                   <input
                     type="text"
@@ -284,7 +284,7 @@ export default function QuestionFormModal({
                     placeholder={`Option ${idx + 1}`}
                     disabled={form.type === 'TRUE_FALSE'}
                     onChange={(e) => updateOptionText(idx, e.target.value)}
-                    className="h-9 flex-1 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-premium-sm transition-all duration-200 placeholder:text-slate-400 hover:border-slate-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none disabled:bg-slate-50 disabled:text-slate-500"
+                    className="h-9 flex-1 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-premium-sm transition-all duration-200 placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none disabled:bg-slate-50 disabled:text-slate-500"
                   />
                   {form.type === 'MCQ' && form.options.length > 2 && (
                     <IconButton icon={Trash2} label="Remove option" variant="danger" size="sm" onClick={() => removeOption(idx)} />

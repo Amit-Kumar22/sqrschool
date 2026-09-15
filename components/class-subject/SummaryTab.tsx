@@ -56,7 +56,7 @@ export default function SummaryTab() {
       align: 'center',
       render: (cls) =>
         assignedPairs.has(pairKey(cls.id, subject.id)) ? (
-          <span className="mx-auto flex h-5 w-5 items-center justify-center rounded-full bg-amber-50 text-amber-600">
+          <span className="mx-auto flex h-5 w-5 items-center justify-center rounded-full bg-brand-50 text-brand-600">
             <Check size={12} strokeWidth={3} />
           </span>
         ) : (

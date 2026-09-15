@@ -46,9 +46,9 @@ export default function StudentAttendancePageContent() {
       <SetPageTitle title="Attendance" />
 
       <div className="card-premium animate-fade-in-up relative overflow-hidden p-4">
-        <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-500 via-orange-400 to-amber-400" />
+        <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-600 via-brand-400 to-brand-500" />
         <div className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-premium-sm">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-premium-sm">
             <CalendarCheck size={15} />
           </span>
           <p className="text-sm font-semibold text-slate-900">Today</p>

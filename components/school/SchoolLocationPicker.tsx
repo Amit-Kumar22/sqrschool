@@ -95,7 +95,7 @@ export default function SchoolLocationPicker({ initialLatitude, initialLongitude
       <div className="animate-scale-in flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-premium-lg">
         <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-premium-sm">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-premium-sm">
               <MapPin size={16} />
             </span>
             <h2 className="text-base font-semibold text-slate-900">Pick School Location</h2>
@@ -111,7 +111,7 @@ export default function SchoolLocationPicker({ initialLatitude, initialLongitude
                 value={query}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 placeholder="Search area, landmark, or address…"
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
               />
               {results.length > 0 && (
                 <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-premium">
@@ -123,7 +123,7 @@ export default function SchoolLocationPicker({ initialLatitude, initialLongitude
                         movePin(result.latitude, result.longitude);
                         setQuery(result.displayName);
                       }}
-                      className="block w-full truncate px-3 py-2 text-left text-xs text-slate-600 hover:bg-amber-50"
+                      className="block w-full truncate px-3 py-2 text-left text-xs text-slate-600 hover:bg-brand-50"
                     >
                       {result.displayName}
                     </button>

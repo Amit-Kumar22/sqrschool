@@ -3,11 +3,11 @@ import type { LucideIcon } from 'lucide-react';
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
 
 const inputBase =
-  'h-10 w-full rounded-lg border border-slate-200 bg-white text-sm text-slate-700 shadow-premium-sm transition-all duration-200 placeholder:text-slate-400 hover:border-slate-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 disabled:shadow-none';
+  'h-10 w-full rounded-lg border border-slate-200 bg-white text-sm text-slate-700 shadow-premium-sm transition-all duration-200 placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 disabled:shadow-none';
 
 function FieldLabel({ label, required }: { label: string; required?: boolean }) {
   return (
-    <span className="mb-1.5 block font-medium text-slate-700 transition-colors group-focus-within:text-amber-700">
+    <span className="mb-1.5 block font-medium text-slate-700 transition-colors group-focus-within:text-brand-700">
       {label}
       {required && <span className="ml-0.5 text-red-500">*</span>}
     </span>
@@ -34,7 +34,7 @@ export function TextField({ label, hint, icon: Icon, required, wrapperClassName,
         {Icon && (
           <Icon
             size={15}
-            className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-amber-600"
+            className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-brand-600"
           />
         )}
         <input
@@ -75,13 +75,13 @@ export function SelectField({ label, hint, required, wrapperClassName, className
         <select
           required={required}
           {...rest}
-          className={`w-full appearance-none rounded-lg border border-slate-200 bg-white text-slate-700 shadow-premium-sm transition-all duration-200 hover:border-slate-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 disabled:shadow-none ${SELECT_SIZE_CLASSES[uiSize]} ${className ?? ''}`}
+          className={`w-full appearance-none rounded-lg border border-slate-200 bg-white text-slate-700 shadow-premium-sm transition-all duration-200 hover:border-slate-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 disabled:shadow-none ${SELECT_SIZE_CLASSES[uiSize]} ${className ?? ''}`}
         >
           {children}
         </select>
         <ChevronDown
           size={uiSize === 'sm' ? 13 : 15}
-          className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-amber-600 ${SELECT_CHEVRON_CLASSES[uiSize]}`}
+          className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-brand-600 ${SELECT_CHEVRON_CLASSES[uiSize]}`}
         />
       </div>
       <FieldHint hint={hint} />
@@ -117,7 +117,7 @@ export function CheckboxField({ label, hint, wrapperClassName, className, ...res
     <label className={`flex items-start gap-2 text-sm ${wrapperClassName ?? ''}`}>
       <input
         type="checkbox"
-        className={`mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-amber-600 focus:ring-amber-500/30 ${className ?? ''}`}
+        className={`mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-brand-600 focus:ring-brand-500/30 ${className ?? ''}`}
         {...rest}
       />
       <span>

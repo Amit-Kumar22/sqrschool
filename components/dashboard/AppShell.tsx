@@ -52,7 +52,7 @@ export default function AppShell({ role, children }: AppShellProps) {
     // <main> scrolls. (Previously the whole document scrolled, which
     // carried the sidebar/topbar away with the page on any tall panel.)
     <PageTitleProvider>
-      <div className="flex h-screen overflow-hidden bg-slate-50">
+      <div className="flex h-screen overflow-hidden bg-canvas">
         <Sidebar
           role={role}
           open={sidebarOpen}

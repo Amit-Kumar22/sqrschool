@@ -81,10 +81,10 @@ export default function TeacherDetailPageContent({ teacherId, initialTab }: { te
       <BackButton onClick={backToList} />
 
       <div className="card-premium animate-fade-in-up relative overflow-hidden">
-        <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-500 via-orange-400 to-amber-400" />
+        <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-600 via-brand-400 to-brand-500" />
         <div className="flex flex-wrap items-center justify-between gap-4 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-700 to-orange-800 text-lg font-semibold text-white shadow-glow-amber">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-lg font-semibold text-white shadow-glow-brand">
               {initials || '?'}
             </div>
             <div>
@@ -131,7 +131,7 @@ export default function TeacherDetailPageContent({ teacherId, initialTab }: { te
                 {teacher.assignedClasses.map((cls) => (
                   <span
                     key={cls.id}
-                    className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20"
+                    className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700 ring-1 ring-inset ring-brand-600/20"
                   >
                     {cls.className}
                   </span>
@@ -154,7 +154,7 @@ function BackButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-amber-700"
+      className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-brand-700"
     >
       <ArrowLeft size={15} /> Back to teachers
     </button>

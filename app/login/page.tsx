@@ -101,7 +101,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen bg-slate-50">
       {/* ── Branding panel — fixed premium dark chrome, unified with the panel's Sidebar/Topbar. Deliberately NOT built from the admin-editable site theme (only companyName is pulled from it); see Sidebar.tsx. ── */}
-      <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-br from-amber-950 via-[#2b1706] to-stone-950 p-10 text-white lg:flex xl:p-14">
+      <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-br from-forest-800 via-forest-900 to-forest-950 p-10 text-white lg:flex xl:p-14">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.15]"
           style={{
@@ -110,10 +110,10 @@ export default function LoginPage() {
           }}
         />
         <div className="pointer-events-none absolute -top-24 -right-24 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
-        <div className="animate-float pointer-events-none absolute bottom-10 left-10 h-48 w-48 rounded-full bg-amber-500/20 blur-3xl" />
+        <div className="animate-float pointer-events-none absolute bottom-10 left-10 h-48 w-48 rounded-full bg-brand-500/20 blur-3xl" />
 
         <Link href="/" className="relative flex items-center gap-2 font-semibold">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-gradient-to-br from-amber-400 to-amber-600 text-amber-950 shadow-premium-sm">
+          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-premium-sm">
             <GraduationCap size={20} />
           </span>
           <span>{theme.companyName || 'SQR School'}</span>
@@ -138,7 +138,7 @@ export default function LoginPage() {
                 style={{ animationDelay: `${150 + idx * 90}ms` }}
                 className="animate-fade-in-up flex items-start gap-2.5 text-sm text-white/90"
               >
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-400 text-amber-950 shadow-glow-amber">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-400 text-white shadow-glow-brand">
                   <ShieldCheck size={12} />
                 </span>
                 {item}
@@ -162,11 +162,11 @@ export default function LoginPage() {
             <ArrowLeft size={15} /> Back to home
           </Link>
 
-          <div className="animate-scale-in relative w-full overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-8 shadow-glow-amber-lg">
-            <span className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-amber-500 via-orange-400 to-amber-500" />
+          <div className="animate-scale-in relative w-full overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-8 shadow-glow-brand-lg">
+            <span className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-brand-600 via-brand-400 to-brand-600" />
 
             <div className="mb-8 flex flex-col items-center lg:items-start">
-              <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-glow-amber lg:hidden">
+              <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-glow-brand lg:hidden">
                 <GraduationCap size={22} />
               </span>
               <h2 className="text-2xl font-bold text-slate-900">Welcome back</h2>
@@ -188,7 +188,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@sqrschool.edu"
-                    className="h-11 w-full rounded-lg border border-slate-200 bg-white pr-3 pl-10 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                    className="h-11 w-full rounded-lg border border-slate-200 bg-white pr-3 pl-10 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
                   />
                 </div>
               </div>
@@ -207,7 +207,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="h-11 w-full rounded-lg border border-slate-200 bg-white pr-10 pl-10 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                    className="h-11 w-full rounded-lg border border-slate-200 bg-white pr-10 pl-10 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
                   />
                   <button
                     type="button"
@@ -229,7 +229,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-amber-700 text-sm font-semibold text-white shadow-glow-amber transition-all hover:-translate-y-0.5 hover:bg-amber-800 hover:shadow-glow-amber-lg disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-600 text-sm font-semibold text-white shadow-glow-brand transition-all hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-glow-brand-lg disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
               >
                 {loading && <Loader2 size={16} className="animate-spin" />}
                 {loading ? 'Signing in…' : 'Sign In'}
@@ -239,7 +239,7 @@ export default function LoginPage() {
             <div className="mt-7 border-t border-slate-200 pt-5">
               <div className="flex items-center justify-between gap-2">
                 <p className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
-                  <Sparkles size={14} className="text-amber-600" /> Demo accounts
+                  <Sparkles size={14} className="text-brand-600" /> Demo accounts
                 </p>
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-500">
                   Password: {DEMO_PASSWORD}
@@ -257,13 +257,13 @@ export default function LoginPage() {
                       onClick={() => fillDemoAccount(demoEmail)}
                       className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-left transition-all hover:-translate-y-0.5 ${
                         selected
-                          ? 'border-amber-500 bg-amber-50 shadow-glow-amber'
-                          : 'border-slate-200 bg-white hover:border-amber-300 hover:shadow-premium-sm'
+                          ? 'border-brand-500 bg-brand-50 shadow-glow-brand'
+                          : 'border-slate-200 bg-white hover:border-brand-300 hover:shadow-premium-sm'
                       }`}
                     >
                       <span
                         className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors ${
-                          selected ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-500'
+                          selected ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-500'
                         }`}
                       >
                         <Icon size={15} />

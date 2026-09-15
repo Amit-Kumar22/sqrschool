@@ -228,13 +228,13 @@ export default function StaffFormModal({
                         onClick={() => toggleClass(cls.id)}
                         className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-2 text-left text-xs font-semibold transition-colors ${
                           checked
-                            ? 'border-amber-400 bg-amber-50/60 text-amber-800'
-                            : 'border-slate-200 bg-white text-slate-700 hover:border-amber-300 hover:bg-amber-50/30'
+                            ? 'border-brand-400 bg-brand-50/60 text-brand-800'
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-brand-300 hover:bg-brand-50/30'
                         }`}
                       >
                         <span
                           className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 ${
-                            checked ? 'border-amber-500 bg-amber-500 text-white' : 'border-slate-300'
+                            checked ? 'border-brand-500 bg-brand-500 text-white' : 'border-slate-300'
                           }`}
                         >
                           {checked && <Check size={9} strokeWidth={3} />}

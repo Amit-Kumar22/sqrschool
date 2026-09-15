@@ -235,9 +235,9 @@ export default function QuestionsPageContent({
                   key={sub.id}
                   type="button"
                   onClick={() => chooseSubject(sub.subjectId, sub.subjectName)}
-                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-left transition-colors hover:border-amber-300 hover:bg-amber-50/40"
+                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-left transition-colors hover:border-brand-300 hover:bg-brand-50/40"
                 >
-                  <BookOpen size={15} className="shrink-0 text-amber-500" />
+                  <BookOpen size={15} className="shrink-0 text-brand-500" />
                   <span className="truncate text-sm font-semibold text-slate-900">{sub.subjectName}</span>
                 </button>
               ))}

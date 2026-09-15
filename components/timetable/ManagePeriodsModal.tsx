@@ -140,7 +140,7 @@ export default function ManagePeriodsModal({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Period 9"
-                className="h-9 w-full rounded-lg border border-slate-200 px-3 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                className="h-9 w-full rounded-lg border border-slate-200 px-3 text-sm text-slate-700 shadow-premium-sm placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
               />
             </div>
 
@@ -151,7 +151,7 @@ export default function ManagePeriodsModal({
                   type="time"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="h-9 w-full rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 shadow-premium-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                  className="h-9 w-full rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 shadow-premium-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
                 />
               </div>
               <div>
@@ -160,7 +160,7 @@ export default function ManagePeriodsModal({
                   type="time"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="h-9 w-full rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 shadow-premium-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                  className="h-9 w-full rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 shadow-premium-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
                 />
               </div>
             </div>
@@ -170,7 +170,7 @@ export default function ManagePeriodsModal({
                 type="checkbox"
                 checked={breakPeriod}
                 onChange={(e) => setBreakPeriod(e.target.checked)}
-                className="h-3.5 w-3.5 rounded border-slate-300 text-amber-600 focus:ring-amber-500/30"
+                className="h-3.5 w-3.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500/30"
               />
               This is a break / lunch (not editable in timetable)
             </label>
@@ -178,7 +178,7 @@ export default function ManagePeriodsModal({
             <button
               type="submit"
               disabled={adding}
-              className="flex h-9 w-full items-center justify-center gap-1.5 rounded-full bg-amber-700 text-sm font-semibold text-white shadow-glow-amber transition-all hover:-translate-y-0.5 hover:bg-amber-800 hover:shadow-glow-amber-lg disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+              className="flex h-9 w-full items-center justify-center gap-1.5 rounded-full bg-brand-600 text-sm font-semibold text-white shadow-glow-brand transition-all hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-glow-brand-lg disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
             >
               <Plus size={15} /> {adding ? 'Adding…' : 'Add Period'}
             </button>

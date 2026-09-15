@@ -215,7 +215,7 @@ export default function TestsTab() {
       sortable: true,
       accessor: (test) => test.subjectName,
       render: (test) => (
-        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
+        <span className="inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700">
           {test.subjectName}
         </span>
       ),
@@ -279,15 +279,15 @@ export default function TestsTab() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <ClipboardList size={16} className="text-amber-600" />
+          <ClipboardList size={16} className="text-brand-600" />
           <h2 className="text-sm font-bold text-slate-900">All Tests</h2>
-          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">{tests.length}</span>
+          <span className="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700">{tests.length}</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <select
             value={filterClassId}
             onChange={(e) => setFilterClassId(e.target.value ? Number(e.target.value) : '')}
-            className="h-9 w-36 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+            className="h-9 w-36 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
           >
             <option value="">All classes</option>
             {classes.map((cls) => (
@@ -299,7 +299,7 @@ export default function TestsTab() {
           <select
             value={filterSubjectId}
             onChange={(e) => setFilterSubjectId(e.target.value ? Number(e.target.value) : '')}
-            className="h-9 w-36 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+            className="h-9 w-36 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
           >
             <option value="">All subjects</option>
             {subjects.map((subject) => (
@@ -311,7 +311,7 @@ export default function TestsTab() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as ExamStatus | '')}
-            className="h-9 w-32 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+            className="h-9 w-32 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
           >
             <option value="">All statuses</option>
             {EXAM_STATUS_OPTIONS.map((status) => (

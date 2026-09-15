@@ -1,16 +1,15 @@
 // ─── Dashboard chart color tokens ────────────────────────────────────────────
-// Fixed hex mirrors of the site's existing glow-shadow brand colors
-// (app/globals.css .shadow-glow-{indigo,amber,emerald,violet,sky,rose}), so
-// every chart draws from the same categorical set StatCard already cycles
-// through — assigned in this fixed order, never re-picked per render.
+// Fixed categorical set led by the panel's brand green (app/globals.css
+// --color-brand-500), then hues distinct enough from it and from each other
+// to tell series apart — assigned in this fixed order, never re-picked per render.
 
 export const CATEGORY_COLORS = [
-  '#4f63e5', // indigo
-  '#f59e0b', // amber
-  '#10b981', // emerald
+  '#1faa62', // brand green
+  '#3b82f6', // blue
   '#8b5cf6', // violet
-  '#0ea5e9', // sky
+  '#f59e0b', // amber
   '#f43f5e', // rose
+  '#0ea5e9', // sky
 ] as const;
 
 export function categoryColor(index: number): string {

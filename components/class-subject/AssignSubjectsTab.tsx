@@ -130,7 +130,7 @@ export default function AssignSubjectsTab() {
     <div className="card-premium space-y-4 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-premium-sm">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-premium-sm">
             <Landmark size={17} />
           </span>
           <div>
@@ -186,13 +186,13 @@ export default function AssignSubjectsTab() {
                     isAssigned
                       ? 'cursor-not-allowed border-slate-100 bg-slate-50/60'
                       : isChecked
-                        ? 'border-amber-400 bg-amber-50/60'
-                        : 'border-slate-200 bg-white hover:border-amber-300 hover:bg-amber-50/30'
+                        ? 'border-brand-400 bg-brand-50/60'
+                        : 'border-slate-200 bg-white hover:border-brand-300 hover:bg-brand-50/30'
                   }`}
                 >
                   <span
                     className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
-                      isAssigned ? 'border-slate-200' : isChecked ? 'border-amber-500 bg-amber-500 text-white' : 'border-slate-300'
+                      isAssigned ? 'border-slate-200' : isChecked ? 'border-brand-500 bg-brand-500 text-white' : 'border-slate-300'
                     }`}
                   >
                     {isChecked && !isAssigned && <Check size={10} strokeWidth={3} />}
@@ -222,7 +222,7 @@ export default function AssignSubjectsTab() {
       {!loading && (
         <div>
           <p className="mb-2 text-sm text-slate-600">
-            Currently assigned to <span className="font-semibold text-amber-700">{selectedClass?.className ?? '—'}</span>:
+            Currently assigned to <span className="font-semibold text-brand-700">{selectedClass?.className ?? '—'}</span>:
           </p>
           {assignments.length === 0 ? (
             <p className="text-sm text-slate-400">No subjects assigned yet.</p>
@@ -231,7 +231,7 @@ export default function AssignSubjectsTab() {
               {assignments.map((a) => (
                 <span
                   key={a.id}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 py-1 pr-1.5 pl-2.5 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 py-1 pr-1.5 pl-2.5 text-xs font-medium text-brand-800 ring-1 ring-inset ring-brand-600/20"
                 >
                   <BookOpen size={12} />
                   {a.subjectName}
@@ -240,7 +240,7 @@ export default function AssignSubjectsTab() {
                     onClick={() => handleRemove(a)}
                     disabled={removingId === a.id}
                     aria-label={`Remove ${a.subjectName}`}
-                    className="ml-0.5 rounded-full p-0.5 text-amber-600 hover:bg-amber-100 hover:text-amber-900 disabled:opacity-40"
+                    className="ml-0.5 rounded-full p-0.5 text-brand-600 hover:bg-brand-100 hover:text-brand-900 disabled:opacity-40"
                   >
                     {removingId === a.id ? <Loader2 size={11} className="animate-spin" /> : <X size={11} />}
                   </button>

@@ -15,8 +15,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANT_CLASSES: Record<Variant, string> = {
   primary:
-    'bg-amber-700 text-white shadow-glow-amber hover:-translate-y-0.5 hover:bg-amber-800 hover:shadow-glow-amber-lg',
-  secondary: 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50',
+    'bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-glow-brand hover:-translate-y-0.5 hover:from-brand-600 hover:to-brand-800 hover:shadow-glow-brand-lg',
+  secondary: 'border border-slate-200 bg-white text-slate-600 hover:border-brand-200 hover:bg-brand-50/50 hover:text-brand-700',
   danger: 'bg-red-600 text-white shadow-premium-sm hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-premium',
   ghost: 'text-slate-500 hover:bg-slate-100 hover:text-slate-800',
 };
@@ -67,7 +67,7 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const ICON_VARIANT_CLASSES: Record<IconVariant, string> = {
   default: 'text-slate-500 hover:bg-slate-100 hover:text-slate-800',
-  primary: 'text-amber-700 hover:bg-amber-50',
+  primary: 'text-brand-600 hover:bg-brand-50',
   danger: 'text-red-500 hover:bg-red-50',
   inverse: 'text-slate-300 hover:bg-white/10 hover:text-white',
 };

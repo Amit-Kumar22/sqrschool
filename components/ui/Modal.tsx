@@ -3,16 +3,16 @@ import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { IconButton } from './Button';
 
-type Accent = 'amber' | 'emerald' | 'rose';
+type Accent = 'brand' | 'emerald' | 'rose';
 
 const ACCENT_BAR: Record<Accent, string> = {
-  amber: 'from-amber-400 via-orange-400 to-amber-400',
+  brand: 'from-brand-600 via-brand-400 to-brand-600',
   emerald: 'from-emerald-500 via-teal-400 to-emerald-500',
   rose: 'from-rose-500 via-red-400 to-rose-500',
 };
 
 const ACCENT_BADGE: Record<Accent, string> = {
-  amber: 'from-amber-400 to-amber-600',
+  brand: 'from-brand-500 to-brand-700',
   emerald: 'from-emerald-500 to-emerald-700',
   rose: 'from-rose-500 to-rose-700',
 };
@@ -43,9 +43,9 @@ interface ModalProps {
  * icon-only close button, scrollable body (so long forms never overflow the
  * viewport) and an optional sticky footer for actions.
  */
-export default function Modal({ icon: Icon, title, subtitle, badge, accent = 'amber', size = 'md', onClose, footer, children }: ModalProps) {
+export default function Modal({ icon: Icon, title, subtitle, badge, accent = 'brand', size = 'md', onClose, footer, children }: ModalProps) {
   return (
-    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/60 p-4 backdrop-blur-sm">
+    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-forest-950/55 p-4 backdrop-blur-sm">
       <div className={`animate-scale-in relative w-full ${SIZE_CLASSES[size]} overflow-hidden rounded-2xl bg-white shadow-premium-lg`}>
         <span className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${ACCENT_BAR[accent]}`} />
 
@@ -71,7 +71,7 @@ export default function Modal({ icon: Icon, title, subtitle, badge, accent = 'am
 
         <div className="scrollbar-thin max-h-[65vh] overflow-y-auto px-5 py-4">{children}</div>
 
-        {footer && <div className="flex flex-wrap justify-end gap-2 border-t border-slate-100 px-5 py-3.5">{footer}</div>}
+        {footer && <div className="flex flex-wrap justify-end gap-2 border-t border-slate-100 bg-slate-50/60 px-5 py-3.5">{footer}</div>}
       </div>
     </div>
   );

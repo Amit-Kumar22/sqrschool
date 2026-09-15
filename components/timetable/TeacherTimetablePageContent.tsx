@@ -152,7 +152,7 @@ export default function TeacherTimetablePageContent() {
         <div className="card-premium px-4 py-16 text-center text-sm text-slate-400">Loading timetable…</div>
       ) : entries.length === 0 ? (
         <div className="card-premium flex flex-col items-center gap-2 px-4 py-16 text-center">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-50 text-amber-700">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-brand-700">
             <CalendarClock size={20} />
           </span>
           <p className="text-sm font-semibold text-slate-900">No periods found</p>
@@ -167,13 +167,13 @@ export default function TeacherTimetablePageContent() {
             .map((day) => (
               <div key={day} className="card-premium overflow-hidden">
                 <div
-                  className={`flex items-center justify-between border-b border-amber-100 px-4 py-2.5 ${
-                    day === today ? 'bg-amber-100' : 'bg-amber-50/70'
+                  className={`flex items-center justify-between border-b border-brand-100 px-4 py-2.5 ${
+                    day === today ? 'bg-brand-100' : 'bg-brand-50/70'
                   }`}
                 >
-                  <span className={`text-xs font-semibold tracking-wide uppercase ${day === today ? 'text-amber-700' : 'text-amber-600'}`}>
+                  <span className={`text-xs font-semibold tracking-wide uppercase ${day === today ? 'text-brand-700' : 'text-brand-600'}`}>
                     {dayLabel(day)}
-                    {day === today && <span className="ml-1.5 font-normal normal-case text-amber-500">· Today</span>}
+                    {day === today && <span className="ml-1.5 font-normal normal-case text-brand-500">· Today</span>}
                   </span>
                   <span className="text-xs text-slate-400">
                     {entriesByDay(day).length} period{entriesByDay(day).length === 1 ? '' : 's'}

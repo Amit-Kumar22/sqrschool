@@ -7,7 +7,7 @@ interface DonutStatProps {
 }
 
 /** Compact circular progress ring for a single percentage — collection %, attendance %, etc. */
-export default function DonutStat({ percentage, label, sublabel, color = '#4f63e5', size = 128 }: DonutStatProps) {
+export default function DonutStat({ percentage, label, sublabel, color = '#1faa62', size = 128 }: DonutStatProps) {
   const clamped = Math.min(Math.max(percentage ?? 0, 0), 100);
   const stroke = size * 0.11;
   const radius = (size - stroke) / 2;

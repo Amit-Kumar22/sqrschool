@@ -22,7 +22,7 @@ export default function TimetableListPanel({ entries }: { entries: DashboardTime
               <div className="flex items-center gap-2.5">
                 <span
                   className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
-                    entry.breakPeriod ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'
+                    entry.breakPeriod ? 'bg-amber-100 text-amber-700' : 'bg-brand-100 text-brand-700'
                   }`}
                 >
                   {entry.breakPeriod ? <Coffee size={14} /> : <CalendarClock size={14} />}

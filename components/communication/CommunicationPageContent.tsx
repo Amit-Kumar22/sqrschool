@@ -402,7 +402,7 @@ export default function CommunicationPageContent() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search conversations..."
-                className="h-9 w-full rounded-lg border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 shadow-premium-sm transition-colors placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                className="h-9 w-full rounded-lg border border-slate-200 bg-white pr-3 pl-8 text-sm text-slate-700 shadow-premium-sm transition-colors placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
               />
             </div>
           </div>
@@ -422,7 +422,7 @@ export default function CommunicationPageContent() {
               </div>
             ) : filteredConversations.length === 0 && newChatSuggestions.length === 0 ? (
               <div className="flex flex-col items-center gap-1.5 px-4 py-14 text-center">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 text-amber-700">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-50 text-brand-700">
                   <MessageSquare size={17} />
                 </span>
                 <p className="text-sm font-semibold text-slate-900">
@@ -445,11 +445,11 @@ export default function CommunicationPageContent() {
                       type="button"
                       onClick={() => setSelectedId(conversation.id)}
                       className={`relative flex w-full items-center gap-2.5 border-b border-slate-50 px-3.5 py-2.5 text-left transition-colors ${
-                        isSelected ? 'bg-amber-50/70' : 'hover:bg-slate-50'
+                        isSelected ? 'bg-brand-50/70' : 'hover:bg-slate-50'
                       }`}
                     >
-                      {isSelected && <span className="absolute inset-y-0 left-0 w-1 bg-amber-600" />}
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-600 to-orange-700 text-xs font-semibold text-white">
+                      {isSelected && <span className="absolute inset-y-0 left-0 w-1 bg-brand-600" />}
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-semibold text-white">
                         {initialsOf(conversation.name)}
                       </span>
                       <div className="min-w-0 flex-1">
@@ -464,7 +464,7 @@ export default function CommunicationPageContent() {
                             {last ? last.content : conversationSubtitle(conversation, currentUser?.id)}
                           </p>
                           {unread > 0 && (
-                            <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-amber-600 px-1.5 text-[10px] font-semibold text-white">
+                            <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-brand-600 px-1.5 text-[10px] font-semibold text-white">
                               {unread > 99 ? '99+' : unread}
                             </span>
                           )}
@@ -494,7 +494,7 @@ export default function CommunicationPageContent() {
                           <p className="truncate text-sm font-semibold text-slate-900">{staff.fullName}</p>
                           <p className="truncate text-xs text-slate-500">{formatRoleLabel(staff.role)}</p>
                         </div>
-                        <UserPlus size={14} className="shrink-0 text-amber-600" />
+                        <UserPlus size={14} className="shrink-0 text-brand-600" />
                       </button>
                     ))}
                   </div>
@@ -527,7 +527,7 @@ export default function CommunicationPageContent() {
                 >
                   <ArrowLeft size={17} />
                 </button>
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-600 to-orange-700 text-xs font-semibold text-white">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-semibold text-white">
                   {initialsOf(selectedConversation.name)}
                 </span>
                 <div className="min-w-0">
@@ -546,7 +546,7 @@ export default function CommunicationPageContent() {
                       <div
                         className={`max-w-[70%] rounded-2xl px-3.5 py-2 text-sm shadow-premium-sm ${
                           isMine
-                            ? 'rounded-br-sm bg-gradient-to-br from-amber-600 to-orange-700 text-white'
+                            ? 'rounded-br-sm bg-gradient-to-br from-brand-500 to-brand-700 text-white'
                             : 'rounded-bl-sm bg-slate-100 text-slate-800'
                         }`}
                       >
@@ -584,13 +584,13 @@ export default function CommunicationPageContent() {
                   value={messageDraft}
                   onChange={(e) => setMessageDraft(e.target.value)}
                   placeholder="Type a message..."
-                  className="h-10 flex-1 rounded-full border border-slate-200 bg-white px-4 text-sm text-slate-700 shadow-premium-sm transition-colors placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                  className="h-10 flex-1 rounded-full border border-slate-200 bg-white px-4 text-sm text-slate-700 shadow-premium-sm transition-colors placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
                 />
                 <button
                   type="submit"
                   disabled={!messageDraft.trim()}
                   title="Send"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-700 text-white shadow-glow-amber transition-all hover:-translate-y-0.5 hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white shadow-glow-brand transition-all hover:-translate-y-0.5 hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
                 >
                   <Send size={15} />
                 </button>
@@ -598,7 +598,7 @@ export default function CommunicationPageContent() {
             </>
           ) : (
             <div className="flex flex-1 flex-col items-center justify-center gap-1.5 text-center">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-50 text-amber-700">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-brand-700">
                 <MessageSquare size={20} />
               </span>
               <p className="text-sm font-semibold text-slate-900">Select a conversation</p>

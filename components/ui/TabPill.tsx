@@ -17,7 +17,7 @@ export default function TabPill({ label, active = false, disabled = false, onCli
       title={disabled ? 'Coming soon' : undefined}
       className={`h-8 shrink-0 rounded-full px-3.5 text-sm font-medium transition-colors ${
         active
-          ? 'bg-amber-700 text-white shadow-glow-amber'
+          ? 'bg-brand-600 text-white shadow-glow-brand'
           : disabled
             ? 'cursor-not-allowed text-slate-300'
             : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'

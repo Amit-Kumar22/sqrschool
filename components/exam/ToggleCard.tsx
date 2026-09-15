@@ -16,7 +16,7 @@ export default function ToggleCard({ label, sublabel, selected, onClick }: Toggl
       type="button"
       onClick={onClick}
       className={`flex items-center justify-between gap-2 rounded-xl border px-3.5 py-2.5 text-left transition-colors ${
-        selected ? 'border-amber-400 bg-amber-50' : 'border-slate-200 bg-white hover:border-slate-300'
+        selected ? 'border-brand-400 bg-brand-50' : 'border-slate-200 bg-white hover:border-slate-300'
       }`}
     >
       <span>
@@ -25,7 +25,7 @@ export default function ToggleCard({ label, sublabel, selected, onClick }: Toggl
       </span>
       <span
         className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
-          selected ? 'border-amber-500 bg-amber-500 text-white' : 'border-slate-300 bg-white'
+          selected ? 'border-brand-500 bg-brand-500 text-white' : 'border-slate-300 bg-white'
         }`}
       >
         {selected && <Check size={12} strokeWidth={3} />}

@@ -298,7 +298,7 @@ export default function CollectFeePageContent({ feeId }: { feeId: number }) {
         <button
           type="button"
           onClick={() => setReceipt(p)}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 transition-colors hover:text-amber-800 hover:underline"
+          className="inline-flex items-center gap-1 text-xs font-semibold text-brand-700 transition-colors hover:text-brand-800 hover:underline"
         >
           <ReceiptIcon size={12} /> Receipt
         </button>
@@ -312,10 +312,10 @@ export default function CollectFeePageContent({ feeId }: { feeId: number }) {
       <BackLink onClick={goBack} />
 
       <div className="card-premium relative overflow-hidden">
-        <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-500 via-orange-400 to-amber-400" />
+        <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-600 via-brand-400 to-brand-500" />
         <div className="flex flex-wrap items-center justify-between gap-4 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-700 to-orange-800 text-base font-semibold text-white shadow-glow-amber">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-base font-semibold text-white shadow-glow-brand">
               {initials || '?'}
             </div>
             <div>
@@ -380,8 +380,8 @@ export default function CollectFeePageContent({ feeId }: { feeId: number }) {
           id="collect-fee-section"
           title={`Collect — ${titleFor(activeFee)}`}
           icon={CircleDollarSign}
-          accent="from-amber-400 via-orange-400 to-amber-400"
-          iconBg="bg-amber-50 text-amber-600"
+          accent="from-brand-600 via-brand-400 to-brand-500"
+          iconBg="bg-brand-50 text-brand-600"
         >
           {activeFee.status === 'PAID' ? (
             <p className="py-2 text-sm text-emerald-700">This fee is fully paid.</p>
@@ -507,7 +507,7 @@ function BackLink({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-amber-700"
+      className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-brand-700"
     >
       <ArrowLeft size={15} /> Back to Collect Fee
     </button>

@@ -278,17 +278,17 @@ export default function RolePermissionPageContent() {
                     type="button"
                     onClick={() => uid && setSelectedId(uid)}
                     className={`flex w-full items-center gap-2.5 border-l-2 px-3.5 py-2.5 text-left transition-colors ${
-                      active ? 'border-l-amber-500 bg-amber-50/60' : 'border-l-transparent hover:bg-slate-50'
+                      active ? 'border-l-brand-500 bg-brand-50/60' : 'border-l-transparent hover:bg-slate-50'
                     }`}
                   >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-xs font-semibold text-white">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-xs font-semibold text-white">
                       {initialsOf(teacher.teacherUser?.fullName || '?') || '?'}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-semibold text-slate-900">{teacher.teacherUser?.fullName || '—'}</span>
                       <span className="block truncate text-xs text-slate-400">{teacher.employeeCode}</span>
                     </span>
-                    <ChevronRight size={14} className={active ? 'text-amber-500' : 'text-slate-300'} />
+                    <ChevronRight size={14} className={active ? 'text-brand-500' : 'text-slate-300'} />
                   </button>
                 );
               })
@@ -343,7 +343,7 @@ export default function RolePermissionPageContent() {
                             <div
                               key={action.key}
                               className={`flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 transition-colors ${
-                                checked ? 'border-amber-200 bg-amber-50/50' : 'border-slate-200 bg-white'
+                                checked ? 'border-brand-200 bg-brand-50/50' : 'border-slate-200 bg-white'
                               }`}
                             >
                               <span className="text-sm font-medium text-slate-800">{action.label}</span>

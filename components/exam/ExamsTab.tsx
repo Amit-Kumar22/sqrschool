@@ -354,7 +354,7 @@ export default function ExamsTab() {
       sortable: true,
       accessor: (exam) => exam.examType,
       render: (exam) => (
-        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
+        <span className="inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700">
           {formatTypeLabel(exam.examType)}
         </span>
       ),
@@ -526,9 +526,9 @@ export default function ExamsTab() {
                   {scheduledSubjects.map((subject) => {
                     const row = schedule[subject.id] ?? { examDate: '', totalMarks: '', passingMarks: '', durationMinutes: '' };
                     return (
-                      <div key={subject.id} className="rounded-xl border border-amber-100 bg-white p-2.5">
+                      <div key={subject.id} className="rounded-xl border border-brand-100 bg-white p-2.5">
                         <span className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-900">
-                          <BookOpen size={14} className="text-amber-500" /> {subject.subjectName}
+                          <BookOpen size={14} className="text-brand-500" /> {subject.subjectName}
                         </span>
                         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
                           <div>
@@ -537,7 +537,7 @@ export default function ExamsTab() {
                               type="date"
                               value={row.examDate}
                               onChange={(e) => setScheduleField(subject.id, 'examDate', e.target.value)}
-                              className="h-9 w-full rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                              className="h-9 w-full rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
                             />
                           </div>
                           <div>
@@ -549,7 +549,7 @@ export default function ExamsTab() {
                               placeholder="Marks"
                               value={row.totalMarks}
                               onChange={(e) => setScheduleField(subject.id, 'totalMarks', e.target.value ? Number(e.target.value) : '')}
-                              className="h-9 w-full rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                              className="h-9 w-full rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
                             />
                           </div>
                           <div>
@@ -561,7 +561,7 @@ export default function ExamsTab() {
                               placeholder="Marks"
                               value={row.passingMarks}
                               onChange={(e) => setScheduleField(subject.id, 'passingMarks', e.target.value ? Number(e.target.value) : '')}
-                              className="h-9 w-full rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                              className="h-9 w-full rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
                             />
                           </div>
                           <div>
@@ -572,7 +572,7 @@ export default function ExamsTab() {
                               placeholder="Minutes"
                               value={row.durationMinutes}
                               onChange={(e) => setScheduleField(subject.id, 'durationMinutes', e.target.value ? Number(e.target.value) : '')}
-                              className="h-9 w-full rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+                              className="h-9 w-full rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
                             />
                           </div>
                         </div>
@@ -590,9 +590,9 @@ export default function ExamsTab() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <ClipboardList size={16} className="text-amber-600" />
+          <ClipboardList size={16} className="text-brand-600" />
           <h2 className="text-sm font-bold text-slate-900">All Exams</h2>
-          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">{exams.length}</span>
+          <span className="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700">{exams.length}</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <form onSubmit={handleSearch}>
@@ -601,13 +601,13 @@ export default function ExamsTab() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search exams…"
-              className="h-9 w-40 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+              className="h-9 w-40 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
             />
           </form>
           <select
             value={filterClassId}
             onChange={(e) => setFilterClassId(e.target.value ? Number(e.target.value) : '')}
-            className="h-9 w-32 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+            className="h-9 w-32 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
           >
             <option value="">All classes</option>
             {classes.map((cls) => (
@@ -619,7 +619,7 @@ export default function ExamsTab() {
           <select
             value={filterExamType}
             onChange={(e) => setFilterExamType(e.target.value as ExamType | '')}
-            className="h-9 w-36 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+            className="h-9 w-36 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
           >
             <option value="">All types</option>
             {EXAM_TYPE_OPTIONS.map((type) => (
@@ -631,7 +631,7 @@ export default function ExamsTab() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as ExamStatus | '')}
-            className="h-9 w-32 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 focus:outline-none"
+            className="h-9 w-32 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25 focus:outline-none"
           >
             <option value="">All statuses</option>
             {EXAM_STATUS_OPTIONS.map((status) => (
@@ -660,7 +660,7 @@ export default function ExamsTab() {
             <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
               {exam.subjects.map((sub) => (
                 <div key={sub.id} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5">
-                  <BookOpen size={15} className="shrink-0 text-amber-500" />
+                  <BookOpen size={15} className="shrink-0 text-brand-500" />
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-slate-900">{sub.subjectName}</p>
                     <p className="truncate text-xs text-slate-400">

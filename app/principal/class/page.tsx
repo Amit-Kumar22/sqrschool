@@ -116,7 +116,7 @@ export default function StaffClassPage() {
         </div>
       ) : items.length === 0 ? (
         <div className="card-premium flex flex-col items-center gap-2 px-4 py-16 text-center">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-50 text-amber-700">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-brand-700">
             <Inbox size={20} />
           </span>
           <p className="text-sm font-semibold text-slate-900">No classes yet</p>
@@ -129,13 +129,13 @@ export default function StaffClassPage() {
             return (
               <div
                 key={item.id}
-                className="card-premium group relative overflow-hidden p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-amber-lg"
+                className="card-premium group relative overflow-hidden p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-brand-lg"
               >
-                <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 to-amber-200 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-400 to-brand-200 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex min-w-0 items-center gap-2">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-premium-sm transition-transform duration-300 group-hover:scale-110">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-premium-sm transition-transform duration-300 group-hover:scale-110">
                       <GraduationCap size={14} />
                     </span>
                     <p className="truncate text-sm font-semibold text-slate-900">{item.className}</p>

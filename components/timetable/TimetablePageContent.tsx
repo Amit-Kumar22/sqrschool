@@ -118,7 +118,7 @@ export default function TimetablePageContent() {
               value={classId}
               disabled={classes.length === 0}
               onChange={(e) => setClassId(Number(e.target.value))}
-              className="h-9 appearance-none rounded-full border border-amber-300 bg-white pr-9 pl-4 text-sm font-semibold text-slate-800 shadow-premium-sm transition-colors hover:border-amber-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/25 focus:outline-none disabled:opacity-50"
+              className="h-9 appearance-none rounded-full border border-brand-300 bg-white pr-9 pl-4 text-sm font-semibold text-slate-800 shadow-premium-sm transition-colors hover:border-brand-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/25 focus:outline-none disabled:opacity-50"
             >
               {classes.length === 0 && <option>No classes</option>}
               {classes.map((cls) => (
@@ -127,7 +127,7 @@ export default function TimetablePageContent() {
                 </option>
               ))}
             </select>
-            <ChevronDown size={14} className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-amber-500" />
+            <ChevronDown size={14} className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-brand-500" />
           </div>
 
           <Button variant="secondary" size="sm" icon={Settings} disabled={!classId} onClick={() => setManageOpen(true)}>
@@ -141,7 +141,7 @@ export default function TimetablePageContent() {
           value={activeSubjectId ?? ''}
           disabled={subjects.length === 0}
           onChange={(e) => setActiveSubjectId(e.target.value ? Number(e.target.value) : null)}
-          className="h-9 w-full appearance-none rounded-full border border-amber-300 bg-white pr-9 pl-4 text-sm font-semibold text-slate-800 shadow-premium-sm transition-colors hover:border-amber-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/25 focus:outline-none disabled:opacity-50"
+          className="h-9 w-full appearance-none rounded-full border border-brand-300 bg-white pr-9 pl-4 text-sm font-semibold text-slate-800 shadow-premium-sm transition-colors hover:border-brand-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/25 focus:outline-none disabled:opacity-50"
         >
           <option value="">All subjects</option>
           {subjects.map((subject) => (
@@ -150,7 +150,7 @@ export default function TimetablePageContent() {
             </option>
           ))}
         </select>
-        <ChevronDown size={14} className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-amber-500" />
+        <ChevronDown size={14} className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-brand-500" />
       </div>
 
       {error && <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
@@ -160,7 +160,7 @@ export default function TimetablePageContent() {
           <table className="w-full min-w-[900px] border-collapse text-sm">
             <thead>
               <tr>
-                <th className="w-36 border-b border-amber-100 bg-amber-50/70 px-3 py-3 text-left text-xs font-semibold tracking-wide text-amber-700 uppercase">
+                <th className="w-36 border-b border-brand-100 bg-brand-50/70 px-3 py-3 text-left text-xs font-semibold tracking-wide text-brand-700 uppercase">
                   <span className="inline-flex items-center gap-1.5">
                     <Clock size={13} /> Time
                   </span>
@@ -168,8 +168,8 @@ export default function TimetablePageContent() {
                 {GRID_DAYS.map((day) => (
                   <th
                     key={day}
-                    className={`border-b border-amber-100 px-3 py-3 text-center text-xs font-semibold tracking-wide uppercase ${
-                      day === today ? 'bg-amber-100 text-amber-700' : 'bg-amber-50/70 text-amber-600'
+                    className={`border-b border-brand-100 px-3 py-3 text-center text-xs font-semibold tracking-wide uppercase ${
+                      day === today ? 'bg-brand-100 text-brand-700' : 'bg-brand-50/70 text-brand-600'
                     }`}
                   >
                     {dayLabel(day)}
@@ -218,7 +218,7 @@ export default function TimetablePageContent() {
                         const color = entry ? subjectColor(entry.subjectId) : null;
                         const highlighted = !!entry && activeSubjectId === entry.subjectId;
                         return (
-                          <td key={day} className={`px-1.5 py-1.5 align-top ${day === today ? 'bg-amber-50/40' : ''}`}>
+                          <td key={day} className={`px-1.5 py-1.5 align-top ${day === today ? 'bg-brand-50/40' : ''}`}>
                             {entry && color ? (
                               <button
                                 type="button"
@@ -234,7 +234,7 @@ export default function TimetablePageContent() {
                               <button
                                 type="button"
                                 onClick={() => setAssignTarget({ period, day, entry: null })}
-                                className="flex h-[46px] w-full items-center justify-center rounded-lg border border-dashed border-slate-200 text-slate-300 transition-colors hover:border-amber-300 hover:text-amber-600"
+                                className="flex h-[46px] w-full items-center justify-center rounded-lg border border-dashed border-slate-200 text-slate-300 transition-colors hover:border-brand-300 hover:text-brand-600"
                                 aria-label={`Assign a subject for ${dayLabel(day)}, ${period.name}`}
                               >
                                 <Plus size={14} />

@@ -51,7 +51,7 @@ export default function ParentDashboardPage() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <Loader2 size={28} className="animate-spin text-amber-700" />
+        <Loader2 size={28} className="animate-spin text-brand-700" />
       </div>
     );
   }
@@ -83,7 +83,7 @@ export default function ParentDashboardPage() {
 
       {childLoading && !childDetail && (
         <div className="flex h-48 items-center justify-center">
-          <Loader2 size={24} className="animate-spin text-amber-700" />
+          <Loader2 size={24} className="animate-spin text-brand-700" />
         </div>
       )}
 

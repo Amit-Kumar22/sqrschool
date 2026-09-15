@@ -143,8 +143,8 @@ export default function PersonAttendanceCalendar({ userId }: { userId: number })
                       isFuture
                         ? 'cursor-not-allowed border-transparent text-slate-300'
                         : isToday
-                          ? 'border-amber-400 bg-amber-50/60 text-amber-800 hover:bg-amber-50'
-                          : 'border-slate-100 text-slate-700 hover:border-amber-200 hover:bg-amber-50/40'
+                          ? 'border-brand-400 bg-brand-50/60 text-brand-800 hover:bg-brand-50'
+                          : 'border-slate-100 text-slate-700 hover:border-brand-200 hover:bg-brand-50/40'
                     }`}
                   >
                     <span className="font-medium">{day}</span>

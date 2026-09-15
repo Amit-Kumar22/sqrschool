@@ -28,7 +28,7 @@ export default function TeacherDashboardPage() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <Loader2 size={28} className="animate-spin text-amber-700" />
+        <Loader2 size={28} className="animate-spin text-brand-700" />
       </div>
     );
   }
@@ -86,7 +86,7 @@ export default function TeacherDashboardPage() {
             {profile?.assignedClassNames && profile.assignedClassNames.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-1.5">
                 {profile.assignedClassNames.map((name) => (
-                  <span key={name} className="rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700 ring-1 ring-inset ring-indigo-600/20">
+                  <span key={name} className="rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-semibold text-brand-700 ring-1 ring-inset ring-brand-600/20">
                     {name}
                   </span>
                 ))}

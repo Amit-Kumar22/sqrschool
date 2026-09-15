@@ -38,6 +38,35 @@
     0 8px 16px -4px hsl(var(--shadow-color) / 0.16);
 }
 
+/*
+ * Post-login panel palette — static, NOT backend-controlled (the --theme-*
+ * vars above only drive the public site). Every role panel reads from these
+ * two scales, so the panel's whole look can be retuned here in one place:
+ *   brand-*  green accent — active nav, primary buttons, focus rings, icon tiles
+ *   forest-* deep green chrome — sidebar, login hero, dark banners
+ *   canvas   the light page ground behind panel cards
+ */
+@theme {
+  --color-brand-50: #ecfbf2;
+  --color-brand-100: #d2f5e0;
+  --color-brand-200: #a6eac4;
+  --color-brand-300: #6fd9a1;
+  --color-brand-400: #3cc47d;
+  --color-brand-500: #1faa62;
+  --color-brand-600: #168c50;
+  --color-brand-700: #147042;
+  --color-brand-800: #145937;
+  --color-brand-900: #12492f;
+  --color-brand-950: #062918;
+
+  --color-forest-700: #10504a;
+  --color-forest-800: #0c3d39;
+  --color-forest-900: #092f2c;
+  --color-forest-950: #051d1c;
+
+  --color-canvas: #f3f6f5;
+}
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -178,6 +207,16 @@ a {
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--color-ink) 35%, transparent);
 }
+/* Same thin scrollbar, with a light thumb for dark chrome (the panel sidebar). */
+.scrollbar-thin.scrollbar-on-dark {
+  scrollbar-color: rgb(255 255 255 / 0.16) transparent;
+}
+.scrollbar-thin.scrollbar-on-dark::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.14);
+}
+.scrollbar-thin.scrollbar-on-dark::-webkit-scrollbar-thumb:hover {
+  background: rgb(255 255 255 / 0.26);
+}
 
 @layer utilities {
   .shadow-premium-sm {
@@ -223,6 +262,14 @@ a {
    * look regardless of the public-site theme (see card-premium), so each
    * card/action gets a literal brand color instead of the active theme color.
    */
+  .shadow-glow-brand {
+    box-shadow: 0 2px 4px hsl(var(--shadow-color) / 0.05), 0 14px 28px -10px rgb(31 170 98 / 0.45),
+      0 6px 14px -6px rgb(31 170 98 / 0.3);
+  }
+  .shadow-glow-brand-lg {
+    box-shadow: 0 4px 8px hsl(var(--shadow-color) / 0.06), 0 24px 46px -12px rgb(31 170 98 / 0.5),
+      0 10px 22px -8px rgb(31 170 98 / 0.36);
+  }
   .shadow-glow-indigo {
     box-shadow: 0 2px 4px hsl(var(--shadow-color) / 0.05), 0 16px 32px -10px rgb(79 99 229 / 0.45),
       0 6px 14px -6px rgb(79 99 229 / 0.32);
@@ -281,9 +328,11 @@ a {
    */
   .card-premium {
     border-radius: 1rem;
-    border: 1px solid rgb(15 23 42 / 0.06);
+    border: 1px solid rgb(15 23 42 / 0.07);
     background: #ffffff;
-    box-shadow: var(--shadow-premium);
+    /* Softer than shadow-premium — panel cards sit on the light canvas and
+       should read as clean white sheets, not floating tiles. */
+    box-shadow: 0 1px 2px rgb(16 24 40 / 0.04), 0 8px 24px -12px rgb(16 24 40 / 0.12);
   }
 
   .skeleton {

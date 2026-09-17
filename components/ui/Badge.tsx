@@ -369,6 +369,30 @@ export function ExamResultStatusBadge({ status }: { status: string }) {
   );
 }
 
+// All five values are confirmed by the staff-salary API spec's "Available
+// values" list.
+const STAFF_SALARY_STATUS_STYLES: Record<string, string> = {
+  DRAFT: 'bg-slate-100 text-slate-600 ring-slate-200',
+  GENERATED: 'bg-sky-50 text-sky-700 ring-sky-600/20',
+  APPROVED: 'bg-violet-50 text-violet-700 ring-violet-600/20',
+  PAID: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  CANCELLED: 'bg-red-50 text-red-700 ring-red-600/20',
+};
+
+/** Pill for a payslip's lifecycle status — tinted by known stage, neutral for anything else. */
+export function StaffSalaryStatusBadge({ status }: { status: string }) {
+  const style = STAFF_SALARY_STATUS_STYLES[status] ?? 'bg-slate-100 text-slate-600 ring-slate-200';
+  const label = status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : 'Unknown';
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${style}`}
+    >
+      {label}
+    </span>
+  );
+}
+
 // Only "ACTIVE" is confirmed by the home-work API spec — unrecognized values
 // fall back to a neutral slate pill instead of breaking, same approach as
 // the other badges in this file.

@@ -204,6 +204,32 @@ export const API_ENDPOINTS = {
     UPDATE: (id: number) => `/v1/student-concessions/${id}`,
     DELETE: (id: number) => `/v1/student-concessions/${id}`,
   },
+  // Global salary templates — one shared pay structure (basic + allowances +
+  // deductions) that staff salaries are generated from. Exactly one is the
+  // "active" template at a time, hence ACTIVE/ACTIVATE alongside plain CRUD.
+  STAFF_SALARY_TEMPLATE: {
+    LIST: '/v1/staff-salary-templates',
+    CREATE: '/v1/staff-salary-templates',
+    GET: (id: number) => `/v1/staff-salary-templates/${id}`,
+    UPDATE: (id: number) => `/v1/staff-salary-templates/${id}`,
+    DELETE: (id: number) => `/v1/staff-salary-templates/${id}`,
+    ACTIVE: '/v1/staff-salary-templates/active',
+    // Toggles the template's active flag both ways (activate / deactivate).
+    ACTIVATE: (id: number) => `/v1/staff-salary-templates/${id}/activate`,
+  },
+  STAFF_SALARY: {
+    LIST: '/v1/staff-salaries',
+    CREATE: '/v1/staff-salaries',
+    GET: (id: number) => `/v1/staff-salaries/${id}`,
+    UPDATE: (id: number) => `/v1/staff-salaries/${id}`,
+    DELETE: (id: number) => `/v1/staff-salaries/${id}`,
+    UPDATE_STATUS: (id: number) => `/v1/staff-salaries/${id}/status`,
+    // Returns the payslip as a binary PDF, not JSON — see getStaffSalaryPdf.
+    PDF: (id: number) => `/v1/staff-salaries/${id}/pdf`,
+    // Caller-scoped payslips for the Teacher panel — the backend resolves the
+    // user from the auth token, so there's no userId param here.
+    MY_SALARIES: '/v1/staff-salaries/my-salaries',
+  },
   PERIOD: {
     LIST: '/v1/periods',
     CREATE: '/v1/periods',

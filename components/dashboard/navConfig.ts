@@ -17,10 +17,12 @@ import {
   MessageSquare,
   NotebookPen,
   Palette,
+  ReceiptIndianRupee,
   ShieldCheck,
   UserCircle,
   UserPlus,
   Users,
+  Wallet,
 } from 'lucide-react';
 import type { Role } from '@/lib/auth';
 
@@ -61,6 +63,8 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Classes', href: '/principal/class', icon: BookOpen });
     // items.push({ label: 'Attedance', href: '/principal/attedance', icon: ClipboardCheck });
     items.push({ label: 'Fees', href: '/principal/fee-structure', icon: IndianRupee });
+    items.push({ label: 'Salary Template', href: '/principal/salary-template', icon: ReceiptIndianRupee });
+    items.push({ label: 'Staff Salary', href: '/principal/staff-salary', icon: Wallet });
     items.push({ label: 'Time Table', href: '/principal/time-table', icon: CalendarClock });
     items.push({ label: 'Notice', href: '/principal/notice', icon: Megaphone });
     items.push({ label: 'Homework', href: '/principal/homework', icon: NotebookPen });
@@ -85,6 +89,7 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Time Table', href: '/teacher/time-table', icon: CalendarClock });
     items.push({ label: 'Homework', href: '/teacher/homework', icon: NotebookPen });
     items.push({ label: 'Holidays', href: '/teacher/holiday', icon: CalendarDays });
+    items.push({ label: 'My Salary', href: '/teacher/salary', icon: Wallet });
     items.push({ label: 'Communication', href: '/teacher/communication', icon: MessageSquare });
   }
 

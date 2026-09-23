@@ -57,18 +57,37 @@ export const createGroupConversation = async (
 
 // ─── Messages ───────────────────────────────────────────────────────────────
 
-export type MessageType = 'TEXT';
+// SENDING is client-only — an optimistic bubble not yet echoed back by the server.
+export type MessageStatus = 'SENDING' | 'SENT' | 'DELIVERED' | 'READ' | 'DELETED';
 
+// Same shape from REST (GET .../messages) and the /topic/conversation/{id}
+// broadcast. clientMessageId only exists on local optimistic copies.
 export interface ChatMessage {
   id: number;
-  clientMessageId: string;
+  clientMessageId?: string;
   conversationId: number;
   senderId: number;
   senderName: string;
-  type: MessageType;
   content: string;
-  status: string;
+  status: MessageStatus;
   createdAt: string;
+}
+
+// Broadcast on /topic/conversation/{id}/typing.
+export interface TypingEvent {
+  conversationId: number;
+  userId: number;
+  userName: string;
+  typing: boolean;
+}
+
+// Broadcast on /topic/conversation/{id}/read.
+export interface ReadReceiptEvent {
+  conversationId: number;
+  userId: number;
+  userName: string;
+  lastReadMessageId: number;
+  readAt: string;
 }
 
 export const getMessages = async (conversationId: number): Promise<ChatMessage[]> => {

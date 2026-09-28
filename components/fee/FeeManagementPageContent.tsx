@@ -1,12 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { FileSpreadsheet } from 'lucide-react';
 import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import TabPill from '@/components/ui/TabPill';
+import Button from '@/components/ui/Button';
 import FeeStructurePageContent from './FeeStructurePageContent';
 import CollectFeeTab from './CollectFeeTab';
 import ReportsTab from './ReportsTab';
 import ConcessionsTab from './ConcessionsTab';
+import ExportFeesModal from './ExportFeesModal';
 
 type TopTab = 'structure' | 'collect' | 'reports' | 'concessions';
 
@@ -24,6 +27,7 @@ export default function FeeManagementPageContent({ initialTab }: { initialTab?: 
   // Lets the Collect Fee detail page's "Back" link (?tab=collect) land back
   // on the tab it was opened from instead of always resetting to Fee Structure.
   const [tab, setTab] = useState<TopTab>(isTopTab(initialTab) ? initialTab : 'structure');
+  const [exportOpen, setExportOpen] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -34,12 +38,17 @@ export default function FeeManagementPageContent({ initialTab }: { initialTab?: 
         {TOP_TABS.map((t) => (
           <TabPill key={t.key} label={t.label} active={tab === t.key} onClick={() => setTab(t.key)} />
         ))}
+        <Button icon={FileSpreadsheet} size="sm" variant="secondary" className="ml-auto" onClick={() => setExportOpen(true)}>
+          Export Excel
+        </Button>
       </div>
 
       {tab === 'structure' && <FeeStructurePageContent />}
       {tab === 'collect' && <CollectFeeTab />}
       {tab === 'reports' && <ReportsTab />}
       {tab === 'concessions' && <ConcessionsTab />}
+
+      {exportOpen && <ExportFeesModal onClose={() => setExportOpen(false)} />}
     </div>
   );
 }

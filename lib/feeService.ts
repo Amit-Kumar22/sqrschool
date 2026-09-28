@@ -179,6 +179,21 @@ export const markOverdueStudentFees = async (): Promise<number> => {
   return response.data;
 };
 
+export type StudentFeeExcelParams = Pick<StudentFeeListParams, 'classId' | 'studentId' | 'status'>;
+
+/**
+ * Downloads the student fees as an Excel workbook, optionally filtered by
+ * class/student/status. Returns binary, so it asks axios for a Blob — leaving
+ * the default JSON parsing on would corrupt the bytes.
+ */
+export const getStudentFeesExcel = async ({ classId, studentId, status }: StudentFeeExcelParams = {}): Promise<Blob> => {
+  const response = await api.get<Blob>(API_ENDPOINTS.STUDENT_FEE.EXCEL, {
+    params: { classId, studentId, status },
+    responseType: 'blob',
+  });
+  return response.data;
+};
+
 export interface RecordFeePaymentPayload {
   amount: number;
   paymentMode: PaymentMode;

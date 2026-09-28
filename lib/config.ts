@@ -196,6 +196,7 @@ export const API_ENDPOINTS = {
     MARK_OVERDUE: '/v1/student-fees/overdue/mark',
     PAYMENTS: (id: number) => `/v1/student-fees/${id}/payments`,
     ALL_PAYMENTS: '/v1/student-fees/all-payment',
+    EXCEL: '/v1/student-fees/excel',
   },
   STUDENT_CONCESSION: {
     LIST: '/v1/student-concessions',

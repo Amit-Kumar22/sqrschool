@@ -33,7 +33,7 @@ const HIGHLIGHTS = [
 const DEMO_PASSWORD = '12345';
 
 const DEMO_ACCOUNTS = [
-  { role: 'Super Admin', email: 'super-admin@gmail.com', icon: ShieldCheck },
+  // { role: 'Super Admin', email: 'super-admin@gmail.com', icon: ShieldCheck },
   { role: 'Principal', email: 'admin@gmail.com', icon: Briefcase },
   { role: 'Teacher', email: 'kavita.joshi@yopmail.com', icon: UserCog },
   { role: 'Student', email: 'aarav@gvs.edu', icon: GraduationCap },

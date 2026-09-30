@@ -122,21 +122,88 @@ export const deleteStudent = async (studentId: number): Promise<void> => {
   await api.put(API_ENDPOINTS.STUDENT_ADMISSION.DELETE(studentId));
 };
 
-// Bulk-imports students from a raw file (multipart/form-data, single `file`
-// field). `api`'s instance default sets Content-Type: application/json —
+// Header row the bulk-import endpoint expects, in this order.
+export const STUDENT_IMPORT_HEADERS = [
+  'name',
+  'fatherName',
+  'motherName',
+  'parentEmail',
+  'parentPhone',
+  'className',
+  'dob',
+  'address',
+  'pincode',
+  'gender',
+] as const;
+
+export interface StudentImportRowError {
+  row: number | null;
+  message: string;
+}
+
+export interface StudentImportResult {
+  imported: number | null;
+  failed: number | null;
+  errors: StudentImportRowError[];
+  message: string;
+}
+
+const firstNumber = (obj: Record<string, unknown>, keys: string[]): number | null => {
+  for (const key of keys) {
+    const value = obj[key];
+    if (typeof value === 'number') return value;
+    if (Array.isArray(value)) return value.length;
+  }
+  return null;
+};
+
+// The response shape isn't documented by the API spec — accept either an
+// {result} envelope or a flat body, and the common names for the success
+// count and the per-row error list. Row errors may be objects
+// ({row|rowNumber, message|error|reason|errors}) or plain strings.
+const normalizeImportResult = (data: unknown): StudentImportResult => {
+  const envelope = (data ?? {}) as Record<string, unknown>;
+  const body = (envelope.result && typeof envelope.result === 'object' ? envelope.result : envelope) as Record<
+    string,
+    unknown
+  >;
+  const rawErrors = ['errors', 'invalidRows', 'failedRows', 'failures', 'rowErrors']
+    .map((key) => body[key])
+    .find(Array.isArray) as unknown[] | undefined;
+
+  const errors = (rawErrors ?? []).map((item): StudentImportRowError => {
+    if (typeof item === 'string') return { row: null, message: item };
+    const obj = (item ?? {}) as Record<string, unknown>;
+    const row = obj.row ?? obj.rowNumber ?? obj.rowNo ?? obj.line;
+    const detail = obj.message ?? obj.error ?? obj.reason ?? obj.errors;
+    return {
+      row: typeof row === 'number' ? row : row != null ? Number(row) || null : null,
+      message: Array.isArray(detail) ? detail.join(', ') : String(detail ?? 'Invalid row'),
+    };
+  });
+
+  return {
+    imported: firstNumber(body, ['successCount', 'imported', 'importedCount', 'created', 'createdCount', 'success']),
+    failed: firstNumber(body, ['failedCount', 'failureCount', 'failed', 'invalidCount']) ?? (rawErrors ? errors.length : null),
+    errors,
+    message: typeof envelope.message === 'string' ? envelope.message : '',
+  };
+};
+
+// Bulk-imports students from a CSV/Excel file (multipart/form-data, single
+// `file` field). `api`'s instance default sets Content-Type: application/json —
 // axios's transformRequest checks that against the current header and, if
 // it matches, JSON.stringifies a FormData body instead of sending it as
 // multipart (see defaults/index.js's isFormData branch), silently breaking
 // the upload. Clearing Content-Type per-request avoids that; the browser
-// then sets the correct multipart boundary itself. Response shape isn't
-// documented by the API spec.
-export const uploadStudentRawFile = async (file: File): Promise<unknown> => {
+// then sets the correct multipart boundary itself.
+export const bulkImportStudents = async (file: File): Promise<StudentImportResult> => {
   const formData = new FormData();
   formData.append('file', file);
-  const response = await api.post(API_ENDPOINTS.STUDENT_ADMISSION.RAW_FILE_UPLOAD, formData, {
+  const response = await api.post(API_ENDPOINTS.STUDENT_ADMISSION.BULK_IMPORT, formData, {
     headers: { 'Content-Type': undefined },
   });
-  return response.data;
+  return normalizeImportResult(response.data);
 };
 
 // ─── Student Class Section service ──────────────────────────────────────────

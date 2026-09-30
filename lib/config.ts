@@ -62,7 +62,7 @@ export const API_ENDPOINTS = {
     LIST: '/v1/student/all-student',
     UPDATE: (studentId: number) => `/v1/student/update-student/${studentId}`,
     DELETE: (studentId: number) => `/v1/student/delete-student/${studentId}`,
-    RAW_FILE_UPLOAD: '/v1/student/student-raw-file-upload',
+    BULK_IMPORT: '/v1/student/bulk-import',
   },
   STUDENT_CLASS_SECTION: {
     CREATE: '/v1/student-class-sections',

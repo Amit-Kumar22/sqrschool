@@ -9,5 +9,5 @@ export default async function PrincipalTeacherDetailPage({
 }) {
   const { teacherId } = await params;
   const { tab } = await searchParams;
-  return <TeacherDetailPageContent teacherId={Number(teacherId)} initialTab={tab === 'attendance' ? 'attendance' : 'details'} />;
+  return <TeacherDetailPageContent teacherId={Number(teacherId)} initialTab={tab === 'attendance' || tab === 'documents' ? tab : 'details'} />;
 }

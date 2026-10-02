@@ -9,5 +9,5 @@ export default async function PrincipalStudentDetailPage({
 }) {
   const { studentId } = await params;
   const { tab } = await searchParams;
-  return <StudentDetailPageContent studentId={Number(studentId)} initialTab={tab === 'attendance' ? 'attendance' : 'details'} />;
+  return <StudentDetailPageContent studentId={Number(studentId)} initialTab={tab === 'attendance' || tab === 'documents' ? tab : 'details'} />;
 }

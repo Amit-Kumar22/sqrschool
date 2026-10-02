@@ -8,6 +8,7 @@ import {
   ClipboardCheck,
   ClipboardList,
   Contact2,
+  FolderOpen,
   Globe,
   IndianRupee,
   LayoutDashboard,
@@ -91,11 +92,13 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Holidays', href: '/teacher/holiday', icon: CalendarDays });
     items.push({ label: 'My Salary', href: '/teacher/salary', icon: Wallet });
     items.push({ label: 'Communication', href: '/teacher/communication', icon: MessageSquare });
+    items.push({ label: 'My Documents', href: '/teacher/documents', icon: FolderOpen });
   }
 
   if (role === 'STUDENT') {
     items.push({ label: 'Attedance', href: '/student/attedance', icon: ClipboardCheck });
     items.push({ label: 'Communication', href: '/student/communication', icon: MessageSquare });
+    items.push({ label: 'My Documents', href: '/student/documents', icon: FolderOpen });
   }
 
   items.push({ label: 'My Profile', href: `/${base}/profile`, icon: UserCircle });

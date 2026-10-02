@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CalendarCheck, GraduationCap, IdCard, Loader2, Pencil, Phone, Trash2, User, Users } from 'lucide-react';
+import { ArrowLeft, CalendarCheck, FolderOpen, GraduationCap, IdCard, Loader2, Pencil, Phone, Trash2, User, Users } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteStudent, getStudentAdmissions, type StudentAdmission } from '@/lib/studentService';
@@ -11,15 +11,17 @@ import { StatusBadge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import SegmentedTabs, { type SegmentedTabItem } from '@/components/ui/SegmentedTabs';
 import PersonAttendanceCalendar from '@/components/attendance/PersonAttendanceCalendar';
+import DocumentListContent from '@/components/document/DocumentListContent';
 import StudentEditFormModal from './StudentEditFormModal';
 
 const formatDate = (value?: string | null) => (value ? new Date(value).toLocaleDateString() : '—');
 
-type DetailTab = 'details' | 'attendance';
+type DetailTab = 'details' | 'attendance' | 'documents';
 
 const TABS: SegmentedTabItem[] = [
   { key: 'details', label: 'Details', icon: IdCard },
   { key: 'attendance', label: 'Attendance', icon: CalendarCheck },
+  { key: 'documents', label: 'Documents', icon: FolderOpen },
 ];
 
 export default function StudentDetailPageContent({ studentId, initialTab }: { studentId: number; initialTab?: DetailTab }) {
@@ -162,6 +164,8 @@ export default function StudentDetailPageContent({ studentId, initialTab }: { st
       )}
 
       {activeTab === 'attendance' && <PersonAttendanceCalendar userId={student.studentUser.id} />}
+
+      {activeTab === 'documents' && <DocumentListContent mode="admin" userId={student.studentUser.id} />}
 
       {editModalOpen && (
         <StudentEditFormModal

@@ -3,21 +3,23 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, BadgeCheck, CalendarCheck, GraduationCap, IdCard, Layers, Loader2, Phone } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, CalendarCheck, FolderOpen, GraduationCap, IdCard, Layers, Loader2, Phone } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { getAllTeacherStaff, type TeacherStaffMember } from '@/lib/schoolService';
 import { StatusBadge } from '@/components/ui/Badge';
 import SegmentedTabs, { type SegmentedTabItem } from '@/components/ui/SegmentedTabs';
 import PersonAttendanceCalendar from '@/components/attendance/PersonAttendanceCalendar';
+import DocumentListContent from '@/components/document/DocumentListContent';
 
 const formatDate = (value?: string | null) => (value ? new Date(value).toLocaleDateString() : '—');
 
-type DetailTab = 'details' | 'attendance';
+type DetailTab = 'details' | 'attendance' | 'documents';
 
 const TABS: SegmentedTabItem[] = [
   { key: 'details', label: 'Details', icon: IdCard },
   { key: 'attendance', label: 'Attendance', icon: CalendarCheck },
+  { key: 'documents', label: 'Documents', icon: FolderOpen },
 ];
 
 export default function TeacherDetailPageContent({ teacherId, initialTab }: { teacherId: number; initialTab?: DetailTab }) {
@@ -145,6 +147,8 @@ export default function TeacherDetailPageContent({ teacherId, initialTab }: { te
       )}
 
       {activeTab === 'attendance' && <PersonAttendanceCalendar userId={teacher.teacherUser.id} />}
+
+      {activeTab === 'documents' && <DocumentListContent mode="admin" userId={teacher.teacherUser.id} />}
     </div>
   );
 }

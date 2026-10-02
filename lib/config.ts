@@ -388,6 +388,19 @@ export const API_ENDPOINTS = {
     // roster row.
     USER_TODAY: (userId: number) => `/v1/api/attendance/user-today/user/${userId}`,
   },
+  // Personal documents (Aadhaar, TC, certificates…). CREATE/UPDATE are
+  // multipart/form-data; CREATE always files the document under the caller's
+  // own account. LIST is the admin-side cross-user search (filter by userId),
+  // MY is the caller-scoped list for the Student/Parent panels.
+  DOCUMENT: {
+    LIST: '/v1/documents',
+    CREATE: '/v1/documents',
+    GET: (id: number) => `/v1/documents/${id}`,
+    UPDATE: (id: number) => `/v1/documents/${id}`,
+    DELETE: (id: number) => `/v1/documents/${id}`,
+    VERIFY: (id: number) => `/v1/documents/${id}/verify`,
+    MY: '/v1/documents/my',
+  },
   DASHBOARD: {
     ADMIN_ATTENDANCE_OVERVIEW: '/v1/admin/dashboard/attendance-overview',
     ADMIN_CLASS_STATS: '/v1/admin/dashboard/class-stats',

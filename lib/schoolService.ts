@@ -200,6 +200,27 @@ export const getAllTeachers = async ({ page = 0, size = 200 }: TeacherListParams
   return response.data;
 };
 
+// /v1/teacher/by-subject — flat list of teachers who teach a given subject.
+export interface TeacherBySubject {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  employeeCode: string;
+  qualification: string;
+  experienceYears: number;
+  subjectId: number;
+  subjectName: string;
+}
+
+/** Teachers for one subject. Returns a bare array — no envelope, no paging. */
+export const getTeachersBySubject = async (subjectId: number): Promise<TeacherBySubject[]> => {
+  const response = await api.get<TeacherBySubject[]>(API_ENDPOINTS.TEACHER.BY_SUBJECT, {
+    params: { subjectId },
+  });
+  return response.data ?? [];
+};
+
 // /v1/admin/all-teacher — a distinct, richer teacher roster (subject,
 // qualification, employee code, assigned classes) than getAllTeachers above,
 // which just reuses the student-admission DTO for a bare name/id dropdown.

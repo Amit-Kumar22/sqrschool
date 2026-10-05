@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { BookOpen, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import {
@@ -14,7 +14,7 @@ import {
   type WeeklyTimetablePayload,
 } from '@/lib/timetableService';
 import type { Subject } from '@/lib/subjectService';
-import type { TeacherStaffMember } from '@/lib/schoolService';
+import { getTeachersBySubject, type TeacherBySubject } from '@/lib/schoolService';
 import Modal from '@/components/ui/Modal';
 import Button, { IconButton } from '@/components/ui/Button';
 import { SelectField, TextareaField } from '@/components/ui/FormField';
@@ -34,8 +34,6 @@ export default function AssignmentFormModal({
   dayOfWeek,
   item,
   subjects = [],
-  teachers = [],
-  classId,
   onClose,
   onSaved,
   onDeleted,
@@ -44,9 +42,6 @@ export default function AssignmentFormModal({
   dayOfWeek: DayOfWeek;
   item: WeeklyTimetableEntry | null;
   subjects: Subject[];
-  teachers: TeacherStaffMember[];
-  /** Only teachers assigned to this class are offered — an unassigned teacher can't be scheduled for it. */
-  classId: number;
   onClose: () => void;
   onSaved: (item: WeeklyTimetableEntry) => void;
   onDeleted: (id: number) => void;
@@ -56,11 +51,32 @@ export default function AssignmentFormModal({
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
 
+  // Teacher options come from /v1/teacher/by-subject for the chosen subject;
+  // tagged with the subjectId they were fetched for so a stale list is never shown.
+  const [teacherOptions, setTeacherOptions] = useState<{ subjectId: number; list: TeacherBySubject[] } | null>(null);
+
   const isEditing = !!item;
-  const classTeachers = teachers.filter((teacher) => teacher.assignedClasses.some((cls) => cls.id === classId));
-  // Narrowed to the chosen subject — a teacher assigned to this class but
-  // teaching a different subject can't be scheduled for this period.
-  const availableTeachers = form.subjectId ? classTeachers.filter((teacher) => teacher.subject?.id === form.subjectId) : [];
+  const teachersLoading = !!form.subjectId && teacherOptions?.subjectId !== form.subjectId;
+  const availableTeachers = form.subjectId && !teachersLoading ? teacherOptions!.list : [];
+
+  useEffect(() => {
+    if (!form.subjectId) return;
+    const subjectId = form.subjectId;
+    let cancelled = false;
+    getTeachersBySubject(subjectId)
+      .then((list) => {
+        if (!cancelled) setTeacherOptions({ subjectId, list });
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setTeacherOptions({ subjectId, list: [] });
+        setError(apiErrorMessage(err, 'Could not load teachers for this subject.'));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [form.subjectId]);
+
   const setField = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
@@ -162,20 +178,22 @@ export default function AssignmentFormModal({
         <SelectField
           label="Teacher"
           required
-          disabled={availableTeachers.length === 0}
+          disabled={teachersLoading || availableTeachers.length === 0}
           value={form.teacherId || ''}
           onChange={(e) => setField('teacherId', Number(e.target.value))}
         >
           <option value="" disabled>
             {!form.subjectId
               ? 'Select a subject first'
-              : availableTeachers.length === 0
-                ? 'No teachers for this subject in this class'
-                : 'Select a teacher'}
+              : teachersLoading
+                ? 'Loading teachers…'
+                : availableTeachers.length === 0
+                  ? 'No teachers for this subject'
+                  : 'Select a teacher'}
           </option>
           {availableTeachers.map((teacher) => (
             <option key={teacher.id} value={teacher.id}>
-              {teacher.subject ? `${teacher.teacherUser.fullName} (${teacher.subject.subjectName})` : teacher.teacherUser.fullName}
+              {teacher.subjectName ? `${teacher.fullName} (${teacher.subjectName})` : teacher.fullName}
             </option>
           ))}
         </SelectField>

@@ -48,6 +48,7 @@ export const API_ENDPOINTS = {
   },
   TEACHER: {
     ALL_STUDENT: '/v1/teacher/all-student',
+    BY_SUBJECT: '/v1/teacher/by-subject',
   },
   TEACHER_SUBJECT_MAPPING: {
     LIST: '/v1/student-subject-section-mapping',

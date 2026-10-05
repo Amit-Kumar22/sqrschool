@@ -5,7 +5,6 @@ import { ChevronDown, Clock, Plus, Settings } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { getClasses, type SchoolClass } from '@/lib/classService';
 import { getSubjects, type Subject } from '@/lib/subjectService';
-import { getAllTeacherStaff, type TeacherStaffMember } from '@/lib/schoolService';
 import {
   DAYS_OF_WEEK,
   formatTime,
@@ -39,7 +38,6 @@ interface AssignTarget {
 export default function TimetablePageContent() {
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [teachers, setTeachers] = useState<TeacherStaffMember[]>([]);
   const [classId, setClassId] = useState<number | ''>('');
   const [initialLoading, setInitialLoading] = useState(true);
 
@@ -56,12 +54,11 @@ export default function TimetablePageContent() {
     let cancelled = false;
     (async () => {
       try {
-        const [classesRes, subjectsRes, teachersRes] = await Promise.all([getClasses(), getSubjects(), getAllTeacherStaff()]);
+        const [classesRes, subjectsRes] = await Promise.all([getClasses(), getSubjects()]);
         if (cancelled) return;
         const classList = classesRes.content ?? [];
         setClasses(classList);
         setSubjects(subjectsRes.content ?? []);
-        setTeachers(teachersRes.content ?? []);
         setClassId((prev) => prev || (classList[0]?.id ?? ''));
       } catch (err) {
         if (!cancelled) setError(apiErrorMessage(err, 'Could not load timetable data.'));
@@ -267,8 +264,6 @@ export default function TimetablePageContent() {
           dayOfWeek={assignTarget.day}
           item={assignTarget.entry}
           subjects={subjects}
-          teachers={teachers}
-          classId={Number(classId)}
           onClose={() => setAssignTarget(null)}
           onSaved={() => {
             setAssignTarget(null);

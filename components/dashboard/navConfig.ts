@@ -20,6 +20,7 @@ import {
   Palette,
   ReceiptIndianRupee,
   ShieldCheck,
+  Sparkles,
   UserCircle,
   UserPlus,
   Users,
@@ -71,6 +72,7 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Homework', href: '/principal/homework', icon: NotebookPen });
     items.push({ label: 'Communication', href: '/principal/communication', icon: MessageSquare });
     items.push({ label: 'Report', href: '/principal/report', icon: BarChart3 });
+    items.push({ label: 'AI Assistant', href: '/principal/ai-search', icon: Sparkles });
     items.push({ label: 'Role & Permission', href: '/principal/role-permission', icon: ShieldCheck });
     items.push({ label: 'Subject & Class', href: '/principal/subject-class', icon: Layers });
     items.push({ label: 'Test & Exam', href: '/principal/exams', icon: ClipboardList });

@@ -119,6 +119,11 @@ export const API_ENDPOINTS = {
   SCHOOL_LEADS: {
     LIST: '/v1/school-leads',
   },
+  // Natural-language search over school data: the backend turns the question
+  // into a read-only SQL query and answers with a summary plus the result rows.
+  AI: {
+    SEARCH: '/v1/ai/search',
+  },
   EXAM: {
     LIST: '/v1/exams',
     CREATE: '/v1/exams',

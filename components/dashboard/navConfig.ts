@@ -2,8 +2,14 @@ import type { LucideIcon } from 'lucide-react';
 import {
   BarChart3,
   Bot,
+  Bus,
+  Fuel,
+  HardHat,
+  Route,
+  ShieldAlert,
   BookOpen,
   CalendarClock,
+  Banknote,
   CalendarDays,
   ClipboardCheck,
   ClipboardList,
@@ -67,16 +73,17 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'Fees', href: '/principal/fee-structure', icon: IndianRupee });
     items.push({ label: 'Salary Template', href: '/principal/salary-template', icon: ReceiptIndianRupee });
     items.push({ label: 'Staff Salary', href: '/principal/staff-salary', icon: Wallet });
+    items.push({ label: 'Transport', href: '/principal/transport', icon: Bus });
     items.push({ label: 'Time Table', href: '/principal/time-table', icon: CalendarClock });
     items.push({ label: 'Notice', href: '/principal/notice', icon: Megaphone });
     items.push({ label: 'Homework', href: '/principal/homework', icon: NotebookPen });
     items.push({ label: 'Communication', href: '/principal/communication', icon: MessageSquare });
-    items.push({ label: 'Report', href: '/principal/report', icon: BarChart3 });
+    // items.push({ label: 'Report', href: '/principal/report', icon: BarChart3 });
     items.push({ label: 'AI Assistant', href: '/principal/ai-search', icon: Sparkles });
     items.push({ label: 'Role & Permission', href: '/principal/role-permission', icon: ShieldCheck });
     items.push({ label: 'Subject & Class', href: '/principal/subject-class', icon: Layers });
     items.push({ label: 'Test & Exam', href: '/principal/exams', icon: ClipboardList });
-    items.push({ label: 'Study Material', href: '/principal/study-material', icon: Library });
+    // items.push({ label: 'Study Material', href: '/principal/study-material', icon: Library });
     items.push({ label: 'Chatbot Management', href: '/principal/chatbot', icon: Bot });
 
     // items.push({ label: 'Subject', href: '/principal/subject', icon: BookMarked });
@@ -103,6 +110,16 @@ export function getNavItems(role: Role): NavItem[] {
     items.push({ label: 'My Documents', href: '/student/documents', icon: FolderOpen });
   }
 
+  if (role === 'TRANSPORT') {
+    items.push({ label: 'Vehicles', href: '/transport/vehicles', icon: Bus });
+    items.push({ label: 'Routes & Students', href: '/transport/routes', icon: Route });
+    items.push({ label: 'Transport Staff', href: '/transport/staff', icon: HardHat });
+    items.push({ label: 'Expenses', href: '/transport/expenses', icon: Fuel });
+    items.push({ label: 'Staff Salaries', href: '/transport/salaries', icon: Wallet });
+    items.push({ label: 'Transport Fees', href: '/transport/fees', icon: Banknote });
+    items.push({ label: 'Compliance', href: '/transport/compliance', icon: ShieldAlert });
+  }
+
   items.push({ label: 'My Profile', href: `/${base}/profile`, icon: UserCircle });
 
   return items;
@@ -116,4 +133,5 @@ export const ROLE_LABELS: Record<Role, string> = {
   STUDENT: 'Student',
   ADMIN: "Admin",
   PARENT: 'Parent',
+  TRANSPORT: 'Transport',
 };

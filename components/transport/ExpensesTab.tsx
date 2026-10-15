@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BarChart3, Bus, Fuel, Pencil, PieChart, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { BarChart3, Bus, Pencil, PieChart, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import {
   deleteExpense,
@@ -16,7 +16,6 @@ import {
   type Vehicle,
   type VehicleExpense,
 } from '@/lib/transportService';
-import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import Button, { IconButton } from '@/components/ui/Button';
 import { SelectField, TextField } from '@/components/ui/FormField';
@@ -178,29 +177,6 @@ export default function ExpensesTab() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={Fuel}
-        title="Vehicle Expenses"
-        description="Fuel, maintenance and renewal costs with fleet-wide breakdowns."
-        actions={
-          <>
-            <Button variant="secondary" size="sm" icon={RefreshCw} onClick={refreshAll} disabled={loading}>
-              Refresh
-            </Button>
-            <Button
-              size="sm"
-              icon={Plus}
-              onClick={() => {
-                setEditing(null);
-                setFormOpen(true);
-              }}
-            >
-              Record Expense
-            </Button>
-          </>
-        }
-      />
-
       <FilterBar>
         <TextField label="From" type="date" wrapperClassName="w-40" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} />
         <TextField label="To" type="date" wrapperClassName="w-40" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} />
@@ -233,14 +209,31 @@ export default function ExpensesTab() {
             Clear filters
           </Button>
         )}
+        <div className="mb-0.5 ml-auto flex flex-wrap items-center gap-2">
+          <Button variant="secondary" size="sm" icon={RefreshCw} onClick={refreshAll} disabled={loading}>
+            Refresh
+          </Button>
+          <Button
+            size="sm"
+            icon={Plus}
+            onClick={() => {
+              setEditing(null);
+              setFormOpen(true);
+            }}
+          >
+            Record Expense
+          </Button>
+        </div>
       </FilterBar>
 
+      {/* Stat cards — hidden for now, kept for later.
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MiniStat label="Total spend" value={formatMoney(stats.total)} tone="indigo" hint={hasFilters ? 'Filtered ledger' : 'Selected period'} />
         <MiniStat label="Entries" value={String(stats.count)} />
         <MiniStat label="Fuel spend" value={formatMoney(stats.fuelAmount)} tone="amber" />
         <MiniStat label="Fuel filled" value={`${stats.litres.toLocaleString('en-IN', { maximumFractionDigits: 1 })} L`} tone="emerald" />
       </div>
+      */}
 
       <ErrorBanner message={error} />
 

@@ -2,10 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Banknote, HandCoins, Plus, RefreshCw } from 'lucide-react';
+import { HandCoins, Plus, RefreshCw } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { getOutstandingTransportFees, getRoutes, type OutstandingTransportFee, type TransportRoute } from '@/lib/transportService';
-import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import Button from '@/components/ui/Button';
 import TransportStudentPicker from './TransportStudentPicker';
@@ -122,28 +121,14 @@ export default function FeesTab({ collectHref }: { collectHref?: (feeId: number)
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={Banknote}
-        title="Transport Fees"
-        description="Raise route-based transport fees and follow up on unpaid balances."
-        actions={
-          <>
-            <Button variant="secondary" size="sm" icon={RefreshCw} onClick={load} disabled={loading}>
-              Refresh
-            </Button>
-            <Button size="sm" icon={Plus} onClick={() => setGenerateOpen(true)}>
-              Generate Fee
-            </Button>
-          </>
-        }
-      />
-
+      {/* Stat cards — hidden for now, kept for later.
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MiniStat label="Outstanding" value={formatMoney(stats.due)} tone="red" hint={`${stats.count} fee${stats.count === 1 ? '' : 's'}`} />
         <MiniStat label="Students owing" value={String(stats.students)} tone="indigo" />
         <MiniStat label="Overdue" value={formatMoney(stats.overdue)} tone={stats.overdueCount ? 'amber' : 'emerald'} hint={`${stats.overdueCount} past due date`} />
         <MiniStat label="Active routes" value={String(routes.length)} />
       </div>
+      */}
 
       {notice && <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{notice}</div>}
       <ErrorBanner message={error} />
@@ -170,6 +155,14 @@ export default function FeesTab({ collectHref }: { collectHref?: (feeId: number)
             Show all students
           </Button>
         )}
+        <div className="mb-0.5 ml-auto flex flex-wrap items-center gap-2">
+          <Button variant="secondary" size="sm" icon={RefreshCw} onClick={load} disabled={loading}>
+            Refresh
+          </Button>
+          <Button size="sm" icon={Plus} onClick={() => setGenerateOpen(true)}>
+            Generate Fee
+          </Button>
+        </div>
       </FilterBar>
 
       <DataTable

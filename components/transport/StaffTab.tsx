@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Bus, HardHat, History, Link2Off, Pencil, Phone, Plus, RefreshCw, Search, UserX } from 'lucide-react';
+import { Bus, History, Link2Off, Pencil, Phone, Plus, RefreshCw, Search, UserX } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import {
   deactivateTransportStaff,
@@ -16,7 +16,6 @@ import {
   type TransportStaff,
   type Vehicle,
 } from '@/lib/transportService';
-import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import Button, { IconButton } from '@/components/ui/Button';
 import { SelectField, TextField } from '@/components/ui/FormField';
@@ -197,35 +196,14 @@ export default function StaffTab() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={HardHat}
-        title="Transport Staff"
-        description="Drivers, conductors and helpers — licences, vehicle duty and pay."
-        actions={
-          <>
-            <Button variant="secondary" size="sm" icon={RefreshCw} onClick={load} disabled={loading}>
-              Refresh
-            </Button>
-            <Button
-              size="sm"
-              icon={Plus}
-              onClick={() => {
-                setEditing(null);
-                setFormOpen(true);
-              }}
-            >
-              Add Staff
-            </Button>
-          </>
-        }
-      />
-
+      {/* Stat cards — hidden for now, kept for later.
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MiniStat label="Staff listed" value={String(stats.total)} />
         <MiniStat label="Active drivers" value={String(stats.drivers)} tone="indigo" />
         <MiniStat label="Expired licences" value={String(stats.expiredLicences)} tone={stats.expiredLicences ? 'red' : 'emerald'} />
         <MiniStat label="Monthly payroll" value={formatMoney(stats.payroll)} tone="emerald" hint="Active staff" />
       </div>
+      */}
 
       <ErrorBanner message={error} />
 
@@ -273,6 +251,21 @@ export default function StaffTab() {
             Clear filters
           </Button>
         )}
+        <div className="mb-0.5 ml-auto flex flex-wrap items-center gap-2">
+          <Button variant="secondary" size="sm" icon={RefreshCw} onClick={load} disabled={loading}>
+            Refresh
+          </Button>
+          <Button
+            size="sm"
+            icon={Plus}
+            onClick={() => {
+              setEditing(null);
+              setFormOpen(true);
+            }}
+          >
+            Add Staff
+          </Button>
+        </div>
       </FilterBar>
 
       <DataTable

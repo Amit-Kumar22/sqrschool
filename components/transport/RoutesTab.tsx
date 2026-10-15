@@ -28,7 +28,6 @@ import {
   type TransportStaff,
   type Vehicle,
 } from '@/lib/transportService';
-import PageHeader from '@/components/ui/PageHeader';
 import Button, { IconButton } from '@/components/ui/Button';
 import { SelectField } from '@/components/ui/FormField';
 import { StatusBadge } from '@/components/ui/Badge';
@@ -110,38 +109,14 @@ export default function RoutesTab() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={RouteIcon}
-        title="Routes & Students"
-        description="Routes, stops and timings — and which students board where."
-        actions={
-          <>
-            <Button variant="secondary" size="sm" icon={SearchCheck} onClick={() => setLookupOpen(true)}>
-              Find Student
-            </Button>
-            <Button variant="secondary" size="sm" icon={RefreshCw} onClick={load} disabled={loading}>
-              Refresh
-            </Button>
-            <Button
-              size="sm"
-              icon={Plus}
-              onClick={() => {
-                setEditing(null);
-                setFormOpen(true);
-              }}
-            >
-              New Route
-            </Button>
-          </>
-        }
-      />
-
+      {/* Stat cards — hidden for now, kept for later.
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MiniStat label="Active routes" value={String(stats.routes)} />
         <MiniStat label="Students boarded" value={String(stats.students)} tone="indigo" />
         <MiniStat label="Seat occupancy" value={`${stats.occupancy}%`} tone={stats.occupancy > 100 ? 'red' : stats.occupancy > 85 ? 'amber' : 'emerald'} />
         <MiniStat label="Missing vehicle/driver" value={String(stats.unstaffed)} tone={stats.unstaffed ? 'amber' : 'emerald'} />
       </div>
+      */}
 
       <ErrorBanner message={error} />
 
@@ -151,6 +126,24 @@ export default function RoutesTab() {
           <option value="false">Inactive routes</option>
           <option value="">All routes</option>
         </SelectField>
+        <div className="mb-0.5 ml-auto flex flex-wrap items-center gap-2">
+          <Button variant="secondary" size="sm" icon={SearchCheck} onClick={() => setLookupOpen(true)}>
+            Find Student
+          </Button>
+          <Button variant="secondary" size="sm" icon={RefreshCw} onClick={load} disabled={loading}>
+            Refresh
+          </Button>
+          <Button
+            size="sm"
+            icon={Plus}
+            onClick={() => {
+              setEditing(null);
+              setFormOpen(true);
+            }}
+          >
+            New Route
+          </Button>
+        </div>
       </FilterBar>
 
       {loading ? (

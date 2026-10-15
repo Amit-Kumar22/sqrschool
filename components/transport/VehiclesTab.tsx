@@ -11,7 +11,6 @@ import {
   type Vehicle,
   type VehicleType,
 } from '@/lib/transportService';
-import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import Button, { IconButton } from '@/components/ui/Button';
 import { SelectField, TextField } from '@/components/ui/FormField';
@@ -150,35 +149,14 @@ export default function VehiclesTab() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={Bus}
-        title="Vehicles"
-        description="Fleet register with insurance, fitness, permit and PUC validity."
-        actions={
-          <>
-            <Button variant="secondary" size="sm" icon={RefreshCw} onClick={load} disabled={loading}>
-              Refresh
-            </Button>
-            <Button
-              size="sm"
-              icon={Plus}
-              onClick={() => {
-                setEditing(null);
-                setFormOpen(true);
-              }}
-            >
-              Add Vehicle
-            </Button>
-          </>
-        }
-      />
-
+      {/* Stat cards — hidden for now, kept for later.
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MiniStat label="Vehicles" value={String(stats.total)} hint={`${stats.active} active`} />
         <MiniStat label="Seating capacity" value={String(stats.seats)} tone="indigo" hint="Across active vehicles" />
         <MiniStat label="Docs due ≤ 30 days" value={String(stats.dueSoon)} tone={stats.dueSoon ? 'amber' : 'emerald'} />
         <MiniStat label="Docs expired" value={String(stats.expired)} tone={stats.expired ? 'red' : 'emerald'} />
       </div>
+      */}
 
       <ErrorBanner message={error} />
 
@@ -218,6 +196,21 @@ export default function VehiclesTab() {
             Clear filters
           </Button>
         )}
+        <div className="mb-0.5 ml-auto flex flex-wrap items-center gap-2">
+          <Button variant="secondary" size="sm" icon={RefreshCw} onClick={load} disabled={loading}>
+            Refresh
+          </Button>
+          <Button
+            size="sm"
+            icon={Plus}
+            onClick={() => {
+              setEditing(null);
+              setFormOpen(true);
+            }}
+          >
+            Add Vehicle
+          </Button>
+        </div>
       </FilterBar>
 
       <DataTable

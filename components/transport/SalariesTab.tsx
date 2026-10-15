@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FileText, HandCoins, ListChecks, Pencil, Plus, RefreshCw, Trash2, Wallet } from 'lucide-react';
+import { FileText, HandCoins, ListChecks, Pencil, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import {
   deleteTransportSalary,
@@ -12,7 +12,6 @@ import {
   type TransportSalaryStatus,
   type TransportStaff,
 } from '@/lib/transportService';
-import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import Button, { IconButton } from '@/components/ui/Button';
 import { SelectField, TextField } from '@/components/ui/FormField';
@@ -173,35 +172,14 @@ export default function SalariesTab() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={Wallet}
-        title="Transport Staff Salaries"
-        description="Monthly payroll for drivers, conductors and helpers."
-        actions={
-          <>
-            <Button variant="secondary" size="sm" icon={RefreshCw} onClick={load} disabled={loading}>
-              Refresh
-            </Button>
-            <Button
-              size="sm"
-              icon={Plus}
-              onClick={() => {
-                setEditing(null);
-                setFormOpen(true);
-              }}
-            >
-              Generate Salary
-            </Button>
-          </>
-        }
-      />
-
+      {/* Stat cards — hidden for now, kept for later.
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MiniStat label="Salary records" value={String(stats.count)} />
         <MiniStat label="Paid out" value={formatMoney(stats.paid)} tone="emerald" />
         <MiniStat label="Awaiting payment" value={formatMoney(stats.due)} tone={stats.dueCount ? 'amber' : 'emerald'} hint={`${stats.dueCount} salar${stats.dueCount === 1 ? 'y' : 'ies'}`} />
         <MiniStat label="Advances recovered" value={formatMoney(stats.advances)} tone="violet" />
       </div>
+      */}
 
       <ErrorBanner message={error} />
 
@@ -230,6 +208,21 @@ export default function SalariesTab() {
             Clear filters
           </Button>
         )}
+        <div className="mb-0.5 ml-auto flex flex-wrap items-center gap-2">
+          <Button variant="secondary" size="sm" icon={RefreshCw} onClick={load} disabled={loading}>
+            Refresh
+          </Button>
+          <Button
+            size="sm"
+            icon={Plus}
+            onClick={() => {
+              setEditing(null);
+              setFormOpen(true);
+            }}
+          >
+            Generate Salary
+          </Button>
+        </div>
       </FilterBar>
 
       <DataTable

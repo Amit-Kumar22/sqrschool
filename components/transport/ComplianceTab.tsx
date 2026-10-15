@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, FileWarning, Pencil, RefreshCw, ShieldAlert, ShieldCheck, XCircle } from 'lucide-react';
+import { CheckCircle2, FileWarning, Pencil, RefreshCw, ShieldCheck, XCircle } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import {
   getDocumentExpiries,
@@ -11,7 +11,6 @@ import {
   type DocumentRule,
   type VehicleType,
 } from '@/lib/transportService';
-import PageHeader from '@/components/ui/PageHeader';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import Button from '@/components/ui/Button';
 import { SelectField } from '@/components/ui/FormField';
@@ -94,38 +93,20 @@ export default function ComplianceTab() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        icon={ShieldAlert}
-        title="Document Compliance"
-        description="Expired and upcoming vehicle document renewals, and the rules per vehicle type."
-        actions={
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={RefreshCw}
-            onClick={() => {
-              loadExpiries();
-              loadRules();
-            }}
-            disabled={loading}
-          >
-            Refresh
-          </Button>
-        }
-      />
-
+      {/* Stat cards — hidden for now, kept for later.
       <div className="grid grid-cols-3 gap-3">
         <MiniStat label="Expired" value={String(stats.expired)} tone={stats.expired ? 'red' : 'emerald'} />
         <MiniStat label={`Due in ${withinDays} days`} value={String(stats.upcoming)} tone={stats.upcoming ? 'amber' : 'emerald'} />
         <MiniStat label="Vehicles affected" value={String(stats.vehicles)} tone="indigo" />
       </div>
+      */}
 
       <ErrorBanner message={error} />
 
       <div className="grid gap-4 xl:grid-cols-5">
         <div className="space-y-3 xl:col-span-3">
-          <div className="card-premium flex flex-wrap items-end justify-between gap-3 px-4 py-3.5">
-            <div className="flex items-center gap-2.5">
+          <div className="card-premium flex flex-wrap items-end gap-3 px-4 py-3.5">
+            <div className="mr-auto flex items-center gap-2.5">
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
                 <FileWarning size={16} />
               </span>
@@ -141,6 +122,19 @@ export default function ComplianceTab() {
                 </option>
               ))}
             </SelectField>
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={RefreshCw}
+              className="mb-0.5"
+              onClick={() => {
+                loadExpiries();
+                loadRules();
+              }}
+              disabled={loading}
+            >
+              Refresh
+            </Button>
           </div>
           <DataTable
             columns={columns}

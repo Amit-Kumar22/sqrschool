@@ -114,6 +114,34 @@ export const createStudentAdmission = async (data: NewAdmissionPayload): Promise
   await api.post(API_ENDPOINTS.STUDENT_ADMISSION.CREATE, data);
 };
 
+export interface AdmissionFormPayload {
+  classId: number;
+  session: string;
+  name: string;
+  adharNumber: string;
+  gender: string;
+  dob: string;
+  bloodGroup: string;
+  cast: string;
+  fatherName: string;
+  fatherEmail: string;
+  fatherPhone: string;
+  fatherOccupation: string;
+  motherName: string;
+  motherEmail: string;
+  motherPhone: string;
+  motherOccupation: string;
+  nationality: string;
+  parentAnnualIncome: string;
+  address: string;
+  pincode: string;
+  photo: string;
+}
+
+export const createAdmissionForm = async (data: AdmissionFormPayload): Promise<void> => {
+  await api.post(API_ENDPOINTS.STUDENT_ADMISSION.FORM, data);
+};
+
 export const updateStudent = async (studentId: number, data: UpdateStudentPayload): Promise<void> => {
   await api.put(API_ENDPOINTS.STUDENT_ADMISSION.UPDATE(studentId), data);
 };

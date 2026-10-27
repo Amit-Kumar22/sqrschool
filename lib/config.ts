@@ -60,6 +60,7 @@ export const API_ENDPOINTS = {
   },
   STUDENT_ADMISSION: {
     CREATE: '/v1/student/new-addmission',
+    FORM: '/v1/student/addmission-form',
     LIST: '/v1/student/all-student',
     UPDATE: (studentId: number) => `/v1/student/update-student/${studentId}`,
     DELETE: (studentId: number) => `/v1/student/delete-student/${studentId}`,

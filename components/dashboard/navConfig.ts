@@ -14,6 +14,7 @@ import {
   ClipboardCheck,
   ClipboardList,
   Contact2,
+  FilePlus2,
   FolderOpen,
   Globe,
   IndianRupee,
@@ -66,6 +67,7 @@ export function getNavItems(role: Role): NavItem[] {
   // }
 
   if (role === 'ADMIN' || role === 'PRINCIPAL') {
+    items.push({ label: 'Admission', href: '/principal/admission', icon: FilePlus2 });
     items.push({ label: 'Students', href: '/principal/student-admission', icon: UserPlus });
     items.push({ label: 'Teachers', href: '/principal/staff', icon: Users });
     items.push({ label: 'Classes', href: '/principal/class', icon: BookOpen });

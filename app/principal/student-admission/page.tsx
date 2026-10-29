@@ -2,10 +2,12 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, Pencil, Plus, Search, Trash2, Upload, X } from 'lucide-react';
+import { Download, Eye, Pencil, Plus, Search, Trash2, Upload, X } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
+import { downloadAdmissionFormPdf } from '@/lib/admissionFormPdf';
 import { deleteStudent, getStudentAdmissions, type FeeStatus, type StudentAdmission } from '@/lib/studentService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
+import { useTheme } from '@/contexts/ThemeContext';
 import SetPageTitle from '@/components/dashboard/SetPageTitle';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
@@ -23,6 +25,7 @@ const FEE_STATUS_OPTIONS: { value: FeeStatus; label: string }[] = [
 
 export default function StaffStudentAdmissionPage() {
   const router = useRouter();
+  const { theme } = useTheme();
 
   const [students, setStudents] = useState<StudentAdmission[]>([]);
   const [loading, setLoading] = useState(false);
@@ -39,6 +42,7 @@ export default function StaffStudentAdmissionPage() {
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<StudentAdmission | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [downloadingId, setDownloadingId] = useState<number | null>(null);
 
   useEffect(() => {
     setClassesLoading(true);
@@ -94,6 +98,18 @@ export default function StaffStudentAdmissionPage() {
   const handleEditSaved = async () => {
     setEditingStudent(null);
     await loadStudents();
+  };
+
+  const handleDownloadForm = async (student: StudentAdmission) => {
+    setDownloadingId(student.id);
+    setError('');
+    try {
+      await downloadAdmissionFormPdf(student, theme.companyName || 'SQR School');
+    } catch (err) {
+      setError(apiErrorMessage(err, 'Could not generate the admission form PDF.'));
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
   const handleDelete = async (student: StudentAdmission) => {
@@ -153,9 +169,19 @@ export default function StaffStudentAdmissionPage() {
       key: 'actions',
       header: 'Actions',
       align: 'right',
-      widthClassName: 'w-24',
+      widthClassName: 'w-32',
       render: (item) => (
         <div className="flex items-center justify-end gap-1">
+          <IconButton
+            icon={Download}
+            label="Download admission form"
+            variant="primary"
+            loading={downloadingId === item.id}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDownloadForm(item);
+            }}
+          />
           <IconButton
             icon={Eye}
             label="View details"

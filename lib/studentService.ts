@@ -38,17 +38,27 @@ export interface StudentAdmission {
   studentUser: StudentUser;
   parentUser: StudentUser;
   admissionNumber: string;
-  studentCode: string;
+  studentCode: string | null;
   rollNumber: string | null;
+  studentImage: string | null;
+  academicYear: string | null;
   schoolClass: AdmissionSchoolClass;
   admissionDate: string;
   fatherName: string;
+  fatherOccupation: string | null;
   motherName: string;
+  motherPhone: string | null;
+  motherEmail: string | null;
+  motherOccupation: string | null;
   bloodGroup: string | null;
   dob: string | null;
   address: string;
   pincode: string;
   gender: string;
+  adharNumber: string | null;
+  caste: string | null;
+  nationality: string | null;
+  parentAnnualIncome: string | number | null;
   active: boolean;
 }
 

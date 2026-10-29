@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BarChart3, Check, Pencil, Save, Trash2, X } from 'lucide-react';
+import { BarChart3, Check, Download, Pencil, Save, Trash2, X } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { downloadExamResultPdf, downloadExamResultsBroadsheetPdf } from '@/lib/examResultPdf';
 import { apiErrorMessage } from '@/lib/api';
 import { getClasses, type SchoolClass } from '@/lib/classService';
 import { getStudentAdmissions, type StudentAdmission } from '@/lib/studentService';
@@ -45,6 +47,10 @@ const inputClass =
 
 /** Result Entry — per-student mark entry for one class's exam, one subject at a time. Save is per-row: POST/PUT /exam-results each take a single result, not a list. */
 export default function ResultsTab() {
+  const { theme } = useTheme();
+  const [downloadingId, setDownloadingId] = useState<number | null>(null);
+  const [downloadingAll, setDownloadingAll] = useState(false);
+
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [classId, setClassId] = useState<number | ''>('');
   const [refLoading, setRefLoading] = useState(true);
@@ -152,6 +158,42 @@ export default function ResultsTab() {
 
   const hasActiveFilter = !!(studentFilter || statusFilter || absentFilter || passedFilter);
   const visibleStudents = filteredResults ? students.filter((s) => filteredResults.some((r) => r.studentId === s.id)) : students;
+
+  const handleDownloadResults = async () => {
+    setDownloadingAll(true);
+    setError('');
+    try {
+      await downloadExamResultsBroadsheetPdf({
+        results,
+        students: visibleStudents,
+        exam: selectedExam,
+        subject: activeSubject,
+        schoolName: theme.companyName || 'SQR School',
+      });
+    } catch (err) {
+      setError(apiErrorMessage(err, 'Could not generate broadsheet PDF.'));
+    } finally {
+      setDownloadingAll(false);
+    }
+  };
+
+  const handleDownloadSingleResult = async (student: StudentAdmission, existing: ExamResult) => {
+    setDownloadingId(student.id);
+    setError('');
+    try {
+      await downloadExamResultPdf({
+        result: existing,
+        student,
+        exam: selectedExam,
+        subject: activeSubject,
+        schoolName: theme.companyName || 'SQR School',
+      });
+    } catch (err) {
+      setError(apiErrorMessage(err, 'Could not generate result marksheet PDF.'));
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   // Real query — hits GET /exam-results with classId/studentId/status/absent/
   // passed exactly as the API defines them, whenever any filter is set.
@@ -465,12 +507,27 @@ export default function ResultsTab() {
       ) : selectedExam ? (
         <div className="card-premium p-4">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
-            <p className="text-sm font-semibold text-slate-900">{selectedExam.title}</p>
-            <p className="text-xs text-slate-400">
-              {filterLoading
-                ? 'Filtering…'
-                : `Showing ${visibleStudents.length} of ${students.length} student${students.length === 1 ? '' : 's'}`}
-            </p>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">
+                {selectedExam.title} {activeSubject ? `· ${activeSubject.subjectName}` : ''}
+              </p>
+              <p className="text-xs text-slate-400">
+                {filterLoading
+                  ? 'Filtering…'
+                  : `Showing ${visibleStudents.length} of ${students.length} student${students.length === 1 ? '' : 's'}`}
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              icon={Download}
+              loading={downloadingAll}
+              disabled={visibleStudents.length === 0}
+              onClick={handleDownloadResults}
+            >
+              Download Broadsheet PDF
+            </Button>
           </div>
 
           <div className="scrollbar-thin mt-3 overflow-x-auto">
@@ -486,7 +543,7 @@ export default function ResultsTab() {
                   <th className="w-16 py-2">Grade</th>
                   <th className="w-20 py-2">Result</th>
                   <th className="w-36 py-2">Published</th>
-                  <th className="w-24 py-2 text-right">Actions</th>
+                  <th className="w-32 py-2 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -653,6 +710,16 @@ export default function ResultsTab() {
                               </>
                             ) : (
                               <>
+                                {existing && (
+                                  <IconButton
+                                    icon={Download}
+                                    label={`Download result marksheet for ${student.studentUser?.fullName || 'this student'}`}
+                                    variant="primary"
+                                    size="sm"
+                                    loading={downloadingId === student.id}
+                                    onClick={() => handleDownloadSingleResult(student, existing)}
+                                  />
+                                )}
                                 <IconButton
                                   icon={Pencil}
                                   label={`Edit ${student.studentUser?.fullName || 'this row'}`}

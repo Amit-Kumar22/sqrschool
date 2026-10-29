@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { CircleDollarSign, History, Plus, Trash2 } from 'lucide-react';
+import { CircleDollarSign, Download, History, Plus, Trash2 } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { downloadFeeReceiptPdf } from '@/lib/feeReceiptPdf';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteStudentFee, getStudentFees, type StudentFee } from '@/lib/feeService';
 import DataTable, { type DataTableColumn } from '@/components/ui/DataTable';
@@ -15,9 +17,21 @@ import FeePaymentsModal from './FeePaymentsModal';
 const formatDate = (value: string) => (value ? new Date(value).toLocaleDateString() : '—');
 const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
+function downloadCsv(filename: string, rows: string[][]) {
+  const csv = rows.map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function CollectFeeTab() {
   const router = useRouter();
   const pathname = usePathname();
+  const { theme } = useTheme();
   // fee-structure lives under both /principal and /principal-2 — derive the
   // active base path so the collect detail page opens under whichever role
   // this tab is currently mounted in.
@@ -34,6 +48,7 @@ export default function CollectFeeTab() {
   const [generateModalOpen, setGenerateModalOpen] = useState(false);
   const [viewingItem, setViewingItem] = useState<StudentFee | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [downloadingId, setDownloadingId] = useState<number | null>(null);
 
   const loadFees = async () => {
     if (!studentId) {
@@ -69,6 +84,35 @@ export default function CollectFeeTab() {
       setError(apiErrorMessage(err, 'Could not delete this fee record.'));
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleDownloadFees = () => {
+    const header = ['ID', 'Student Name', 'Class', 'Fee Type', 'Amount', 'Paid Amount', 'Due Amount', 'Due Date', 'Status'];
+    const dataRows = fees.map((f) => [
+      String(f.id),
+      f.studentName || studentName || '—',
+      f.className || '—',
+      f.feeType,
+      String(f.amount),
+      String(f.paidAmount),
+      String(f.dueAmount),
+      f.dueDate || '',
+      f.status,
+    ]);
+    const sName = (studentName || 'student').replace(/\s+/g, '-').toLowerCase();
+    downloadCsv(`student-fees-${sName}-${new Date().toISOString().slice(0, 10)}.csv`, [header, ...dataRows]);
+  };
+
+  const handleDownloadFeeSlip = async (fee: StudentFee) => {
+    setDownloadingId(fee.id);
+    setError('');
+    try {
+      await downloadFeeReceiptPdf({ fee, schoolName: theme.companyName || 'SQR School' });
+    } catch (err) {
+      setError(apiErrorMessage(err, 'Could not generate fee receipt PDF.'));
+    } finally {
+      setDownloadingId(null);
     }
   };
 
@@ -120,9 +164,19 @@ export default function CollectFeeTab() {
       key: 'actions',
       header: 'Actions',
       align: 'right',
-      widthClassName: 'w-28',
+      widthClassName: 'w-36',
       render: (item) => (
         <div className="flex items-center justify-end gap-1">
+          <IconButton
+            icon={Download}
+            label="Download fee receipt"
+            variant="primary"
+            loading={downloadingId === item.id}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDownloadFeeSlip(item);
+            }}
+          />
           <Button
             icon={CircleDollarSign}
             size="sm"
@@ -170,9 +224,20 @@ export default function CollectFeeTab() {
             setStudentId(s);
           }}
         />
-        <Button icon={Plus} size="sm" disabled={!classId || !studentId} onClick={() => setGenerateModalOpen(true)}>
-          Generate Fee
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            icon={Download}
+            variant="secondary"
+            size="sm"
+            disabled={fees.length === 0}
+            onClick={handleDownloadFees}
+          >
+            Download Fees
+          </Button>
+          <Button icon={Plus} size="sm" disabled={!classId || !studentId} onClick={() => setGenerateModalOpen(true)}>
+            Generate Fee
+          </Button>
+        </div>
       </div>
 
       {error && (

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Download, Pencil, Plus, Trash2 } from 'lucide-react';
 import { apiErrorMessage } from '@/lib/api';
 import { deleteFeeStructure, getFeeStructures, type FeeStructure } from '@/lib/feeService';
 import { getClasses, type SchoolClass } from '@/lib/classService';
@@ -12,6 +12,17 @@ import { SelectField } from '@/components/ui/FormField';
 import FeeStructureFormModal from '@/components/fee/FeeStructureFormModal';
 
 const formatDate = (value: string) => (value ? new Date(value).toLocaleDateString() : '—');
+
+function downloadCsv(filename: string, rows: string[][]) {
+  const csv = rows.map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
 
 /** Fee structure management panel — one tab of the Fee Management page. Classes are filtered via a dropdown. */
 export default function FeeStructurePageContent() {
@@ -99,6 +110,42 @@ export default function FeeStructurePageContent() {
     await loadFeeStructures();
   };
 
+  const handleDownloadFeeStructures = () => {
+    const header = ['ID', 'Title', 'Class ID', 'Class Name', 'Academic Year', 'Fee Type', 'Frequency', 'Amount', 'Description', 'Created At'];
+    const dataRows = feeStructures.map((f) => [
+      String(f.id),
+      f.title,
+      String(f.classId),
+      f.className || selectedClassName || '',
+      f.academicYear,
+      f.feeType,
+      f.frequency,
+      String(f.amount),
+      f.description || '',
+      f.createdAt || '',
+    ]);
+    const cName = (selectedClassName || 'all').replace(/\s+/g, '-').toLowerCase();
+    downloadCsv(`fee-structures-${cName}-${new Date().toISOString().slice(0, 10)}.csv`, [header, ...dataRows]);
+  };
+
+  const handleDownloadSingleStructure = (item: FeeStructure) => {
+    const header = ['ID', 'Title', 'Class ID', 'Class Name', 'Academic Year', 'Fee Type', 'Frequency', 'Amount', 'Description', 'Created At'];
+    const row = [
+      String(item.id),
+      item.title,
+      String(item.classId),
+      item.className || selectedClassName || '',
+      item.academicYear,
+      item.feeType,
+      item.frequency,
+      String(item.amount),
+      item.description || '',
+      item.createdAt || '',
+    ];
+    const slugTitle = item.title.replace(/\s+/g, '-').toLowerCase();
+    downloadCsv(`fee-structure-${slugTitle}.csv`, [header, row]);
+  };
+
   const columns: DataTableColumn<FeeStructure>[] = [
     {
       key: 'title',
@@ -147,9 +194,18 @@ export default function FeeStructurePageContent() {
       key: 'actions',
       header: 'Actions',
       align: 'right',
-      widthClassName: 'w-20',
+      widthClassName: 'w-28',
       render: (item) => (
         <div className="flex items-center justify-end gap-1">
+          <IconButton
+            icon={Download}
+            label="Download fee structure"
+            variant="primary"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDownloadSingleStructure(item);
+            }}
+          />
           <IconButton
             icon={Pencil}
             label="Edit"
@@ -198,9 +254,20 @@ export default function FeeStructurePageContent() {
             ))
           )}
         </SelectField>
-        <Button icon={Plus} size="sm" onClick={openCreateModal} disabled={classesLoading || classes.length === 0}>
-          Add Fee Structure
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            icon={Download}
+            variant="secondary"
+            size="sm"
+            disabled={feeStructures.length === 0}
+            onClick={handleDownloadFeeStructures}
+          >
+            Download CSV
+          </Button>
+          <Button icon={Plus} size="sm" onClick={openCreateModal} disabled={classesLoading || classes.length === 0}>
+            Add Fee Structure
+          </Button>
+        </div>
       </div>
 
       {error && (
